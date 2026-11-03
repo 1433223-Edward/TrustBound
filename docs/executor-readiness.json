@@ -1,0 +1,10 @@
+{
+  "source": "NO_LIVE_CALL",
+  "status": "BLOCKED",
+  "model_selection": null,
+  "requests": [],
+  "model_suggestion": null,
+  "verification": null,
+  "calls": [],
+  "error": "MISSING_VULTR_INFERENCE_API_KEY"
+}

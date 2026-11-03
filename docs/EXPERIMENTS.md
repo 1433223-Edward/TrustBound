@@ -86,3 +86,48 @@ Windows PATH、常见系统安装目录以及 `%LOCALAPPDATA%\Programs\DockerDes
 尚未验证：CPU/内存/PID 打满时的压力行为、任意恶意 Python 代码、容器逃逸防御、
 并发任务、API 健康检查、LLM 调用及云部署。资源限制已检查配置，不能等同于压力实测。
 本轮完成的是受控固定任务的执行和验收闭环。
+
+## Day 2 Vultr 接口与受控 Executor（等待凭据）
+
+- 已审查 Day 1 源码、测试及证据，在修改前创建本地基线 commit `2213003`
+  （`Establish Day 1 sandbox and independent verification baseline`），未 push。
+  初始总档案中的三处 Markdown 行末双空格触发 diff whitespace 提示，保留原稿未改写。
+- 从宿主进程及用户环境只检查配置存在性，未发现 `VULTR_INFERENCE_API_KEY`、
+  `VULTR_API_KEY` 或 `VULTR_MODEL`；未搜索其他项目或读取凭据文件。
+- 真实 GET `https://api.vultrinference.com/v1/models?format=openrouter` 成功，返回 13 个模型，
+  原始目录保存于 `artifacts/vultr-catalog-live.json`，可审查摘要见 `vultr-model-selection.json`。
+- 选择 `deepseek-v4.1-flash-1017`：官方 quickstart 使用它，实时目录确认文本输出、
+  response_format、max_completion_tokens 和可选推理；价格为输入 $0.15/百万 Token、
+  输出 $0.60/百万 Token。选择考虑任务规模和低成本，并非能力评测结论。
+  公开目录中存在不代表当前账号已获授权或已充值。
+- 新增标准库 HTTP client、受限 Executor、离线测试；提取 service 的公共验收流程供两种入口复用。
+  TaskSpec/ExecutionResult/VerificationReport 契约、正式验收文件及 Runner 容器参数没有修改。
+- 本轮密钥缺失的实际 CLI：`.\.venv\Scripts\python.exe -B -m trustbound.executor`，
+  返回 BLOCKED，单独进程退出码 2，`source=NO_LIVE_CALL`、calls 为空、无验证结论。
+  初始记录位于 `artifacts/executor-30f775e87fa346eba201a0d78a7e2225/report.json`；
+  最终就绪快照见 `executor-readiness.json`。
+- `.\.venv\Scripts\python.exe -B -m unittest discover -s tests -v`：26 项通过
+  （原 10 项 + 新增 16 项）。首次新增测试曾因 tuple 与 JSON list 的断言比较失败，
+  已改为检查空执行集合，未改变策略或放宽验收。
+- 离线覆盖结构正确/异常/重复 JSON key、受保护路径、限制语法、Token 预算传递、
+  usage/费用估算、缺失 usage、截断输出、模型 ID 不一致、认证/API 失败、超时、
+  429 有界重试和密钥回显脱敏。测试的 transport/verification mock 不算真实 LLM 证据。
+- 真实容器回归命令 `.\.venv\Scripts\python.exe -B -m trustbound all` 退出码 0，
+  五个固定场景依次为 FAILED、VERIFIED、FAILED、FAILED、REJECTED；
+  原始记录 `artifacts/20261103T073039Z-33110ef2/reports.json`。这是固定样例回归，非模型补丁实测。
+
+调用预算：每 HTTP 操作 30 秒 socket 超时，最小请求 64 Token，补丁请求 1024 Token，
+每份请求材料最多 12000 JSON 字符；仅明确的 429 最多重试一次。
+连接/读取超时或 5xx 不盲目重试，费用保持 UNKNOWN；有 usage 时按实时目录单价估算，
+不假定失败请求免费，也不将缺失 usage 记为 0。
+
+本轮真实推理调用数 **0**，推理支出 **$0**。尚未执行最小模型请求或真实模型生成补丁验收。
+需要用户在 Vultr 控制台确认账号、有效 Serverless Inference 额度及使用资格，并在本地
+运行环境设置 `VULTR_INFERENCE_API_KEY`；不要将密钥发入聊天。之后再运行 Executor 验证两次请求
+及真实补丁。未使用其他付费服务替代。本轮代码改动保留为未提交，等待用户验收。
+
+官方资料：
+- https://api.vultrinference.com/docs/get-started/quickstart
+- https://api.vultrinference.com/docs/reference/list-models
+- https://api.vultrinference.com/docs/reference/create-chat-completion
+- https://api.vultrinference.com/docs/models

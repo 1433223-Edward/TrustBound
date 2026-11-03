@@ -76,3 +76,41 @@ Docker Socket、宿主项目目录和宿主环境变量不传入容器。
 配置检查、工作区完整性和清理结果。仅测试通过、证据对应且清理成功时才可 `VERIFIED`；
 控制器错误或清理无法确认产生 `INCONCLUSIVE`。
 这套机制以可信仓库和受审核候选为前提，不支持任意公众代码，也没有提供通用沙盒安全证明。
+
+## Vultr 最小 Executor
+
+新增 `trustbound/inference.py`（仅 Vultr 官方 HTTP API）、`trustbound/executor.py`
+（一次候选生成、结构与代码检查、调用原有权限检查及验收）和 `tests/test_executor.py`。
+未增加第三方依赖，原来的固定场景 CLI 保持可用。
+
+在本地进程环境中配置 `VULTR_INFERENCE_API_KEY`；可选 `VULTR_MODEL` 默认值为
+`deepseek-v4.1-flash-1017`。不要将密钥写入仓库或聊天。`.env.example` 仅作变量说明，
+程序不自动读取 `.env`，也不读取通用 `VULTR_API_KEY`。
+
+```powershell
+.\.venv\Scripts\python.exe -B -m trustbound.executor
+```
+
+运行顺序：实时查询官方公开模型目录 → 确认所选 ID 在目录中 → 64 Token 最小请求 →
+1024 Token JSON 补丁请求 → 输出校验 → 范围检查 → 受限容器公开测试 → 新容器独立验收。
+每个 HTTP 操作设置 30 秒 socket 超时；只对明确的 HTTP 429 最多重试一次，
+超时、5xx、认证失败和格式错误不自动重试，以避免重复产生不确定费用。
+不做 Agent 多轮修复，最大生成输出预算为 64 + 1024 Token（正常两次成功请求）；
+输入采用固定材料并限制为 12000 个 JSON 字符，账单以服务端实际用量为准。
+
+Executor 只读取固定 TaskSpec、原始代码与公开测试，不向模型提供正式验收文件。
+模型必须返回严格 JSON：`analysis` 与单文件 `files` 替换映射。
+模型不能重定义 TaskSpec、运行命令、选择 Docker 参数或提供正式验收材料。
+允许的生成代码语法限定为 Decimal 导入与单个 `to_cents` 函数、单一 return 表达式，
+支持 `int`、`Decimal`、基础算术与 `quantize`。拒绝额外导入、装饰器、默认值执行、
+IO、进程控制、赋值及循环，避免候选主动退出或篡改 unittest 来伪造通过。
+有些正确 Python 写法也会被此保守规则拒绝，这是本轮最小 Executor 的明确限制。
+
+每次结果存入 `artifacts/executor-<id>/report.json`，模型建议、请求材料、调用台账与
+实际 `VerificationReport` 分开保存。台账记录输出预算、用量、按目录单价估算的 USD，
+未知用量或请求超时时费用标为未知；估算不等于最终账单。密钥和 HTTP 错误响应体不写入报告。
+无 Key 时退出码为 2、状态为 `BLOCKED`、`source=NO_LIVE_CALL`，不会用假响应替代。
+离线测试的注入 transport 标为 `OFFLINE_TEST`，不等同于模型已可用。
+
+本轮真实公开目录选择依据见 [模型记录](docs/vultr-model-selection.json)。
+真实推理尚未验证，当前阻塞及验收结果见 [实验记录](docs/EXPERIMENTS.md)。

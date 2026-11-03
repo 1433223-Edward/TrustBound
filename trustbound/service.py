@@ -24,12 +24,25 @@ def run_task(task_id: str, candidate_id: str) -> VerificationReport:
         raise ValueError("Unknown candidate ID; arbitrary patches are not accepted")
     original = (ROOT / "fixtures/billing/original.py").read_bytes()
     code = (ROOT / "fixtures/billing" / CANDIDATES[candidate_id]).read_bytes()
+    proposed_paths = ("billing.py", "acceptance/billing_v1.py") if (
+        candidate_id == "unauthorized") else (("billing.py",) if code != original else ())
+    return _verify_candidate(code, proposed_paths, candidate_id)
+
+
+def verify_patch(task_id: str, files: dict[str, str]) -> VerificationReport:
+    """Accept structured file replacements; policy remains owned by this service."""
+    if task_id != TASK.task_id:
+        raise ValueError("Unknown task ID")
+    original = (ROOT / "fixtures/billing/original.py").read_bytes()
+    code = files.get("billing.py", original.decode()).encode("utf-8")
+    return _verify_candidate(code, tuple(files), "executor")
+
+
+def _verify_candidate(code: bytes, proposed_paths: tuple[str, ...], candidate_id: str):
+    original = (ROOT / "fixtures/billing/original.py").read_bytes()
     public = (ROOT / "fixtures/billing/public_tests.py").read_bytes()
     acceptance_path = ROOT / "acceptance/billing_v1.py"
     acceptance = acceptance_path.read_bytes()
-    # The adversarial request is data; never apply a protected-file write to disk.
-    proposed_paths = ("billing.py", "acceptance/billing_v1.py") if (
-        candidate_id == "unauthorized") else (("billing.py",) if code != original else ())
     allowed = all(path in TASK.allowed_write_paths for path in proposed_paths)
     diff = "".join(unified_diff(
         original.decode().splitlines(True), code.decode().splitlines(True),
@@ -39,7 +52,8 @@ def run_task(task_id: str, candidate_id: str) -> VerificationReport:
     reason = "Allowed: all proposed writes are within billing.py"
     status = "REJECTED"
     if not allowed:
-        reason = "Denied: acceptance/billing_v1.py is protected and outside write scope"
+        reason = "Denied: protected or outside write scope: " + ", ".join(
+            path for path in proposed_paths if path not in TASK.allowed_write_paths)
     else:
         executions.append(_execute_fixed_tests(code, public, "public", TASK.timeout_seconds))
         # Verification uses the trusted snapshot and a new sandbox, never public logs.
@@ -59,7 +73,7 @@ def run_task(task_id: str, candidate_id: str) -> VerificationReport:
     return VerificationReport(
         uuid.uuid4().hex, TASK, candidate_id, sha256(code), sha256(acceptance),
         status, reason, proposed_paths, diff, tuple(executions),
-        ("Only curated candidates and declared billing-v1 cases are supported",
+        ("Only fixed billing tasks and declared billing-v1 cases are supported",
          "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
          "Repository and Docker controller are trusted; containers are not a VM security proof"),
     )
