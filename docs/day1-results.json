@@ -1,0 +1,231 @@
+[
+  {
+    "run_id": "a2120e8515de405d8371efcd26021efb",
+    "task": {
+      "task_id": "billing-rounding-01",
+      "acceptance_id": "billing-v1",
+      "allowed_write_paths": [
+        "billing.py"
+      ],
+      "timeout_seconds": 3
+    },
+    "candidate_id": "original",
+    "artifact_hash": "2802b58b231c79faab5bc1f05e0411dbf36aaa0bf7cd6003cc2ef71cce94c598",
+    "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+    "status": "FAILED",
+    "policy_reason": "Allowed: all proposed writes are within billing.py",
+    "changed_paths": [],
+    "diff": "",
+    "executions": [
+      {
+        "phase": "public",
+        "container_name": "trustbound-c9863e9c8b4342a2a56c8e15515e61df",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "2802b58b231c79faab5bc1f05e0411dbf36aaa0bf7cd6003cc2ef71cce94c598",
+        "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+        "status": "EXITED",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... FAIL\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n======================================================================\nFAIL: test_round_fraction (__main__.PublicTests.test_round_fraction)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 17, in test_round_fraction\n    self.assertEqual(to_cents(\"1.239\"), 124)\nAssertionError: 123 != 124\n\n----------------------------------------------------------------------\nRan 2 tests in 0.029s\n\nFAILED (failures=1)\n",
+        "timeout_reason": null,
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      }
+    ],
+    "limitations": [
+      "Only curated candidates and declared billing-v1 cases are supported",
+      "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+      "Repository and Docker controller are trusted; containers are not a VM security proof"
+    ]
+  },
+  {
+    "run_id": "b04b3556a87b4504a792958773d26dce",
+    "task": {
+      "task_id": "billing-rounding-01",
+      "acceptance_id": "billing-v1",
+      "allowed_write_paths": [
+        "billing.py"
+      ],
+      "timeout_seconds": 3
+    },
+    "candidate_id": "fixed",
+    "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+    "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+    "status": "VERIFIED",
+    "policy_reason": "Allowed: all proposed writes are within billing.py",
+    "changed_paths": [
+      "billing.py"
+    ],
+    "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+    "executions": [
+      {
+        "phase": "public",
+        "container_name": "trustbound-9458549cfd3047fbada1f6d4329019f9",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+        "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+        "status": "EXITED",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+        "timeout_reason": null,
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      },
+      {
+        "phase": "acceptance",
+        "container_name": "trustbound-0188a4a48b3d4497826fa99cfee64ce6",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+        "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+        "status": "EXITED",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+        "timeout_reason": null,
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      }
+    ],
+    "limitations": [
+      "Only curated candidates and declared billing-v1 cases are supported",
+      "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+      "Repository and Docker controller are trusted; containers are not a VM security proof"
+    ]
+  },
+  {
+    "run_id": "328cf52715044e3d8e9e7611f0cad8b4",
+    "task": {
+      "task_id": "billing-rounding-01",
+      "acceptance_id": "billing-v1",
+      "allowed_write_paths": [
+        "billing.py"
+      ],
+      "timeout_seconds": 3
+    },
+    "candidate_id": "public_only",
+    "artifact_hash": "26de206b2a508e80b5419122d6978473952df8737c8a11a86d57cf541b5b44ad",
+    "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+    "status": "FAILED",
+    "policy_reason": "Allowed: all proposed writes are within billing.py",
+    "changed_paths": [
+      "billing.py"
+    ],
+    "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Deliberately incomplete candidate: passes public tests, fails half-cent ties.\"\"\"\n+from decimal import Decimal, ROUND_HALF_EVEN\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_EVEN))\n",
+    "executions": [
+      {
+        "phase": "public",
+        "container_name": "trustbound-8bf436e22fa24b4193e9f932f363c132",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "26de206b2a508e80b5419122d6978473952df8737c8a11a86d57cf541b5b44ad",
+        "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+        "status": "EXITED",
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+        "timeout_reason": null,
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      },
+      {
+        "phase": "acceptance",
+        "container_name": "trustbound-785e78c5b8994745a49e00a7281363e0",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "26de206b2a508e80b5419122d6978473952df8737c8a11a86d57cf541b5b44ad",
+        "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+        "status": "EXITED",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... \n  test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='1.005') ... FAIL\n  test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='2.685') ... FAIL\n  test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='0.005') ... FAIL\n  test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='-1.005') ... FAIL\n  test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='-0.005') ... FAIL\n\n======================================================================\nFAIL: test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='1.005')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 20, in test_declared_money_examples\n    self.assertEqual(to_cents(amount), expected)\nAssertionError: 100 != 101\n\n======================================================================\nFAIL: test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='2.685')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 20, in test_declared_money_examples\n    self.assertEqual(to_cents(amount), expected)\nAssertionError: 268 != 269\n\n======================================================================\nFAIL: test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='0.005')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 20, in test_declared_money_examples\n    self.assertEqual(to_cents(amount), expected)\nAssertionError: 0 != 1\n\n======================================================================\nFAIL: test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='-1.005')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 20, in test_declared_money_examples\n    self.assertEqual(to_cents(amount), expected)\nAssertionError: -100 != -101\n\n======================================================================\nFAIL: test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) (amount='-0.005')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/work/checks.py\", line 20, in test_declared_money_examples\n    self.assertEqual(to_cents(amount), expected)\nAssertionError: 0 != -1\n\n----------------------------------------------------------------------\nRan 1 test in 0.015s\n\nFAILED (failures=5)\n",
+        "timeout_reason": null,
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      }
+    ],
+    "limitations": [
+      "Only curated candidates and declared billing-v1 cases are supported",
+      "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+      "Repository and Docker controller are trusted; containers are not a VM security proof"
+    ]
+  },
+  {
+    "run_id": "09dd12f6b5d947cf8d0e86b3d46cec56",
+    "task": {
+      "task_id": "billing-rounding-01",
+      "acceptance_id": "billing-v1",
+      "allowed_write_paths": [
+        "billing.py"
+      ],
+      "timeout_seconds": 3
+    },
+    "candidate_id": "timeout",
+    "artifact_hash": "7ed56265658247d2a93e28b6a81e8d843831b6f5f7a525512555f3ebd2d3df25",
+    "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+    "status": "FAILED",
+    "policy_reason": "Allowed: all proposed writes are within billing.py",
+    "changed_paths": [
+      "billing.py"
+    ],
+    "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Controlled timeout fixture; this file must only run inside the container.\"\"\"\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    while True:\n+        pass\n",
+    "executions": [
+      {
+        "phase": "public",
+        "container_name": "trustbound-a06bf246c77f4619a9309371176b7a34",
+        "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+        "artifact_hash": "7ed56265658247d2a93e28b6a81e8d843831b6f5f7a525512555f3ebd2d3df25",
+        "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+        "status": "TIMED_OUT",
+        "exit_code": 137,
+        "stdout": "",
+        "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ",
+        "timeout_reason": "Host deadline exceeded: 3 seconds after start",
+        "cleanup_confirmed": true,
+        "workspace_unchanged": true,
+        "limits_verified": true,
+        "error": null
+      }
+    ],
+    "limitations": [
+      "Only curated candidates and declared billing-v1 cases are supported",
+      "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+      "Repository and Docker controller are trusted; containers are not a VM security proof"
+    ]
+  },
+  {
+    "run_id": "7ec92762e02949c28bfddadc4d66bb8a",
+    "task": {
+      "task_id": "billing-rounding-01",
+      "acceptance_id": "billing-v1",
+      "allowed_write_paths": [
+        "billing.py"
+      ],
+      "timeout_seconds": 3
+    },
+    "candidate_id": "unauthorized",
+    "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+    "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+    "status": "REJECTED",
+    "policy_reason": "Denied: acceptance/billing_v1.py is protected and outside write scope",
+    "changed_paths": [
+      "billing.py",
+      "acceptance/billing_v1.py"
+    ],
+    "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+    "executions": [],
+    "limitations": [
+      "Only curated candidates and declared billing-v1 cases are supported",
+      "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+      "Repository and Docker controller are trusted; containers are not a VM security proof"
+    ]
+  }
+]
