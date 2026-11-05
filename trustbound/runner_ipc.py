@@ -76,12 +76,16 @@ def run_through_worker(code, tests, phase, *, cases=None):
         with _connect(os.environ["TRUSTBOUND_RUNNER_SOCKET"]) as connection:
             write_message(connection, request, MAX_REQUEST, 3)
             reply = read_message(connection, MAX_RESPONSE, REQUEST_DEADLINE)
+        if type(reply) is dict:
+            # Older workers did not report Docker's OOM state.
+            reply.setdefault("oom_killed", None)
         if (type(reply) is not dict or set(reply) != {field.name for field in fields(ExecutionResult)}
                 or (reply["phase"], reply["image"], reply["artifact_hash"], reply["test_hash"])
                 != (phase, IMAGE, artifact_hash, test_hash)
                 or any(type(reply[key]) is not bool for key in
                        ("cleanup_confirmed", "workspace_unchanged", "limits_verified"))
                 or (reply["exit_code"] is not None and type(reply["exit_code"]) is not int)
+                or (reply["oom_killed"] is not None and type(reply["oom_killed"]) is not bool)
                 or any(type(reply[key]) is not str for key in ("container_name", "stdout", "stderr"))
                 or any(reply[key] is not None and type(reply[key]) is not str
                        for key in ("timeout_reason", "error"))):

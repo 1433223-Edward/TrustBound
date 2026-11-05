@@ -12,6 +12,9 @@ from .contracts import ExecutionResult
 
 
 IMAGE = "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30"
+MEMORY_LIMIT_BYTES = 128 * 1024 * 1024
+CPU_LIMIT_NANOS = 500_000_000
+PID_LIMIT = 32
 
 
 def sha256(content: bytes) -> str:
@@ -61,8 +64,9 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
                 "create", "--pull", "never", "--name", name,
                 "--network", "none", "--read-only", "--user", "65534:65534",
                 "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
-                "--memory", "128m", "--memory-swap", "128m", "--cpus", "0.5",
-                "--pids-limit", "32", "--log-driver", "local",
+                "--memory", str(MEMORY_LIMIT_BYTES), "--memory-swap", str(MEMORY_LIMIT_BYTES),
+                "--cpus", str(CPU_LIMIT_NANOS / 1_000_000_000),
+                "--pids-limit", str(PID_LIMIT), "--log-driver", "local",
                 "--log-opt", "max-size=1m", "--log-opt", "max-file=2",
                 "--mount", f"type=bind,src={workspace},dst=/work,readonly",
                 IMAGE, "python", "-I", "-B", "-u", "/work/checks.py",
@@ -74,8 +78,8 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
                 and inspected["Config"]["User"] == "65534:65534"
                 and host["CapDrop"] == ["ALL"]
                 and "no-new-privileges" in host["SecurityOpt"]
-                and host["Memory"] == host["MemorySwap"] == 134217728
-                and host["NanoCpus"] == 500000000 and host["PidsLimit"] == 32
+                and host["Memory"] == host["MemorySwap"] == MEMORY_LIMIT_BYTES
+                and host["NanoCpus"] == CPU_LIMIT_NANOS and host["PidsLimit"] == PID_LIMIT
                 and len(mounts) == 1 and mounts[0]["Destination"] == "/work"
                 and not mounts[0]["RW"] and mounts[0]["Type"] == "bind"
                 and not host["Privileged"]
@@ -114,4 +118,5 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
         phase, name, IMAGE, sha256(code), sha256(tests), status,
         state.get("ExitCode"), stdout, stderr, reason, cleanup, unchanged,
         limits_verified, error,
+        oom_killed=state.get("OOMKilled") if type(state.get("OOMKilled")) is bool else None,
     )

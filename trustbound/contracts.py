@@ -36,6 +36,7 @@ class ExecutionResult:
     workspace_unchanged: bool
     limits_verified: bool
     error: str | None = None
+    oom_killed: bool | None = None
 
     def __post_init__(self):
         if self.status not in ("EXITED", "TIMED_OUT", "ERROR"):
