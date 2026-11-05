@@ -1,0 +1,18 @@
+# Stage 5A: public static review only. Execution stays blocked until security gates pass.
+{$TRUSTBOUND_DOMAIN} {
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        X-Frame-Options DENY
+    }
+    @api path /api /api/*
+    handle @api {
+        respond "Execution unavailable: deployment security review pending" 503
+    }
+    handle {
+        root * /srv/trustbound/pointers/current/frontend/dist
+        try_files {path} /index.html
+        file_server
+    }
+}

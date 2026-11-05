@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { diffLines } from '../api/adapter.js'
 import CodePanel from './CodePanel.vue'
-const props = defineProps({ task: Object, report: Object, candidate: String, mode: String })
+const props = defineProps({ task: Object, report: Object, candidate: String, mode: String, executionMode: String, recoveryAttempt: Object })
 const tab = ref('diff')
 watch(() => props.report?.run_id, () => { tab.value = 'diff' })
 const changes = computed(() => diffLines(props.report?.diff || ''))
@@ -22,7 +22,7 @@ const removed = computed(() => changes.value.filter(line => line.kind === 'remov
         <div v-else-if="tab === 'diff'" class="empty-state"><h3>No code changes</h3><p>该记录未包含代码差异。</p></div>
         <CodePanel v-else-if="candidate" :source="candidate" />
         <div v-else class="empty-state"><h3>Source not recorded</h3><p>记录只有 Diff，没有候选全文。</p></div>
-        <div class="pane-footer"><span v-if="mode === 'DEMO'">{{ report ? '固定 Fixture · 非 LLM 生成' : '等待显式历史回放' }}</span><span v-else>模型建议不等于验证成功</span></div>
+        <div class="pane-footer"><span v-if="mode === 'DEMO'">{{ report ? '固定 Fixture · 非 LLM 生成' : '等待显式历史回放' }}</span><span v-else-if="recoveryAttempt?.attempt_index > 0">Attempt {{ recoveryAttempt.attempt_index }} · {{ recoveryAttempt.model_source === 'OFFLINE_TEST' ? 'Offline / Mock 恢复提案' : 'Vultr 恢复提案' }} · 真实容器验证</span><span v-else>{{ executionMode === 'fixture' ? '固定候选 · 本次真实执行；非模型生成' : executionMode === 'offline_executor' ? '模拟模型提案 · 真实容器验收' : '模型建议不等于验证成功' }}</span></div>
       </section>
     </div>
   </main>

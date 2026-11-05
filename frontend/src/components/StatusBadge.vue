@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 const props = defineProps({ status: { type: String, default: 'WAITING' }, label: String })
 const tone = computed(() => ['VERIFIED', 'PASSED', 'ALLOWED', 'RECORDED', 'CONNECTED'].includes(props.status) ? 'good'
-  : ['FAILED', 'ERROR', 'API_FAILED', 'TIMED_OUT', 'UNAVAILABLE'].includes(props.status) ? 'bad'
-    : ['REJECTED', 'INCONCLUSIVE', 'DEMO', 'UNKNOWN'].includes(props.status) ? 'warn'
+  : ['FAILED', 'ERROR', 'API_FAILED', 'TIMED_OUT', 'UNAVAILABLE', 'CONFIRMED', 'GENERATION_FAILED'].includes(props.status) ? 'bad'
+    : ['REJECTED', 'INCONCLUSIVE', 'DEMO', 'UNKNOWN', 'INVALID', 'INCOMPLETE'].includes(props.status) ? 'warn'
       : ['LOADING', 'CONNECTING', 'RUNNING'].includes(props.status) ? 'active' : 'neutral')
 </script>
 

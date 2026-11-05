@@ -14,6 +14,7 @@ CANDIDATES = MappingProxyType({
     "original": "original.py", "fixed": "fixed.py",
     "public_only": "public_only.py", "timeout": "timeout.py",
     "unauthorized": "fixed.py",
+    "double_rounding": "double_rounding.py",
 })
 
 

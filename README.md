@@ -114,3 +114,83 @@ IO、进程控制、赋值及循环，避免候选主动退出或篡改 unittest
 
 本轮真实公开目录选择依据见 [模型记录](docs/vultr-model-selection.json)。
 真实推理尚未验证，当前阻塞及验收结果见 [实验记录](docs/EXPERIMENTS.md)。
+
+## 本地 Web 集成（无需 Vultr Key）
+
+已支持 Vue → FastAPI → 原 Task Service → 真实 Docker → 独立验收 → Web 报告。
+保留 Demo Replay 历史回放；要执行新任务，请在页面切换 **Local API**。
+
+首次安装 Web 依赖（仅项目虚拟环境）：
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
+```
+
+终端一，在项目根目录启动后端（仅本机、单进程）：
+
+```powershell
+.\.venv\Scripts\python.exe -B -m uvicorn trustbound.api:app --host 127.0.0.1 --port 8000 --workers 1
+```
+
+终端二，启动前端：
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+浏览器访问 `http://127.0.0.1:5173/`。Vite 将 `/api` 同源代理到 8000；
+不要直接用 `file://` 打开页面，也不要把本地实验服务绑定到公网。
+
+Local API 支持三种模式：
+- `fixture`：选择五个固定候选之一，真实运行原 Runner 与 Verifier，不调用模型。
+- `offline_executor`：只注入固定模型响应，结构校验、AST、权限、Docker 与验收仍真实执行，标记 MOCK LLM。
+- `live_executor`：需本地环境设置 `VULTR_INFERENCE_API_KEY`、`VULTR_MODEL`、`TRUSTBOUND_ENABLE_LIVE=1`。
+  只有配置就绪才接受请求；真实认证、模型可用性由请求验证，失败不冒充通过。本轮未调用 Vultr。
+
+API 最多同时执行一项任务，忙时返回 429，健康检查与轮询不会等待 Docker 完成。
+内存记录最多 50 项，重启不恢复运行态；原始快照保存到 `artifacts/web-runs/`。
+原始 VerificationReport 的 run_id 不被改写，API 作业 ID 与报告 ID 分开绑定。
+
+验证命令（API 测试需要本机 socket 权限；真实集成需两个服务和 Docker 已启动）：
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest discover -s tests -q
+.\.venv\Scripts\python.exe -B scripts/check_web_integration.py --port 5173
+```
+
+接口详见 [WEB_API_CONTRACT.md](docs/WEB_API_CONTRACT.md)，真实六场景证据见
+[web-integration-results.json](docs/web-integration-results.json)。这不是任意用户代码执行服务。
+
+
+## Stage 2 对抗验证
+
+Local API 中选择固定候选 `double_rounding`，再选择 Adversarial `offline` 和 `standard`，
+点击 Run Agent。在 Evidence 的 Adversarial 标签查看真实反例：正式验收 VERIFIED，
+但 1.00499 得到 101（参考 100），总体 FAILED。离线只模拟模型响应，Docker 仍真实执行。
+正确 fixed 候选无已确认反例；invalid/timeout/failure 预设明确显示阶段未完成。
+真实 Vultr 尚未验证，不把离线结果作为模型成功。
+
+设计、上下文边界及恢复接口建议见 [ADVERSARIAL_VERIFICATION.md](docs/ADVERSARIAL_VERIFICATION.md)。
+新增集成命令：`.\.venv\Scripts\python.exe -B scripts/check_adversarial_integration.py`。
+
+
+## Stage 3 有限恢复
+
+Local API → double_rounding → Adversarial offline → Bounded Recovery offline → 正确修复。
+初始失败后最多请求两次修复，每个新候选重新执行权限、公开测试、独立验收和对抗验证。
+Evidence 的 Recovery 标签保留每轮 Diff、哈希、触发证据、结果和停止原因。
+离线模拟的只是模型提案，业务验证仍使用真实 Docker；默认不启用恢复，不自动消耗 Vultr 额度。
+
+实验命令：`.\.venv\Scripts\python.exe -B scripts/check_recovery_integration.py`。
+设计、数据契约、函数学习顺序和单独启用真实模型的步骤见
+[BOUNDED_RECOVERY.md](docs/BOUNDED_RECOVERY.md)。
+
+
+本地开发时，后端导入 inference 模块会加载项目根目录 `.env` 中的
+`VULTR_INFERENCE_API_KEY`、`VULTR_MODEL`、`TRUSTBOUND_ENABLE_LIVE` 和
+`TRUSTBOUND_ENABLE_RECOVERY_LIVE`。系统注入的同名变量优先（包括空值）。
+生产环境可设置 `TRUSTBOUND_LOAD_DOTENV=0` 禁用文件加载。
+支持单行 KEY=value、单/双引号和 export；不执行变量展开或命令。
+`.env` 已被 Git 忽略。修改配置后需重启后端；读取 Key 不会自动发起推理请求。

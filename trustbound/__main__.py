@@ -21,7 +21,7 @@ def main():
         print(f"{report['candidate_id']}: {report['status']}")
     print(f"Report: {directory / 'reports.json'}")
     expected = {"original": "FAILED", "fixed": "VERIFIED", "public_only": "FAILED",
-                "timeout": "FAILED", "unauthorized": "REJECTED"}
+                "timeout": "FAILED", "unauthorized": "REJECTED", "double_rounding": "VERIFIED"}
     if any(item["status"] != expected[item["candidate_id"]] for item in reports):
         raise SystemExit(1)
 

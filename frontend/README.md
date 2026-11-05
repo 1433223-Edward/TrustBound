@@ -1,7 +1,8 @@
 # TrustBound Web Code Workspace
 
 独立 Vue 3 + Vite + JavaScript 前端，原生 CSS，无 UI 库。不需要启动 Python 或 Docker 即可查看 Demo。
-默认仅回放已有报告，未连接真实 Web API，不访问 Vultr，也不接收 API Key。
+默认回放已有报告；切换 Local API 可连接本机 FastAPI 并真实执行 Docker。
+浏览器不访问 Vultr，也不接收 API Key。
 
 ## 启动与构建
 
@@ -43,27 +44,28 @@ predev/prebuild/pretest 都会运行 `scripts/sync-fixtures.mjs`，只读取上�
 
 默认只有一个真实任务，五个场景不是五个任务。先选择历史场景，再点击 Replay sample。
 Demo 显示明确 SAMPLE 标记；正确补丁显示 SAMPLE VERIFIED，不等于实时 Agent 成功。
-Run Agent 在 Demo 模式提示未连接；Live 模式只尝试约定 API，失败不回退到 Demo。
+Run Agent 在 Demo 模式提示切换；Local API 支持 fixture / offline_executor / live_executor，
+失败不回退到 Demo。fixture 显示 DOCKER 标签；offline_executor 显示 MOCK LLM，只有模型响应是模拟的。
 可切换 Diff/After、证据 Overview/Raw diff/Execution logs，逐项展开 stdout/stderr；日志独立滚动。
 
 ## API 接入
 
-契约见 `../docs/WEB_API_CONTRACT.md`，当前端点为提案，并无 FastAPI 实现。
-后续需要由 FastAPI 提供可信任务目录、异步 Executor 调用、作业与原始报告绑定、
-可轮询结果、脱敏错误和服务端资源/调用限制。开发时再配置同源反向代理，
-生产时由同源服务提供静态页面与 `/api`。模型凭据始终保留在后端。
+契约见 `../docs/WEB_API_CONTRACT.md`，FastAPI 已实现于 `trustbound/api.py`，后端启动方法见根 README。
+Vite 已代理 `/api` 到 `http://127.0.0.1:8000`，支持健康、可信任务详情、创建执行与轮询结果。
+模型凭据始终保留在后端；生产部署、用户认证、跨进程队列与自动恢复未实现。
 
 ## 本轮验证结果
 
-- `npm test`：28 项通过，包含契约适配、假成功/超时/越权展示、模式与任务重置、
+- `npm test`：34 项通过，包含契约适配、假成功/超时/越权展示、模式与任务重置、
   旧响应失效、POST 不重试、HTTP/JSON 异常、请求超时和轮询截止。
 - `npm run build`：Vite 7.3.7 生产构建通过。
-- 既有 Python 单元测试：26 项通过，未修改测试或核心后端。
+- Python/API 单元测试：33 项通过；原 26 项保留，新增 7 项 API 控制测试。
 - 本地 HTTP 返回 200。实际浏览器检查初始空状态、显式加载、假成功、正确补丁、
   越权拒绝、超时证据、Diff/After、日志展开、Live 无 API 的明确错误，以及刷新重置。
 - DOM 尺寸检查在 1366×768 时 document 为 1366×768，无页面横向/纵向溢出；
   回放按钮在视口内。2913 字符的正式验收 stderr 在日志区域内滚动。
-- 浏览器测试仅回放已有记录；没有连接真实 FastAPI 或进行 LLM/容器执行。
+- 初版浏览器测试是历史回放；本轮已通过同源代理真实触发固定候选与离线 Executor。
+  六场景真实 HTTP/Docker 记录见 `../docs/web-integration-results.json`，未调用 Vultr。
 
 ## 文件清单
 

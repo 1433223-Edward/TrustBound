@@ -3,14 +3,16 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { createWorkspace } from '../src/state/workspace.js'
 import { createApiClient } from '../src/api/client.js'
-import { diffLines, traceFor, validateReport } from '../src/api/adapter.js'
+import { diffLines, traceFor, validateReport, validateAdversarialEnvelope } from '../src/api/adapter.js'
 
 const demo = JSON.parse(readFileSync(new URL('../src/data/demo.json', import.meta.url), 'utf8'))
 const taskId = demo.tasks[0].spec.task_id
 const sample = id => structuredClone(demo.reports.find(r => r.candidate_id === id))
 const immediate = async () => {}
 const forbiddenClient = { listTasks() { throw new Error('Demo must not contact an API') } }
-const make = (options = {}) => createWorkspace({ demo: structuredClone(demo), client: forbiddenClient, sleep: immediate, ...options })
+const make = (options = {}) => createWorkspace({ demo: structuredClone(demo), sleep: immediate, ...options,
+  client: { health: async () => ({ status: 'ok' }), getTask: async () => demo.tasks[0], ...(options.client || forbiddenClient) },
+})
 const jsonResponse = (body, status = 200, type = 'application/json') => ({ ok: status >= 200 && status < 300, status,
   headers: { get: () => type }, json: async () => body })
 const snapshot = report => ({ run_id: report.run_id, task_id: taskId, source: 'LIVE', state: 'COMPLETED', proposal: null, verification: report })
@@ -90,7 +92,7 @@ test('task changes synchronously update metadata and clear results', async () =>
 })
 test('Run Agent in demo mode does not pretend to execute', async () => {
   const ws = make(); await ws.runAgent()
-  assert.equal(ws.state.phase, 'ERROR'); assert.match(ws.state.error, /Backend not connected/)
+  assert.equal(ws.state.phase, 'ERROR'); assert.match(ws.state.error, /Local API/)
   assert.equal(ws.state.report, null)
 })
 test('live API failure does not fall back to sample success', async () => {
@@ -109,7 +111,7 @@ test('live final verdict is supplied by matching verification, not request succe
 test('switching mode ignores an outstanding live response', async () => {
   let resolve
   const ws = make({ client: { listTasks: () => new Promise(r => { resolve = r }) } })
-  ws.selectMode('LIVE'); const run = ws.runAgent(); ws.selectMode('DEMO')
+  ws.selectMode('LIVE'); const run = ws.runAgent(); await Promise.resolve(); ws.selectMode('DEMO')
   resolve(demo.tasks); await run
   assert.equal(ws.state.phase, 'IDLE'); assert.equal(ws.state.report, null)
 })
@@ -163,7 +165,7 @@ test('server job IDs may differ from the existing verifier-generated report ID',
   assert.equal(result.verification.run_id, report.run_id)
 })
 test('live proposal empty state never claims a fixed sample was generated', () => {
-  assert.match(traceFor(null, null, 'LIVE')[0].detail, /等待后端/)
+  assert.match(traceFor(null, null, 'LIVE', 'offline_executor')[0].detail, /等待后端/)
 })
 test('inconclusive evidence retains its verdict without inventing a pass', () => {
   const report = sample('original'); report.status = 'INCONCLUSIVE'
@@ -177,4 +179,108 @@ test('polling deadline produces no fabricated verdict', async () => {
   const client = createApiClient({ now: () => time, runTimeout: 10, sleep: async () => { time += 20 },
     fetcher: async () => jsonResponse({ ...snapshot(report), state: 'RUNNING' }) })
   await assert.rejects(client.waitForRun(report.run_id, taskId), /状态未知/)
+})
+test('local API health and task details use same-origin routes', async () => {
+  const urls = []
+  const client = createApiClient({ fetcher: async url => {
+    urls.push(url); return jsonResponse(url.endsWith('health') ? { status: 'ok' } : demo.tasks[0])
+  } })
+  assert.equal((await client.health()).status, 'ok')
+  assert.equal((await client.getTask(taskId)).spec.task_id, taskId)
+  assert.deepEqual(urls, ['/api/health', '/api/tasks/' + taskId])
+})
+test('fixture mode and fixed candidate are explicitly submitted', async () => {
+  let body
+  const client = createApiClient({ fetcher: async (_url, options) => {
+    body = JSON.parse(options.body); return jsonResponse({ run_id: 'server-id', state: 'QUEUED' })
+  } })
+  await client.startRun(taskId, null, { mode: 'fixture', candidate_id: 'timeout' })
+  assert.deepEqual(body, { task_id: taskId, mode: 'fixture', candidate_id: 'timeout' })
+})
+test('unexpected execution mode cannot be accepted as the requested result', async () => {
+  const report = sample('fixed')
+  const client = createApiClient({ fetcher: async () => jsonResponse({ ...snapshot(report), mode: 'offline_executor' }) })
+  await assert.rejects(client.waitForRun(report.run_id, taskId, null, { mode: 'fixture', candidateId: 'fixed' }), /mode or candidate/)
+})
+test('changing execution mode clears previous evidence and pending state', async () => {
+  const ws = make(); await ws.replay(); ws.selectExecutionMode('offline_executor')
+  assert.equal(ws.state.report, null); assert.equal(ws.state.runState, '')
+  assert.equal(ws.state.executionMode, 'offline_executor')
+})
+test('backend unavailability reason is shown instead of a fabricated verdict', async () => {
+  const client = createApiClient({ fetcher: async () => jsonResponse({ error: {
+    code: 'MISSING_VULTR_INFERENCE_API_KEY', message: 'Vultr unavailable',
+  } }, 503) })
+  await assert.rejects(client.startRun(taskId, null, { mode: 'live_executor' }), /MISSING_VULTR_INFERENCE_API_KEY/)
+})
+test('a rejected mode does not mark a responding backend as disconnected', async () => {
+  const ws = make({ client: { listTasks: async () => demo.tasks,
+    startRun: async () => { throw new Error('HTTP 503 · MISSING_VULTR_INFERENCE_API_KEY') } } })
+  ws.selectMode('LIVE'); ws.selectExecutionMode('live_executor'); await ws.runAgent()
+  assert.equal(ws.state.connection, 'CONNECTED'); assert.equal(ws.state.phase, 'ERROR')
+  assert.equal(ws.state.report, null)
+})
+
+// Synthetic envelopes test UI guards only; Docker experiments are recorded separately.
+function adversarialSnapshot(confirmed = true) {
+  const base = sample('fixed')
+  const report = { task_id: taskId, artifact_hash: base.artifact_hash, status: 'COMPLETED', source: 'OFFLINE_TEST',
+    driver_hash: 'unit-driver', valid_count: 1, confirmed_count: confirmed ? 1 : 0,
+    challenges: [{ status: confirmed ? 'CONFIRMED' : 'NOT_CONFIRMED', expected: 100, actual: confirmed ? 101 : 100,
+      actual_type: 'int', challenge: { challenge_id: 'one', amount: '1.00499' } }],
+    execution: { ...base.executions[0], phase: 'adversarial', test_hash: 'unit-driver', exit_code: confirmed ? 1 : 0 } }
+  return { ...snapshot(base), adversarial_report: report, final_decision: {
+    formal_report_id: base.run_id, artifact_hash: base.artifact_hash, formal_status: base.status,
+    status: confirmed ? 'FAILED' : 'VERIFIED', reason: 'Evidence-based unit example' } }
+}
+
+test('confirmed challenge downgrades overall verdict while preserving formal report', () => {
+  const data = adversarialSnapshot()
+  validateAdversarialEnvelope(data, 'offline')
+  assert.equal(data.verification.status, 'VERIFIED')
+  assert.equal(traceFor(data.verification, null, 'LIVE', 'fixture', data.final_decision)[5].state, 'FAILED')
+})
+
+test('matching observed output is not a confirmed counterexample', () => {
+  validateAdversarialEnvelope(adversarialSnapshot(false), 'offline')
+})
+
+test('missing, mismatched, or incomplete challenge evidence is rejected', () => {
+  for (const mutate of [s => { s.adversarial_report = null },
+    s => { s.adversarial_report.artifact_hash = 'wrong' },
+    s => { s.adversarial_report.execution.cleanup_confirmed = false },
+    s => { s.adversarial_report.challenges = []; s.adversarial_report.confirmed_count = 0; s.adversarial_report.valid_count = 0 },
+    s => { s.final_decision.status = 'VERIFIED' },
+    s => { s.adversarial_report.challenges[0].status = 'INCONCLUSIVE' }]) {
+    const data = adversarialSnapshot(); mutate(data)
+    assert.throws(() => validateAdversarialEnvelope(data, 'offline'))
+  }
+})
+
+test('offline evidence cannot be presented as a live adversarial call', () => {
+  assert.throws(() => validateAdversarialEnvelope(adversarialSnapshot(), 'live'), /Offline/)
+})
+
+test('changing adversarial settings clears prior evidence without starting a request', async () => {
+  const ws = make(); await ws.replay(); ws.selectAdversarialMode('offline')
+  assert.equal(ws.state.report, null); assert.equal(ws.state.adversarialReport, null)
+  assert.equal(ws.state.finalDecision, null); assert.equal(ws.state.phase, 'IDLE')
+})
+
+
+test('a requested but incomplete adversarial stage cannot retain overall VERIFIED', () => {
+  const data = adversarialSnapshot(false)
+  Object.assign(data.adversarial_report, { status: 'GENERATION_FAILED', challenges: [], valid_count: 0,
+    confirmed_count: 0, execution: null })
+  data.final_decision.status = 'INCONCLUSIVE'
+  validateAdversarialEnvelope(data, 'offline')
+  data.final_decision.status = 'VERIFIED'
+  assert.throws(() => validateAdversarialEnvelope(data, 'offline'), /contradicts/)
+})
+
+
+test('returning from the Stage 2 candidate to Demo selects an available historical scenario', async () => {
+  const ws = make(); ws.selectMode('LIVE'); ws.selectScenario('double_rounding'); ws.selectMode('DEMO')
+  assert.equal(ws.state.scenario, 'public_only')
+  await ws.replay(); assert.equal(ws.state.phase, 'READY')
 })
