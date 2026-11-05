@@ -20,7 +20,9 @@ Runner 启动时检查 Rootless 模式、cgroup v2/systemd 和 CPU、内存、PI
 先由操作员按现有发布流程构建并激活包含本改动的已审核 SHA。使用
 `deploy/install-runner.sh` 注册 socket、Runner 服务和 Web drop-in。该脚本
 检查两个服务账号的权限、私有工作目录及 Runner Docker socket，安装后只 reload
-systemd。由操作员在任务空闲时启动 socket、重启私有 API。之后正常请求会启动
+systemd。Runner 的 drop-in 在 `ProtectHome=tmpfs` 下只挂回自身 UID 的运行目录，
+使 Docker socket 可见并能跟随守护进程重建。由操作员在任务空闲时启动 socket、
+重启私有 API。之后正常请求会启动
 Runner。不要更改 Caddy 的 503 阻断或启用 Live。
 
 通过私有 API 验收 fixed、original、public_only、unauthorized、timeout 和

@@ -12,9 +12,16 @@ done
 [[ $(id -u trustbound-web) != "$(id -u trustbound-runner)" ]]
 [[ -f /srv/trustbound/pointers/current/trustbound/runner_worker.py ]]
 [[ $(stat -c '%U:%G %a' /var/lib/trustbound-runner) == 'trustbound-runner:trustbound-runner 700' ]]
-[[ -S /run/user/$(id -u trustbound-runner)/docker.sock ]]
+runner_runtime="/run/user/$(id -u trustbound-runner)"
+[[ -S $runner_runtime/docker.sock ]]
 
 install -m 0644 "$script_dir/trustbound-runner.socket" "$script_dir/trustbound-runner.service" /etc/systemd/system/
+install -d -m 0755 /etc/systemd/system/trustbound-runner.service.d
+# ProtectHome hides /run/user. Expose only the Runner UID's directory so daemon
+# socket replacement remains visible without exposing other users' runtime files.
+runner_config=/etc/systemd/system/trustbound-runner.service.d/rootless-runtime.conf
+printf '[Service]\nProtectHome=tmpfs\nBindReadOnlyPaths=%s\n' "$runner_runtime" > "$runner_config"
+chmod 0644 "$runner_config"
 install -d -m 0755 /etc/systemd/system/trustbound-api.service.d
 install -m 0644 "$script_dir/runner-api.conf" /etc/systemd/system/trustbound-api.service.d/runner.conf
 systemctl daemon-reload
