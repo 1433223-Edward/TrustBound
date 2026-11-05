@@ -11,7 +11,7 @@ from .adversarial import AMOUNT, MAX_CHALLENGES, REQUIREMENT_ID, build_driver, r
 from .adversarial_contracts import AdversarialChallenge, ChallengeValidationResult
 from .custom_policy import CUSTOM_TASK, build_custom_driver, validate_solution
 from .executor import validate_billing_code
-from .runner import _execute_fixed_tests, checked, sha256
+from .runner import WEB_WORKER_LABEL, _execute_fixed_tests, checked, sha256
 from .runner_ipc import (MAX_CANDIDATE_BYTES, MAX_OUTPUT_CHARS, MAX_REQUEST,
                          MAX_RESPONSE, read_message, write_message)
 from .service import CANDIDATES, ROOT, TASK
@@ -74,7 +74,7 @@ def execute_request(request):
         if not reviewed:
             validate_billing_code(candidate)
         tests = (ROOT / FIXED_TESTS[phase]).read_bytes()
-    result = _execute_fixed_tests(code, tests, phase, TASK.timeout_seconds, work_root=WORK_ROOT)
+    result = _execute_fixed_tests(code, tests, phase, TASK.timeout_seconds, work_root=WORK_ROOT, worker_owned=True)
     if len(result.stdout) > MAX_OUTPUT_CHARS or len(result.stderr) > MAX_OUTPUT_CHARS:
         return replace(result, status="ERROR", stdout=result.stdout[:MAX_OUTPUT_CHARS],
                        stderr=result.stderr[:MAX_OUTPUT_CHARS], error="RUNNER_OUTPUT_LIMIT_EXCEEDED")
@@ -116,12 +116,30 @@ def _configure_docker(uid):
         raise RuntimeError("Required Rootless Docker cgroup controllers are not delegated")
 
 
+def _reconcile_owned_containers():
+    """Only the singleton Web worker uses this label; operator probes are untouched."""
+    arguments = ("ps", "-a", "--filter", f"label={WEB_WORKER_LABEL}", "--format", "{{.ID}} {{.Names}}")
+    rows = checked(*arguments).splitlines()
+    if len(rows) > 8:
+        raise RuntimeError("Too many owned containers for bounded recovery")
+    for row in rows:
+        if not re.fullmatch(r"[a-f0-9]{12,64} trustbound-[a-f0-9]{32}", row):
+            raise RuntimeError("Unexpected owned container identity")
+    for row in rows:
+        checked("rm", "-f", row.split()[0])
+    if rows and checked(*arguments).strip():
+        raise RuntimeError("Owned container cleanup could not be confirmed")
+    if rows:
+        print(f"Reconciled {len(rows)} owned TrustBound containers", flush=True)
+
+
 def main():
     import pwd
 
     if os.environ.get("LISTEN_PID") != str(os.getpid()) or os.environ.get("LISTEN_FDS") != "1":
         raise SystemExit("Start the worker through its systemd socket")
     _configure_docker(os.getuid())
+    _reconcile_owned_containers()
     web_uid = pwd.getpwnam("trustbound-web").pw_uid
     with socket.socket(fileno=3) as listener:
         if listener.family != socket.AF_UNIX or listener.getsockname() != SOCKET_PATH:

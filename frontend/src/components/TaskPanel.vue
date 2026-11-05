@@ -1,6 +1,6 @@
 <script setup>
 import StatusBadge from './StatusBadge.vue'
-defineProps({ task: Object, tasks: Array, mode: String, executionMode: String, scenario: String, busy: Boolean, adversarialMode: String, adversarialFixture: String, recoveryMode: String, recoveryFixture: String })
+defineProps({ task: Object, tasks: Array, mode: String, executionMode: String, scenario: String, busy: Boolean, adversarialMode: String, adversarialFixture: String, recoveryMode: String, recoveryFixture: String, publicDemo: Boolean })
 defineEmits(['task', 'scenario', 'executionMode', 'adversarialMode', 'adversarialFixture', 'recoveryMode', 'recoveryFixture', 'replay', 'run'])
 </script>
 
@@ -30,7 +30,7 @@ defineEmits(['task', 'scenario', 'executionMode', 'adversarialMode', 'adversaria
     <div class="replay-controls" v-else>
       <label class="field-label" for="execution-mode">后端运行模式</label>
       <select id="execution-mode" :value="executionMode" @change="$emit('executionMode', $event.target.value)">
-        <option value="fixture">Fixture · 真实 Docker</option><option value="offline_executor">Offline Executor · 模拟模型 / 真实 Docker</option><option value="live_executor">Vultr Live · 需要后端配置</option>
+        <option value="fixture">Fixture · 真实 Docker</option><option value="offline_executor">Offline Executor · 模拟模型 / 真实 Docker</option><option v-if="!publicDemo" value="live_executor">Vultr Live · 需要后端配置</option>
       </select>
       <template v-if="executionMode === 'fixture'">
         <label class="field-label" for="live-candidate" style="margin-top:12px">固定候选 · 本次真实执行</label>
@@ -40,19 +40,19 @@ defineEmits(['task', 'scenario', 'executionMode', 'adversarialMode', 'adversaria
       </template>
       <label class="field-label" for="adversarial-mode" style="margin-top:12px">独立对抗验证 · Stage 2</label>
       <select id="adversarial-mode" :value="adversarialMode" @change="$emit('adversarialMode', $event.target.value)">
-        <option value="off">Off · 保留正式验收</option><option value="offline">Offline · 模拟提议 / 真实反例执行</option><option value="live">Vultr · 独立对抗模型</option>
+        <option value="off">Off · 保留正式验收</option><option value="offline">Offline · 模拟提议 / 真实反例执行</option><option v-if="!publicDemo" value="live">Vultr · 独立对抗模型</option>
       </select>
-      <template v-if="adversarialMode === 'offline'">
+      <template v-if="adversarialMode === 'offline' && !publicDemo">
         <label class="field-label" for="adversarial-fixture" style="margin-top:10px">离线模型响应预设</label>
         <select id="adversarial-fixture" :value="adversarialFixture" @change="$emit('adversarialFixture', $event.target.value)">
           <option value="standard">边界输入与无效提议</option><option value="invalid">全为无效提议</option><option value="timeout">模拟模型请求超时</option><option value="failure">模拟模型 API 失败</option>
         </select>
       </template>
-      <label class="field-label" for="recovery-mode" style="margin-top:12px">Bounded Recovery · 最多 2 次</label>
-      <select id="recovery-mode" :value="recoveryMode" @change="$emit('recoveryMode', $event.target.value)">
+      <label v-if="!publicDemo" class="field-label" for="recovery-mode" style="margin-top:12px">Bounded Recovery · 最多 2 次</label>
+      <select v-if="!publicDemo" id="recovery-mode" :value="recoveryMode" @change="$emit('recoveryMode', $event.target.value)">
         <option value="off">Off · 不恢复</option><option value="offline">Offline · 模拟修复 / 真实验证</option><option value="live">Vultr · 需单独授权启用</option>
       </select>
-      <template v-if="recoveryMode === 'offline'">
+      <template v-if="recoveryMode === 'offline' && !publicDemo">
         <label class="field-label" for="recovery-fixture" style="margin-top:10px">离线恢复响应</label>
         <select id="recovery-fixture" :value="recoveryFixture" @change="$emit('recoveryFixture', $event.target.value)">
           <option value="fixed">正确修复</option><option value="exhausted">连续错误 · 耗尽预算</option><option value="unauthorized">越权修改</option><option value="invalid_json">非法 JSON</option><option value="empty">空响应</option><option value="failure">模型错误</option><option value="timeout">模型超时</option>

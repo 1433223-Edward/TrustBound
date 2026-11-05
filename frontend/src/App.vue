@@ -14,6 +14,7 @@ const client = createApiClient()
 const workspace = createWorkspace({ demo, client })
 const { state, task, busy, trace } = workspace
 const customEnabled = ref(false)
+const publicDemo = ref(false)
 watch(() => state.mode, async (mode, _, onCleanup) => {
   customEnabled.value = false
   if (mode !== 'LIVE') return
@@ -21,7 +22,15 @@ watch(() => state.mode, async (mode, _, onCleanup) => {
   onCleanup(() => controller.abort())
   try {
     const health = await client.health(controller.signal)
-    if (!controller.signal.aborted) customEnabled.value = health.custom_task?.enabled === true
+    if (!controller.signal.aborted) {
+      publicDemo.value = health.public_demo === true
+      customEnabled.value = !publicDemo.value && health.custom_task?.enabled === true
+      if (publicDemo.value && !busy.value) {
+        if (state.executionMode === 'live_executor') workspace.selectExecutionMode('fixture')
+        if (state.adversarialMode === 'live' || state.adversarialFixture !== 'standard') workspace.selectAdversarialMode('off')
+        if (state.recoveryMode !== 'off') workspace.selectRecoveryMode('off')
+      }
+    }
   } catch { /* Billing retains its own API status and controls. */ }
 })
 const activity = computed(() => busy.value ? state.mode === 'DEMO' ? 'Loading sample' : (state.runState || 'Connecting to API')
@@ -34,7 +43,7 @@ const activity = computed(() => busy.value ? state.mode === 'DEMO' ? 'Loading sa
     <div class="mode-bar"><div class="segmented mode-switch" role="group" aria-label="数据模式"><button :aria-pressed="state.mode === 'DEMO'" :class="{ selected: state.mode === 'DEMO' }" @click="workspace.selectMode('DEMO')">Demo Replay</button><button :aria-pressed="state.mode === 'LIVE'" :class="{ selected: state.mode === 'LIVE' }" @click="workspace.selectMode('LIVE')">Local API</button></div><p v-if="state.mode === 'DEMO'"><span class="sample-label">SAMPLE</span>真实历史报告回放 · 固定候选 · 不调用 LLM，不执行容器</p><p v-else><span class="live-label">LOCAL API</span>{{ state.executionMode === 'fixture' ? '固定候选 · 真实 Docker · Executor 无模型调用' : state.executionMode === 'offline_executor' ? '模拟模型响应 · 真实 Executor / Docker / 验收' : 'Vultr 实时推理 · 仅后端持有凭据' }}<span v-if="state.adversarialMode !== 'off'"> · Adversary {{ state.adversarialMode === 'offline' ? 'OFFLINE 模拟提议' : 'Vultr 独立模型（待实际请求）' }}</span><span v-if="state.recoveryMode !== 'off'"> · Recovery {{ state.recoveryMode === 'offline' ? 'OFFLINE / MOCK' : 'Vultr（需单独授权）' }}</span></p><span class="version mono">LOCAL / v0.1</span></div>
     <div v-if="state.error" class="error-banner" role="alert"><strong>Request not completed</strong><span>{{ state.error }}</span></div>
     <div class="workspace-grid" :aria-busy="busy">
-      <TaskPanel :task="task" :tasks="state.tasks" :mode="state.mode" :scenario="state.scenario" :execution-mode="state.executionMode" :adversarial-mode="state.adversarialMode" :adversarial-fixture="state.adversarialFixture" :recovery-mode="state.recoveryMode" :recovery-fixture="state.recoveryFixture" :busy="busy" @task="workspace.selectTask" @scenario="workspace.selectScenario" @execution-mode="workspace.selectExecutionMode" @adversarial-mode="workspace.selectAdversarialMode" @adversarial-fixture="workspace.selectAdversarialFixture" @recovery-mode="workspace.selectRecoveryMode" @recovery-fixture="workspace.selectRecoveryFixture" @replay="workspace.replay" @run="workspace.runAgent" />
+      <TaskPanel :task="task" :tasks="state.tasks" :mode="state.mode" :scenario="state.scenario" :execution-mode="state.executionMode" :adversarial-mode="state.adversarialMode" :adversarial-fixture="state.adversarialFixture" :recovery-mode="state.recoveryMode" :recovery-fixture="state.recoveryFixture" :busy="busy" :public-demo="publicDemo" @task="workspace.selectTask" @scenario="workspace.selectScenario" @execution-mode="workspace.selectExecutionMode" @adversarial-mode="workspace.selectAdversarialMode" @adversarial-fixture="workspace.selectAdversarialFixture" @recovery-mode="workspace.selectRecoveryMode" @recovery-fixture="workspace.selectRecoveryFixture" @replay="workspace.replay" @run="workspace.runAgent" />
       <CodeWorkspace :recovery-attempt="state.recoveryReport?.attempts?.[state.recoveryReport.validated_attempt_index]" :task="task" :report="state.report" :candidate="state.candidate" :execution-mode="state.executionMode" :mode="state.mode" />
       <ExecutionTrace :stages="trace" :mode="state.mode" :report="state.report" />
       <EvidencePanel :inference-usage="state.inferenceUsage" :recovery-report="state.recoveryReport" :adversarial-report="state.adversarialReport" :final-decision="state.finalDecision" :execution-mode="state.executionMode" :report="state.report" :mode="state.mode" />

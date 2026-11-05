@@ -9,6 +9,7 @@ import socket
 import time
 from urllib import error, request
 
+from .admission import AdmissionError, reserve_live_attempt
 from .config import load_local_env
 
 # Loaded once on backend import; fresh clients read the resulting process settings.
@@ -20,6 +21,14 @@ DEFAULT_MODEL = "deepseek-v4.1-flash-1017"
 
 class InferenceError(Exception):
     """Only sanitized error codes may cross into application reports."""
+
+
+def _reserve_global_live_attempt(source, outputs):
+    if source == "VULTR_LIVE_HTTP":
+        try:
+            reserve_live_attempt(outputs)
+        except AdmissionError as error:
+            raise InferenceError(error.code) from None
 
 
 # One task scope covers all fresh clients without sharing agent message contexts.
@@ -37,6 +46,7 @@ class TaskInferenceBudget:
         # ambiguous request whose provider-side billing is unknown.
         if len(self.calls) >= self.max_requests or self.reserved_tokens + entry["max_completion_tokens"] > self.max_output_tokens:
             raise InferenceError("TASK_INFERENCE_BUDGET_EXHAUSTED")
+        _reserve_global_live_attempt(source, entry["max_completion_tokens"])
         self.reserved_tokens += entry["max_completion_tokens"]
         entry["source"] = source
         self.calls.append(entry)
@@ -157,6 +167,8 @@ class VultrClient:
             budget = _TASK_BUDGET.get()
             if budget is not None:
                 budget.reserve(entry, self.source)
+            else:
+                _reserve_global_live_attempt(self.source, max_tokens)
             self.calls.append(entry)
             try:
                 response = self.transport("POST", "/chat/completions", payload,

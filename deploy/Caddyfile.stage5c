@@ -1,0 +1,36 @@
+# Authenticated offline Billing only. Keep the original Caddyfile as rollback.
+{$TRUSTBOUND_DOMAIN} {
+    encode zstd gzip
+    route {
+        header {
+            X-Content-Type-Options nosniff
+            Referrer-Policy no-referrer
+            X-Frame-Options DENY
+            Cache-Control "no-store"
+        }
+        basic_auth {
+            import /etc/caddy/trustbound-judges.caddy
+        }
+        @readAPI {
+            method GET
+            path /api/health /api/tasks /api/tasks/* /api/runs/*
+        }
+        @submitAPI {
+            method POST
+            path /api/runs
+        }
+        reverse_proxy @readAPI 127.0.0.1:8000 {
+            header_up X-TrustBound-Public 1
+            header_up -Authorization
+        }
+        reverse_proxy @submitAPI 127.0.0.1:8000 {
+            header_up X-TrustBound-Public 1
+            header_up -Authorization
+        }
+        @blockedAPI path /api /api/*
+        respond @blockedAPI 404
+        root * /srv/trustbound/pointers/current/frontend/dist
+        try_files {path} /index.html
+        file_server
+    }
+}

@@ -15,6 +15,7 @@ IMAGE = "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d
 MEMORY_LIMIT_BYTES = 128 * 1024 * 1024
 CPU_LIMIT_NANOS = 500_000_000
 PID_LIMIT = 32
+WEB_WORKER_LABEL = "org.trustbound.owner=private-web-runner-v1"
 
 
 def sha256(content: bytes) -> str:
@@ -39,7 +40,7 @@ def checked(*arguments):
     return result.stdout
 
 
-def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds: int, *, work_root=None):
+def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds: int, *, work_root=None, worker_owned=False):
     """Internal primitive: only the fixed-task service selects payloads and tests.
 
     The host stages exactly two files, never executes them, and mounts only that
@@ -62,6 +63,7 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
         try:
             checked(
                 "create", "--pull", "never", "--name", name,
+                *(("--label", WEB_WORKER_LABEL) if worker_owned else ()),
                 "--network", "none", "--read-only", "--user", "65534:65534",
                 "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
                 "--memory", str(MEMORY_LIMIT_BYTES), "--memory-swap", str(MEMORY_LIMIT_BYTES),

@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from .admission import AdmissionError, deployment_settings, inference_admission
 from .custom_tasks import CustomRunRequest, custom_enabled, execute_custom
 from .service import ROOT, TASK
 from .web_tasks import execute_web_run, live_availability, task_details
@@ -36,24 +37,41 @@ def utc_now():
 
 
 class RunManager:
-    def __init__(self, execute, directory):
+    def __init__(self, execute, directory, admission=None):
         self.execute, self.directory = execute, directory
+        self.admission = admission
         self.lock = threading.RLock()
         self.pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="trustbound-web")
         self.records, self.active = {}, None
 
     def save(self, snapshot):
         if self.directory is not None:
+            data = json.dumps(snapshot, indent=2, ensure_ascii=False).encode("utf-8")
+            if self.admission is not None:
+                # Include the existing report while budgeting its atomic replacement.
+                used = sum(path.stat().st_size for path in self.directory.glob("*/*") if path.is_file())
+                if len(data) > 512 * 1024 or used + len(data) > 64 * 1024 * 1024:
+                    raise OSError("Evidence storage limit exceeded")
             directory = self.directory / snapshot["run_id"]
             directory.mkdir(parents=True, exist_ok=True)
             temporary = directory / "report.tmp"
-            temporary.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False), encoding="utf-8")
+            temporary.write_bytes(data)
             temporary.replace(directory / "report.json")
 
     def submit(self, body):
         with self.lock:
             if self.active is not None:
                 raise HTTPException(429, detail={"code": "RUN_CAPACITY_REACHED", "message": "已有一个任务正在执行，请稍后再试。"})
+            if self.admission is not None:
+                try:
+                    self.admission.reserve_run()
+                except AdmissionError as error:
+                    unavailable = error.code == "QUOTA_STORE_UNAVAILABLE"
+                    raise HTTPException(
+                        503 if unavailable else 429,
+                        detail={"code": error.code, "message": "执行配额不可用。" if unavailable else "已达到运行频率或总次数上限。"},
+                        headers={"Retry-After": str(error.retry_after)} if error.retry_after else None,
+                    ) from None
             while len(self.records) >= 50:
                 del self.records[next(iter(self.records))]
             run_id = uuid.uuid4().hex
@@ -65,7 +83,11 @@ class RunManager:
                         "adversarial_report": None, "final_decision": None,
                         "recovery_mode": body.recovery_mode, "recovery_fixture": body.recovery_fixture,
                         "recovery_report": None, "current_attempt": 0 if body.recovery_mode != "off" else None}
-            self.save(snapshot)
+            try:
+                self.save(snapshot)
+            except (OSError, ValueError):
+                raise HTTPException(503, detail={"code": "EVIDENCE_STORE_UNAVAILABLE",
+                                                 "message": "证据存储不可用，任务未启动。"}) from None
             self.records[run_id], self.active = snapshot, run_id
             try:
                 self.pool.submit(self.work, run_id, body)
@@ -90,9 +112,10 @@ class RunManager:
             options = {} if body.recovery_mode == "off" else {
                 "recovery_mode": body.recovery_mode, "recovery_fixture": body.recovery_fixture,
                 "run_id": run_id, "on_progress": progress}
-            outcome = (execute_custom(body) if isinstance(body, CustomRunRequest)
-                       else self.execute(body.task_id, body.mode, body.candidate_id,
-                                         body.adversarial_mode, body.adversarial_fixture, **options))
+            with inference_admission(self.admission):
+                outcome = (execute_custom(body) if isinstance(body, CustomRunRequest)
+                           else self.execute(body.task_id, body.mode, body.candidate_id,
+                                             body.adversarial_mode, body.adversarial_fixture, **options))
             with self.lock:
                 record.update(outcome)
                 record["state"] = "ERROR" if outcome.get("error") else "COMPLETED"
@@ -106,7 +129,8 @@ class RunManager:
                 try:
                     self.save(record)
                 except Exception:
-                    record.update(state="ERROR", error={"code": "EVIDENCE_SAVE_FAILED", "message": "报告持久化失败。"})
+                    record.update(state="ERROR", verification=None, final_decision=None,
+                                  error={"code": "EVIDENCE_SAVE_FAILED", "message": "报告持久化失败。"})
                 self.active = None
 
     def get(self, run_id):
@@ -117,25 +141,35 @@ class RunManager:
 
 
 def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/web-runs"):
+    public, domain, admission = deployment_settings()
+    if public and report_directory is None:
+        raise ValueError("Public demo requires private evidence storage")
+
     @asynccontextmanager
     async def lifespan(app):
-        app.state.runs = RunManager(execute, report_directory)
+        app.state.runs = RunManager(execute, report_directory, admission)
         yield
         # Finish the owned task on graceful shutdown so Runner's finally can clean up.
         app.state.runs.pool.shutdown(wait=True)
 
     app = FastAPI(title="TrustBound Local API", version="0.1.0", lifespan=lifespan)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"])
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"] + ([domain] if public else []))
 
     @app.middleware("http")
     async def local_request_policy(request: Request, call_next):
+        # Caddy overwrites this marker after authentication. The marker can
+        # restrict a request but can never grant access or model privileges.
+        if request.headers.get("x-trustbound-public") == "1" and not public:
+            return JSONResponse({"error": {"code": "PUBLIC_DEMO_DISABLED", "message": "公网执行入口已关闭。"}}, status_code=503)
         if request.method == "POST":
             origin = request.headers.get("origin")
-            if origin and origin not in {"http://localhost:5173", "http://127.0.0.1:5173",
-                                         "http://localhost:8000", "http://127.0.0.1:8000"}:
-                return JSONResponse({"error": {"code": "ORIGIN_DENIED", "message": "只接受本地工作区请求。"}}, status_code=403)
+            if ((public and origin != f"https://{domain}")
+                    or (not public and origin and origin not in {
+                        "http://localhost:5173", "http://127.0.0.1:5173",
+                        "http://localhost:8000", "http://127.0.0.1:8000"})):
+                return JSONResponse({"error": {"code": "ORIGIN_DENIED", "message": "请求来源不在工作区白名单。"}}, status_code=403)
             # The opt-in custom path accepts bounded source and structured data only.
-            limit = 8192 if request.url.path == "/api/custom-runs" and custom_enabled() else 4096
+            limit = 8192 if not public and request.url.path == "/api/custom-runs" and custom_enabled() else 4096
             body = bytearray()
             async for chunk in request.stream():
                 if len(body) + len(chunk) > limit:
@@ -146,7 +180,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
 
     @app.exception_handler(HTTPException)
     async def http_error(request, exc):
-        return JSONResponse({"error": exc.detail}, status_code=exc.status_code)
+        return JSONResponse({"error": exc.detail}, status_code=exc.status_code, headers=exc.headers)
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
@@ -159,9 +193,11 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
         with app.state.runs.lock:
             active = app.state.runs.active
         return {"status": "ok", "active_run_id": active, "max_concurrent_runs": 1,
-                "docker": "checked_by_execution_not_health", "custom_task": {"enabled": custom_enabled()}, "modes": {
+                "docker": "checked_by_execution_not_health", "public_demo": public,
+                "persistent_quota": admission is not None,
+                "custom_task": {"enabled": not public and custom_enabled()}, "modes": {
                     "fixture": {"enabled": True}, "offline_executor": {"enabled": True},
-                    "live_executor": live_availability()}}
+                    "live_executor": ({"enabled": False, "reason": "PUBLIC_OFFLINE_ONLY"} if public else live_availability())}}
 
     @app.get("/api/tasks")
     async def tasks():
@@ -175,6 +211,10 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
 
     @app.post("/api/runs", status_code=202)
     async def start(body: RunRequest):
+        if public and (body.mode == "live_executor" or body.adversarial_mode == "live"
+                       or body.adversarial_fixture != "standard" or body.recovery_mode != "off"):
+            raise HTTPException(403, detail={"code": "PUBLIC_OFFLINE_ONLY",
+                                             "message": "公网只接受 Billing 固定或标准离线执行。"})
         if body.recovery_mode != "off" and body.adversarial_mode == "off":
             raise HTTPException(422, detail={"code": "RECOVERY_REQUIRES_ADVERSARIAL", "message": "恢复必须重新执行全部验证，请启用对抗阶段。"})
         if body.recovery_mode != "offline" and body.recovery_fixture != "fixed":
@@ -201,7 +241,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
 
     @app.post("/api/custom-runs", status_code=202)
     async def start_custom(body: CustomRunRequest):
-        if not custom_enabled():
+        if public or not custom_enabled():
             raise HTTPException(503, detail={"code": "CUSTOM_TASK_DISABLED", "message": "自定义任务只在显式启用的私有 Runner 环境可用。"})
         return {"run_id": app.state.runs.submit(body), "state": "QUEUED"}
 
@@ -214,7 +254,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
 
     @app.get("/api/custom-runs/{run_id}")
     async def custom_run(run_id: uuid.UUID):
-        if not custom_enabled():
+        if public or not custom_enabled():
             raise HTTPException(503, detail={"code": "CUSTOM_TASK_DISABLED", "message": "私有自定义任务已关闭。"})
         snapshot = app.state.runs.get(run_id.hex)
         if snapshot["mode"] != CustomRunRequest.mode:
