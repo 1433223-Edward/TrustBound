@@ -1,0 +1,28 @@
+[Unit]
+Description=TrustBound isolated Rootless Docker worker
+Requires=trustbound-runner.socket
+After=trustbound-runner.socket
+
+[Service]
+Type=simple
+User=trustbound-runner
+Group=trustbound-runner
+WorkingDirectory=/srv/trustbound/pointers/current
+ExecStart=/srv/trustbound/pointers/current/.venv/bin/python -B -m trustbound.runner_worker
+Environment=TRUSTBOUND_LOAD_DOTENV=0
+Environment=PATH=/usr/bin:/bin
+UnsetEnvironment=VULTR_INFERENCE_API_KEY VULTR_API_KEY VULTR_MODEL DOCKER_CONTEXT DOCKER_CONFIG
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/trustbound-runner
+InaccessiblePaths=-/run/docker.sock -/var/run/docker.sock -/etc/trustbound -/var/lib/trustbound
+CapabilityBoundingSet=
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+MemoryMax=256M
+TasksMax=32
+LogRateLimitIntervalSec=30s
+LogRateLimitBurst=30

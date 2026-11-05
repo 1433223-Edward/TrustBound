@@ -1,0 +1,13 @@
+[Unit]
+Description=TrustBound private sandbox request socket
+
+[Socket]
+ListenStream=/run/trustbound-runner.sock
+SocketUser=trustbound-web
+SocketGroup=trustbound-web
+SocketMode=0600
+Backlog=4
+RemoveOnStop=true
+
+[Install]
+WantedBy=sockets.target

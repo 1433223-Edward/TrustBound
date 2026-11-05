@@ -1,9 +1,9 @@
-"""Fail-closed public-execution gate for the current in-process Docker architecture."""
+"""Fail-closed gate while public execution requirements remain incomplete."""
 import json
 import sys
 
 BLOCKERS = [
-    "Web process directly controls Docker; isolated runner boundary not implemented",
+    "The private runner deployment requires VM-level end-to-end acceptance",
     "No persistent global task/spend quotas or public request-rate limiter",
     "Ubuntu staging permissions and rootless cgroup/UID behavior unverified",
     "Crash recovery, evidence retention and deployment Host/Origin policy incomplete",

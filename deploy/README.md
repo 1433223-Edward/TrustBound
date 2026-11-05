@@ -1,5 +1,8 @@
 # Stage 5A — Deployment Readiness
 
+Stage 5B 的私有 Runner 接入与人工验收步骤见 [PRIVATE_RUNNER.md](PRIVATE_RUNNER.md)。
+下文保留 Stage 5A 审计基线，公网执行仍由现有 Caddy 配置阻断。
+
 **结论：Linux 私有验证可进入准备阶段；完整公网执行 NO-GO。**
 本目录不是已验收的完整云部署。当前 Caddy 仅发布静态 Demo，所有 /api 请求返回 503。
 这可以审查页面与部署基础，但不满足 Hackathon 的完整在线执行目标。不要移除封锁绕过下列门禁。

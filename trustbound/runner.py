@@ -36,7 +36,7 @@ def checked(*arguments):
     return result.stdout
 
 
-def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds: int):
+def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds: int, *, work_root=None):
     """Internal primitive: only the fixed-task service selects payloads and tests.
 
     The host stages exactly two files, never executes them, and mounts only that
@@ -46,10 +46,16 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
     name = "trustbound-" + uuid.uuid4().hex
     state, stdout, stderr, reason, error = {}, "", "", None, None
     status, cleanup, limits_verified = "ERROR", False, False
-    with tempfile.TemporaryDirectory(prefix="trustbound-") as directory:
+    with tempfile.TemporaryDirectory(prefix="trustbound-", dir=work_root) as directory:
         workspace = Path(directory)
         (workspace / "billing.py").write_bytes(code)
         (workspace / "checks.py").write_bytes(tests)
+        if work_root is not None:
+            # The host-only parent stays private. The mapped container UID can
+            # traverse and read just the directory exposed by the bind mount.
+            for filename in ("billing.py", "checks.py"):
+                (workspace / filename).chmod(0o444)
+            workspace.chmod(0o755)
         try:
             checked(
                 "create", "--pull", "never", "--name", name,

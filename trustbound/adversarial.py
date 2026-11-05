@@ -8,6 +8,7 @@ from .adversarial_contracts import AdversarialChallenge, ChallengeValidationResu
 from .executor import ProposalError, unique_object, validate_billing_code
 from .inference import DEFAULT_MODEL, InferenceError, VultrClient, select_model
 from .runner import _execute_fixed_tests, sha256
+from .runner_ipc import run_through_worker, worker_enabled
 from .service import TASK
 
 REQUIREMENT_ID = "billing-v1.round-half-up"
@@ -169,7 +170,12 @@ def run_adversarial(code: bytes, artifact_hash: str, client, *, model_id=None, c
     driver = build_driver(rows)
     driver_hash = sha256(driver)
     try:
-        execution = _execute_fixed_tests(code, driver, "adversarial", TASK.timeout_seconds)
+        if worker_enabled():
+            cases = [{"id": row.challenge.challenge_id, "amount": row.challenge.amount}
+                     for row in valid]
+            execution = run_through_worker(code, driver, "adversarial", cases=cases)
+        else:
+            execution = _execute_fixed_tests(code, driver, "adversarial", TASK.timeout_seconds)
         if (execution.status != "EXITED" or execution.exit_code not in (0, 1) or execution.error
                 or not execution.cleanup_confirmed or not execution.workspace_unchanged or not execution.limits_verified
                 or execution.artifact_hash != artifact_hash or execution.test_hash != driver_hash):

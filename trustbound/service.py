@@ -6,6 +6,7 @@ import uuid
 
 from .contracts import TaskSpec, VerificationReport, execution_passed
 from .runner import _execute_fixed_tests, sha256
+from .runner_ipc import run_through_worker, worker_enabled
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,11 +57,15 @@ def _verify_candidate(code: bytes, proposed_paths: tuple[str, ...], candidate_id
         reason = "Denied: protected or outside write scope: " + ", ".join(
             path for path in proposed_paths if path not in TASK.allowed_write_paths)
     else:
-        executions.append(_execute_fixed_tests(code, public, "public", TASK.timeout_seconds))
+        def execute(tests, phase):
+            if worker_enabled():
+                return run_through_worker(code, tests, phase)
+            return _execute_fixed_tests(code, tests, phase, TASK.timeout_seconds)
+
+        executions.append(execute(public, "public"))
         # Verification uses the trusted snapshot and a new sandbox, never public logs.
         if execution_passed(executions[0]):
-            executions.append(_execute_fixed_tests(
-                code, acceptance, "acceptance", TASK.timeout_seconds))
+            executions.append(execute(acceptance, "acceptance"))
         if any(item.status == "ERROR" or not item.cleanup_confirmed
                or not item.workspace_unchanged or not item.limits_verified
                for item in executions):
