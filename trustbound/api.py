@@ -1,9 +1,10 @@
-"""Local-only asynchronous Web API over existing fixed-task execution paths."""
+"""Local-only asynchronous Web API over the trusted sandbox execution paths."""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
 import json
+import os
 import threading
 from typing import Literal
 import uuid
@@ -14,6 +15,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from .custom_tasks import CustomRunRequest, custom_enabled, execute_custom
 from .service import ROOT, TASK
 from .web_tasks import execute_web_run, live_availability, task_details
 
@@ -88,8 +90,9 @@ class RunManager:
             options = {} if body.recovery_mode == "off" else {
                 "recovery_mode": body.recovery_mode, "recovery_fixture": body.recovery_fixture,
                 "run_id": run_id, "on_progress": progress}
-            outcome = self.execute(body.task_id, body.mode, body.candidate_id,
-                                   body.adversarial_mode, body.adversarial_fixture, **options)
+            outcome = (execute_custom(body) if isinstance(body, CustomRunRequest)
+                       else self.execute(body.task_id, body.mode, body.candidate_id,
+                                         body.adversarial_mode, body.adversarial_fixture, **options))
             with self.lock:
                 record.update(outcome)
                 record["state"] = "ERROR" if outcome.get("error") else "COMPLETED"
@@ -131,12 +134,13 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
             if origin and origin not in {"http://localhost:5173", "http://127.0.0.1:5173",
                                          "http://localhost:8000", "http://127.0.0.1:8000"}:
                 return JSONResponse({"error": {"code": "ORIGIN_DENIED", "message": "只接受本地工作区请求。"}}, status_code=403)
-            # Buffer only the tiny control message; code and commands are never uploadable.
+            # The opt-in custom path accepts bounded source and structured data only.
+            limit = 8192 if request.url.path == "/api/custom-runs" and custom_enabled() else 4096
             body = bytearray()
             async for chunk in request.stream():
+                if len(body) + len(chunk) > limit:
+                    return JSONResponse({"error": {"code": "REQUEST_TOO_LARGE", "message": f"请求超过 {limit} 字节。"}}, status_code=413)
                 body.extend(chunk)
-                if len(body) > 4096:
-                    return JSONResponse({"error": {"code": "REQUEST_TOO_LARGE", "message": "请求超过 4096 字节。"}}, status_code=413)
             request._body = bytes(body)
         return await call_next(request)
 
@@ -146,6 +150,8 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
+        if request.url.path == "/api/custom-runs":
+            return JSONResponse({"error": {"code": "INVALID_CUSTOM_REQUEST", "message": "只接受单文件源码、需求和独立的整数输入/预期值。"}}, status_code=422)
         return JSONResponse({"error": {"code": "INVALID_RUN_REQUEST", "message": "仅接受预定义 task_id、mode 和 candidate_id，不接受代码、路径或命令。"}}, status_code=422)
 
     @app.get("/api/health")
@@ -153,7 +159,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
         with app.state.runs.lock:
             active = app.state.runs.active
         return {"status": "ok", "active_run_id": active, "max_concurrent_runs": 1,
-                "docker": "checked_by_execution_not_health", "modes": {
+                "docker": "checked_by_execution_not_health", "custom_task": {"enabled": custom_enabled()}, "modes": {
                     "fixture": {"enabled": True}, "offline_executor": {"enabled": True},
                     "live_executor": live_availability()}}
 
@@ -174,7 +180,6 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
         if body.recovery_mode != "offline" and body.recovery_fixture != "fixed":
             raise HTTPException(422, detail={"code": "OFFLINE_RECOVERY_PRESET_ONLY", "message": "恢复响应预设仅用于显式离线模式。"})
         if body.recovery_mode == "live":
-            import os
             if os.environ.get("TRUSTBOUND_ENABLE_RECOVERY_LIVE") != "1":
                 raise HTTPException(503, detail={"code": "RECOVERY_LIVE_NOT_AUTHORIZED", "message": "真实恢复推理需用户单独授权并由宿主启用。"})
             if not live_availability()["enabled"]:
@@ -194,9 +199,27 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
         run_id = app.state.runs.submit(body)
         return {"run_id": run_id, "state": "QUEUED"}
 
+    @app.post("/api/custom-runs", status_code=202)
+    async def start_custom(body: CustomRunRequest):
+        if not custom_enabled():
+            raise HTTPException(503, detail={"code": "CUSTOM_TASK_DISABLED", "message": "自定义任务只在显式启用的私有 Runner 环境可用。"})
+        return {"run_id": app.state.runs.submit(body), "state": "QUEUED"}
+
     @app.get("/api/runs/{run_id}")
     async def run(run_id: uuid.UUID):
-        return app.state.runs.get(run_id.hex)
+        snapshot = app.state.runs.get(run_id.hex)
+        if snapshot["mode"] == CustomRunRequest.mode:
+            raise HTTPException(404, detail={"code": "RUN_NOT_FOUND", "message": "任务记录不存在。"})
+        return snapshot
+
+    @app.get("/api/custom-runs/{run_id}")
+    async def custom_run(run_id: uuid.UUID):
+        if not custom_enabled():
+            raise HTTPException(503, detail={"code": "CUSTOM_TASK_DISABLED", "message": "私有自定义任务已关闭。"})
+        snapshot = app.state.runs.get(run_id.hex)
+        if snapshot["mode"] != CustomRunRequest.mode:
+            raise HTTPException(404, detail={"code": "RUN_NOT_FOUND", "message": "任务记录不存在。"})
+        return snapshot
 
     return app
 

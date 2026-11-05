@@ -9,6 +9,7 @@ import struct
 
 from .adversarial import AMOUNT, MAX_CHALLENGES, REQUIREMENT_ID, build_driver, reference_cents
 from .adversarial_contracts import AdversarialChallenge, ChallengeValidationResult
+from .custom_policy import CUSTOM_TASK, build_custom_driver, validate_solution
 from .executor import validate_billing_code
 from .runner import _execute_fixed_tests, checked, sha256
 from .runner_ipc import (MAX_CANDIDATE_BYTES, MAX_OUTPUT_CHARS, MAX_REQUEST,
@@ -43,21 +44,27 @@ def _challenge_driver(cases):
 
 
 def execute_request(request):
-    if type(request) is not dict or request.get("task_id") != TASK.task_id:
+    if type(request) is not dict or request.get("task_id") not in (TASK.task_id, CUSTOM_TASK.task_id):
         raise ValueError("Unknown task")
+    custom = request["task_id"] == CUSTOM_TASK.task_id
+    if custom and os.environ.get("TRUSTBOUND_ENABLE_CUSTOM_TASK") != "1":
+        raise ValueError("Custom runner tasks are disabled")
     phase = request.get("phase")
     fields = {"task_id", "phase", "candidate", "candidate_sha256"}
-    if phase == "adversarial":
-        fields.add("cases")
-    elif type(phase) is not str or phase not in FIXED_TESTS:
+    if type(phase) is not str or phase not in (*FIXED_TESTS, "adversarial"):
         raise ValueError("Unknown phase")
+    if custom or phase == "adversarial":
+        fields.add("cases")
     if set(request) != fields or type(request["candidate"]) is not str:
         raise ValueError("Invalid request fields")
     candidate = request["candidate"]
     code = candidate.encode("utf-8")
     if not 1 <= len(code) <= MAX_CANDIDATE_BYTES or sha256(code) != request["candidate_sha256"]:
         raise ValueError("Invalid candidate size or identity")
-    if phase == "adversarial":
+    if custom:
+        validate_solution(candidate)
+        tests = build_custom_driver(request["cases"])
+    elif phase == "adversarial":
         validate_billing_code(candidate)
         tests = _challenge_driver(request["cases"])
     else:

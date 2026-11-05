@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import demo from './data/demo.json'
 import { createApiClient } from './api/client.js'
 import { createWorkspace } from './state/workspace.js'
@@ -8,9 +8,22 @@ import TaskPanel from './components/TaskPanel.vue'
 import CodeWorkspace from './components/CodeWorkspace.vue'
 import ExecutionTrace from './components/ExecutionTrace.vue'
 import EvidencePanel from './components/EvidencePanel.vue'
+import CustomTaskPanel from './components/CustomTaskPanel.vue'
 
-const workspace = createWorkspace({ demo, client: createApiClient() })
+const client = createApiClient()
+const workspace = createWorkspace({ demo, client })
 const { state, task, busy, trace } = workspace
+const customEnabled = ref(false)
+watch(() => state.mode, async (mode, _, onCleanup) => {
+  customEnabled.value = false
+  if (mode !== 'LIVE') return
+  const controller = new AbortController()
+  onCleanup(() => controller.abort())
+  try {
+    const health = await client.health(controller.signal)
+    if (!controller.signal.aborted) customEnabled.value = health.custom_task?.enabled === true
+  } catch { /* Billing retains its own API status and controls. */ }
+})
 const activity = computed(() => busy.value ? state.mode === 'DEMO' ? 'Loading sample' : (state.runState || 'Connecting to API')
   : state.phase === 'ERROR' ? 'Request error' : state.report ? state.mode === 'DEMO' ? 'Sample loaded' : (state.recoveryReport?.final_status || state.finalDecision?.status || state.report.status) : 'Ready')
 </script>
@@ -26,6 +39,7 @@ const activity = computed(() => busy.value ? state.mode === 'DEMO' ? 'Loading sa
       <ExecutionTrace :stages="trace" :mode="state.mode" :report="state.report" />
       <EvidencePanel :inference-usage="state.inferenceUsage" :recovery-report="state.recoveryReport" :adversarial-report="state.adversarialReport" :final-decision="state.finalDecision" :execution-mode="state.executionMode" :report="state.report" :mode="state.mode" />
     </div>
+    <CustomTaskPanel v-if="customEnabled" :client="client" />
     <footer class="statusbar"><span><span class="status-light"></span>Trusted control · isolated execution</span><span aria-live="polite">{{ activity }}{{ state.mode === 'DEMO' ? ' · Sample mode' : ' · ' + state.executionMode }}</span><span class="mono">Python fixture <span class="footer-divider">/</span> billing-v1</span></footer>
   </div>
 </template>

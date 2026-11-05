@@ -43,11 +43,18 @@ export function createApiClient({ fetcher = globalThis.fetch, now = Date.now,
     return data.run_id
   }
 
+  async function startCustom(body, signal) {
+    const data = await request('/custom-runs', { method: 'POST', body: JSON.stringify(body), signal })
+    if (typeof data.run_id !== 'string' || data.state !== 'QUEUED') throw new Error('Invalid custom run response.')
+    return data.run_id
+  }
+
   async function waitForRun(runId, taskId, signal, { mode, candidateId, onUpdate } = {}) {
     const deadline = now() + runTimeout
+    const runsPath = mode === 'custom_offline' ? '/custom-runs' : '/runs'
     for (let poll = 0; poll < 300 && now() < deadline; poll++) {
       if (signal?.aborted) throw new Error('停止等待不代表取消后端任务。')
-      const data = await request(`/runs/${encodeURIComponent(runId)}`, { signal }, Math.min(requestTimeout, deadline - now()))
+      const data = await request(`${runsPath}/${encodeURIComponent(runId)}`, { signal }, Math.min(requestTimeout, deadline - now()))
       if (data.run_id !== runId || data.task_id !== taskId || data.source !== 'LIVE' ||
           !['QUEUED', 'RUNNING', 'COMPLETED', 'ERROR'].includes(data.state)) throw new Error('Run identity or state mismatch.')
       if (mode && (data.mode !== mode || (mode === 'fixture' && data.candidate_id !== candidateId))) {
@@ -65,7 +72,7 @@ export function createApiClient({ fetcher = globalThis.fetch, now = Date.now,
     }
     throw new Error('等待结果超时，后端状态未知；未产生验收结论。')
   }
-  return { listTasks, startRun, waitForRun,
+  return { listTasks, startRun, startCustom, waitForRun,
     health: signal => request('/health', { signal }),
     getTask: (id, signal) => request(`/tasks/${encodeURIComponent(id)}`, { signal }),
   }

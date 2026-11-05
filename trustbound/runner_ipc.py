@@ -65,10 +65,10 @@ def _connect(path):
     return connection
 
 
-def run_through_worker(code, tests, phase, *, cases=None):
+def run_through_worker(code, tests, phase, *, cases=None, task_id=TASK_ID):
     """Bind evidence to the exact bytes the Web verifier expected."""
     artifact_hash, test_hash = sha256(code), sha256(tests)
-    request = {"task_id": TASK_ID, "phase": phase, "candidate": code.decode("utf-8"),
+    request = {"task_id": task_id, "phase": phase, "candidate": code.decode("utf-8"),
                "candidate_sha256": artifact_hash}
     if cases is not None:
         request["cases"] = cases
