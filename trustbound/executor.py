@@ -98,8 +98,9 @@ def validate_billing_code(code):
         raise ProposalError("UNSUPPORTED_BILLING_CODE") from None
 
 
-def run_executor(client, *, model_id=None, smoke_check=True, proposal_tokens=1024):
-    if type(proposal_tokens) is not int or not 1 <= proposal_tokens <= 2048:
+def run_executor(client, *, model_id=None, smoke_check=True, proposal_tokens=1024,
+                 reasoning_tokens=None):
+    if type(proposal_tokens) is not int or not 1 <= proposal_tokens <= 4096:
         raise ValueError("Invalid proposal token budget")
     report = {"source": "NO_LIVE_CALL", "status": "BLOCKED", "model_selection": None,
               "requests": [], "model_suggestion": None, "verification": None,
@@ -134,7 +135,9 @@ def run_executor(client, *, model_id=None, smoke_check=True, proposal_tokens=102
                 "public_tests.py": (ROOT / "fixtures/billing/public_tests.py").read_text(),
             })}]
         report["requests"].append({"phase": "proposal", "messages": messages})
-        text = client.complete(model, messages, proposal_tokens, json_mode=True)
+        # VultrClient validates catalog support before any proposal request is sent.
+        options = {"reasoning_tokens": reasoning_tokens} if reasoning_tokens is not None else {}
+        text = client.complete(model, messages, proposal_tokens, json_mode=True, **options)
         report["model_suggestion"] = {"raw_content": text}
         proposal = parse_proposal(text)
         report["model_suggestion"]["parsed"] = proposal

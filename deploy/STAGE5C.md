@@ -122,6 +122,12 @@ sudo install -m 0644 /srv/trustbound/pointers/current/deploy/Caddyfile.stage5c /
 `TRUSTBOUND_MAX_MODEL_CALLS` 和 `TRUSTBOUND_MAX_OUTPUT_TOKENS`。
 每次真实生成尝试（含重试）发送前扣减全局额度；不对未知账单退款。
 此额度只计算生成调用和预留输出 Token，实际输入、输出和估算费用仍由现有报告记录。
+当操作者已通过 Vultr 的只读健康检查，可在临时私有环境中设置
+`TRUSTBOUND_EXECUTOR_SINGLE_PROPOSAL=1`，只提交一次补丁生成。该配置跳过
+READY 探针，单次输出上限 4,096，超时 60 秒且不重试。该配置请求 1,536
+推理 Token；目录未声明支持该参数时，客户端在发送补丁请求前停止。为此实验
+配置独立账本，并将总任务、模型调用、输出 Token 上限分别设为 1、1、4,096。公网离线配置
+和默认 Live 配置不受此 opt-in 影响。
 关闭 Live、恢复公开离线 profile 后，重新验收公网路由。
 
 正常 Runner 每轮清理容器。Worker 启动时只会回收自己标记的临时容器，最多

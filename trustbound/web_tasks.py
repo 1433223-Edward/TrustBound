@@ -55,8 +55,16 @@ def _execute_base_run(task_id, mode, candidate):
             raise RuntimeError("Fixture changed during execution")
         return {"proposal": None, "candidate": {"path": "billing.py", "content": code.decode("utf-8"), "source": "FIXTURE"},
                 "verification": verification, "executor": None, "llm_source": "NONE", "error": None}
-    client = offline_client() if mode == "offline_executor" else VultrClient()
-    result = run_executor(client, model_id=DEFAULT_MODEL if mode == "offline_executor" else None)
+    if mode == "offline_executor":
+        result = run_executor(offline_client(), model_id=DEFAULT_MODEL)
+    elif os.environ.get("TRUSTBOUND_EXECUTOR_SINGLE_PROPOSAL") == "1":
+        # The operator already checked credentials. Reserve room for the JSON
+        # proposal after reasoning without adding a second request or retry.
+        client = VultrClient(timeout=60, max_attempts=1, output_limit=4096)
+        result = run_executor(client, smoke_check=False, proposal_tokens=4096,
+                              reasoning_tokens=1536)
+    else:
+        result = run_executor(VultrClient())
     suggestion = result.get("model_suggestion") or {}
     return {"proposal": suggestion.get("parsed"), "candidate": None,
             "verification": result.get("verification"), "executor": result,
