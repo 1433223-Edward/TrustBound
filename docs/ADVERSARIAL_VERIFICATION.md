@@ -1,5 +1,7 @@
 # Stage 2 — Independent adversarial verification
 
+> **Historical Stage Record — Not the Current Release State.** 本文保存 Stage 2 的离线/实验验证记录；Adversarial Agent 不属于当前默认 Live Workspace 功能。当前边界见 [README](../README.md)。
+
 ## Scope and execution
 
 Stage 1 formal acceptance, Permission Gate, Runner constraints and VerificationReport remain intact.

@@ -1,5 +1,7 @@
 # Day 1 环境准备记录
 
+> **Historical Stage Record — Not the Current Release State.** 保留原始实验与测试证据；当前产品和部署边界见 [README](../README.md) 与 [部署与运维说明](TrustBound_Deployment_Operations_Guide_2026-11-08.md)。
+
 日期：2026-11-03（北京时间）。仅记录实际检查，不代表 Gate A 已通过。
 
 ## 已验证

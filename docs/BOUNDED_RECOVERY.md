@@ -1,5 +1,7 @@
 # Stage 3 — Bounded Recovery
 
+> **Historical Stage Record — Not the Current Release State.** Recovery 不是当前默认 Live Workspace 功能；本文保留阶段设计与实验记录。
+
 ## Audit and minimal change
 
 Stage 2's trusted overall decision is `adversarial.final_decision`, attached by

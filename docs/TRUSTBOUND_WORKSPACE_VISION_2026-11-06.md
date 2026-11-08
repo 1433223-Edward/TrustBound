@@ -1,5 +1,7 @@
 # TrustBound — Agent Workspace 产品演进说明
 
+> **Historical Stage Record — Not the Current Release State.** 本文是 2026-11-06 的设计与阶段计划，含当时的目标、待办和假设；当前能力边界以根目录 [README](../README.md) 与 [部署与运维说明](TrustBound_Deployment_Operations_Guide_2026-11-08.md) 为准。
+
 > 版本：Workspace 愿景与架构审计 · 2026-11-06  
 > 性质：产品决策与待确认的实施方案。本文独立于项目总档案。  
 > 稳定基线：`a4371cc`。Stage 5B/5C、A1–A5 和 Billing Live 的状态依据此前 VM 验收记录。

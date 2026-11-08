@@ -1,5 +1,7 @@
 # Workspace Recovery P0 reliability boundaries
 
+> **Historical Stage Record — Not the Current Release State.** 本文记录 Recovery P0 的设计与测试边界；Recovery Agent 不是当前默认 Live Workspace 功能。当前边界见 [README](../README.md)。
+
 The existing Workspace SQLite database gains run_requests and run_events. The quota database gains model_requests, model_request_events and run_admissions. All changes create new tables; existing projects, freezes, source archives, reports and aggregate quota counts are retained. Billing recovery remains a separate orchestration.
 
 ## Identities and state transitions

@@ -1,5 +1,7 @@
 # Custom Task v1 私有验收
 
+> **Historical Stage Record — Not the Current Release State.** Custom Task 是已有私有/离线验收记录，不是当前默认 Live Workspace 功能。
+
 Custom Task 与 Billing 共用 FastAPI 的单任务队列、独立 Runner、固定 Docker
 沙盒和 VerificationReport。原有 Billing 路径及回归保持可用。
 

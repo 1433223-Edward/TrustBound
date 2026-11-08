@@ -12,7 +12,7 @@
 .\scripts\start_workspace_preview.ps1
 ```
 
-默认开启 Workspace、Billing 和重试的模型调用，使用本机已有凭据；额度为 48 次模型调用、196608 输出 Tokens，沿用现有额度账本，不自动清零。仅需离线体验时显式传入 `-EnableLiveFromEnv:$false -EnableBillingLive:$false -EnableRetryFromEnv:$false`。终端二：
+该脚本的历史默认参数会启用本地 Live 开关；**不要把它当作当前产品默认体验或真实模型调用证据**。如只需无付费的离线体验，显式传入 `-EnableLiveFromEnv:$false -EnableBillingLive:$false -EnableRetryFromEnv:$false`。即使本地环境具备凭据，真实调用仍要由操作者单独授权，并受本地配额约束。终端二：
 
 ```powershell
 cd D:\Projects\TrustBound\frontend

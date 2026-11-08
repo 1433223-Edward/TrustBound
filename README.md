@@ -1,212 +1,107 @@
 # TrustBound
 
-面向受控 Python 修复任务的隔离执行与独立验收实验。项目范围与路线见
-[项目总档案](TrustBound_Hackathon_MasterPlan_2026-11-03.md)。
+**AI-assisted Code Modification with Human Approval, Isolated Execution, and Security Evidence.**
+**面向人工审批、隔离执行与安全证据的 AI 辅助代码修改。**
 
-当前已实现不依赖 LLM 的固定金额 Bug 样例、最小 Sandbox Runner、独立验收和 JSON 报告。
+Built for Vultr: Agent Rush Hackathon 2026 — Challenge 1: Blast Radius Zero.
 
-本地 Python 环境：
+[Public Demo](https://66-42-37-36.sslip.io/) · [Documentation](docs/README.md) · [Deployment guide](docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md)
 
-```powershell
-D:\Anaconda\python.exe -m venv .venv
-.\.venv\Scripts\python.exe --version
+## English
+
+### Project overview
+
+TrustBound keeps four decisions separate: an AI may propose a change, a human approves its scope, a restricted executor runs it, and the system preserves evidence of what actually happened. A successful process is not silently treated as proof of business correctness.
+
+Core flow: **Natural Language Task → AI Planning → Human Approval → Executor Agent → Rootless Docker Sandbox → Security Evidence**.
+
+### Core features
+
+- Agent Chat and AI-assisted project planning through the private Workspace.
+- Human review and frozen approval of write scope, entrypoint, constraints, and execution intent.
+- Executor proposals passed through a server-side permission gate.
+- Isolated, bounded execution by a separate Rootless Docker Runner.
+- Diff, run history, hashes, sandbox/cleanup evidence, and quota-aware model-request records.
+- Vultr Serverless Inference integration only from the trusted private backend.
+
+### Architecture and capability boundary
+
+```text
+Public reviewer → HTTPS/Caddy → static UI + allowlisted offline Billing API
+Private operator → SSH tunnel → token-protected Workspace → Vultr LLM / approval gate
+                                             ↓
+                                  Unix socket → Rootless Docker Runner → evidence
 ```
 
-不需要修改 Anaconda 全局环境。Docker Desktop 采用 WSL2 后端，容器数据位于
-`D:\DockerData\TrustBound`。安装后重新打开终端以加载 Docker PATH。
+The public demo at [66-42-37-36.sslip.io](https://66-42-37-36.sslip.io/) is a restricted Billing **offline** demo. Depending on the active Caddy profile, it can proxy only allowlisted offline Billing routes behind Basic Auth; it never exposes the Agent Workspace or real Vultr LLM calls.
 
-复现环境检查（需要 Docker Desktop 已运行）：
+The private Live Workspace listens only on VM loopback `127.0.0.1:8002` and is reached through an SSH tunnel. It uses a Workspace Token and explicit quota/authorization controls. Its configuration supports real Vultr calls, but this repository does **not** contain terminal evidence of a successful production LLM request; configuration readiness is not a successful-call acceptance result.
 
-```powershell
-docker pull python:3.12-slim
-.\.venv\Scripts\python.exe -B scripts\check_sandbox.py
-```
+Functional Verification is **off by default** for new Workspace browser preferences. The retained functional path can produce `VERIFIED` only against approved, trusted acceptance criteria. The default security-only path can produce `EXECUTED_UNVERIFIED`; that means the bounded run and its security evidence were intact, not that the change is business-correct. Adversarial and Recovery agents are retained historical/offline or experimental capabilities, not default Live Workspace features.
 
-脚本只执行预先审核的固定代码，不接收任意代码或挂载宿主目录。每次运行解析本地镜像
-digest，并覆盖 `docs/environment-smoke.json`。测试成功不代表任意代码执行服务安全。
+### Tech stack
 
-真实执行记录及未验证事项见 `docs/EXPERIMENTS.md`。
+Python 3.12, FastAPI/Uvicorn, Vue 3/Vite, SQLite, Caddy, systemd, Vultr Cloud Compute, Vultr Serverless Inference, and Rootless Docker.
 
-## 工程协作
-
-- **按需读取**。从 Git 状态和当前任务的 Diff 入手，定向阅读相关实现、接口、测试和依赖。长篇设计文档、历史记录和实验报告只在与任务有关时查阅。跨模块改动仍须追踪调用链、安全边界和受影响的契约。
-- **L1 · 局部验证**。样式、文案和普通组件的小改动，执行相关组件测试、构建、格式或静态检查。纯文档改动检查 Diff 即可。
-- **L2 · 相关集成验证**。涉及交互、状态、API 或跨模块行为时，验证受影响的链路。Agent 编排、Runner、权限、认证和验收逻辑的改动，必须执行对应的关键集成与安全测试。涉及沙箱行为时，使用真实 Docker 验证。
-- **L3 · 完整回归与安全验收**。正式部署或正式交付前，运行完整回归与适用的安全验收。若必要检查受环境或授权阻塞，记录缺口并标明待验收。
-- **审核分工**。页面视觉、字号、布局和体验由用户人工审核。Codex 负责实现、风险分析、自动化测试和错误定位。通过时简报范围与结果，失败时只提供定位所需的错误信息。
-
-每轮交付用五项简报：
-
-1. 改了什么。
-2. 为什么改。
-3. 执行了哪些测试及结果。
-4. 哪些测试未运行及原因。
-5. 用户需要人工验收什么。
-
-## 固定修复实验
-
-需求是将十进制金额字符串转换为整数分，采用最近值舍入，恰好半分时远离零
-（`ROUND_HALF_UP`）。例如 `1.239 → 124`、`1.005 → 101`、`-1.005 → -101`。
-本轮仅覆盖声明的有限金额样例，未定义无效输入、NaN 或超大金额行为。
+### Local development
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -B -m trustbound all
-```
-
-也可将 `all` 换成 `original`、`fixed`、`public_only`、`unauthorized` 或 `timeout`。
-CLI 仅接受这些候选 ID，不接受命令、代码文本、路径或自定义授权策略。
-每次运行的 JSON 写入独立的 `artifacts/<UTC时间>-<run_id>/reports.json`。
-CLI 退出码 0 表示各场景的实际状态符合预期，**不代表所有候选均通过验收**。
-
-- `original`：截断小数，公开测试失败，报告 `FAILED`。
-- `fixed`：公开测试和新容器中的独立验收都通过，报告 `VERIFIED`。
-- `public_only`：使用银行家舍入，公开测试通过但半分边界验收失败，报告 `FAILED`。
-- `unauthorized`：预定义请求包含修改 `acceptance/billing_v1.py`，在启动容器前报告 `REJECTED`。
-- `timeout`：固定无限循环由宿主超时终止，报告 `FAILED`，执行状态为 `TIMED_OUT`。
-
-`fixtures/billing/` 保存原始代码、完整文件替换补丁、公开测试与受控失败样例；
-`acceptance/billing_v1.py` 是可信正式验收材料；`trustbound/contracts.py` 定义三个契约；
-`service.py` 控制固定任务、范围检查和验收裁决；`runner.py` 负责容器生命周期。
-本轮可审查的真实报告快照为 [docs/day1-results.json](docs/day1-results.json)。
-
-## 信任与隔离边界
-
-TaskSpec、候选注册表和正式验收标准来自可信仓库，用户输入只选择固定 ID，不能重定义策略。
-候选代码从不在宿主 Python 中导入或执行；只读挂载专用临时目录中的两份文件。
-公开测试与独立验收使用不同临时目录和不同容器，候选不能修改验收副本，
-宿主正式验收文件在执行前后做内容一致性检查。验收副本不是保密机制。
-
-执行使用已固定 digest 的 Python 镜像，禁止拉取漂移标签；如果该镜像不存在，可手动执行：
-
-```powershell
-docker pull python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30
-```
-
-每个容器采用 non-root、network none、只读根目录和工作区、cap-drop ALL、
-no-new-privileges、128 MiB 内存及 swap 总量、0.5 CPU、32 PID，日志轮转上限约 2 MiB。
-启动前 inspect 检查限制配置；等待执行限时 3 秒，Docker 控制命令另有 30 秒超时。
-Docker Socket、宿主项目目录和宿主环境变量不传入容器。
-
-报告包含候选及验收 SHA-256、diff、真实 stdout/stderr、退出码、超时原因、
-配置检查、工作区完整性和清理结果。仅测试通过、证据对应且清理成功时才可 `VERIFIED`；
-控制器错误或清理无法确认产生 `INCONCLUSIVE`。
-这套机制以可信仓库和受审核候选为前提，不支持任意公众代码，也没有提供通用沙盒安全证明。
-
-## Vultr 最小 Executor
-
-新增 `trustbound/inference.py`（仅 Vultr 官方 HTTP API）、`trustbound/executor.py`
-（一次候选生成、结构与代码检查、调用原有权限检查及验收）和 `tests/test_executor.py`。
-未增加第三方依赖，原来的固定场景 CLI 保持可用。
-
-在本地进程环境中配置 `VULTR_INFERENCE_API_KEY`；可选 `VULTR_MODEL` 默认值为
-`deepseek-v4.1-flash-1017`。不要将密钥写入仓库或聊天。`.env.example` 仅作变量说明，
-程序不自动读取 `.env`，也不读取通用 `VULTR_API_KEY`。
-
-```powershell
-.\.venv\Scripts\python.exe -B -m trustbound.executor
-```
-
-运行顺序：实时查询官方公开模型目录 → 确认所选 ID 在目录中 → 64 Token 最小请求 →
-1024 Token JSON 补丁请求 → 输出校验 → 范围检查 → 受限容器公开测试 → 新容器独立验收。
-每个 HTTP 操作设置 30 秒 socket 超时；只对明确的 HTTP 429 最多重试一次，
-超时、5xx、认证失败和格式错误不自动重试，以避免重复产生不确定费用。
-不做 Agent 多轮修复，最大生成输出预算为 64 + 1024 Token（正常两次成功请求）；
-输入采用固定材料并限制为 12000 个 JSON 字符，账单以服务端实际用量为准。
-
-Executor 只读取固定 TaskSpec、原始代码与公开测试，不向模型提供正式验收文件。
-模型必须返回严格 JSON：`analysis` 与单文件 `files` 替换映射。
-模型不能重定义 TaskSpec、运行命令、选择 Docker 参数或提供正式验收材料。
-允许的生成代码语法限定为 Decimal 导入与单个 `to_cents` 函数、单一 return 表达式，
-支持 `int`、`Decimal`、基础算术与 `quantize`。拒绝额外导入、装饰器、默认值执行、
-IO、进程控制、赋值及循环，避免候选主动退出或篡改 unittest 来伪造通过。
-有些正确 Python 写法也会被此保守规则拒绝，这是本轮最小 Executor 的明确限制。
-
-每次结果存入 `artifacts/executor-<id>/report.json`，模型建议、请求材料、调用台账与
-实际 `VerificationReport` 分开保存。台账记录输出预算、用量、按目录单价估算的 USD，
-未知用量或请求超时时费用标为未知；估算不等于最终账单。密钥和 HTTP 错误响应体不写入报告。
-无 Key 时退出码为 2、状态为 `BLOCKED`、`source=NO_LIVE_CALL`，不会用假响应替代。
-离线测试的注入 transport 标为 `OFFLINE_TEST`，不等同于模型已可用。
-
-本轮真实公开目录选择依据见 [模型记录](docs/vultr-model-selection.json)。
-真实推理尚未验证，当前阻塞及验收结果见 [实验记录](docs/EXPERIMENTS.md)。
-
-## 本地 Web 集成（无需 Vultr Key）
-
-已支持 Vue → FastAPI → 原 Task Service → 真实 Docker → 独立验收 → Web 报告。
-保留 Demo Replay 历史回放；要执行新任务，请在页面切换 **Local API**。
-
-首次安装 Web 依赖（仅项目虚拟环境）：
-
-```powershell
+python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
-```
-
-终端一，在项目根目录启动后端（仅本机、单进程）：
-
-```powershell
 .\.venv\Scripts\python.exe -B -m uvicorn trustbound.api:app --host 127.0.0.1 --port 8000 --workers 1
-```
 
-终端二，启动前端：
-
-```powershell
 cd frontend
 npm ci
 npm run dev
 ```
 
-浏览器访问 `http://127.0.0.1:5173/`。Vite 将 `/api` 同源代理到 8000；
-不要直接用 `file://` 打开页面，也不要把本地实验服务绑定到公网。
+Run `npm run build`, the relevant Python tests, and Docker checks only where Docker Desktop is available. Do not expose local FastAPI, Vite, or Docker endpoints publicly. See [local Workspace flow](docs/WORKSPACE_LOCAL_FLOW.md).
 
-Local API 支持三种模式：
-- `fixture`：选择五个固定候选之一，真实运行原 Runner 与 Verifier，不调用模型。
-- `offline_executor`：只注入固定模型响应，结构校验、AST、权限、Docker 与验收仍真实执行，标记 MOCK LLM。
-- `live_executor`：需本地环境设置 `VULTR_INFERENCE_API_KEY`、`VULTR_MODEL`、`TRUSTBOUND_ENABLE_LIVE=1`。
-  只有配置就绪才接受请求；真实认证、模型可用性由请求验证，失败不冒充通过。本轮未调用 Vultr。
+### Deployment and configuration
 
-API 最多同时执行一项任务，忙时返回 429，健康检查与轮询不会等待 Docker 完成。
-内存记录最多 50 项，重启不恢复运行态；原始快照保存到 `artifacts/web-runs/`。
-原始 VerificationReport 的 run_id 不被改写，API 作业 ID 与报告 ID 分开绑定。
+The public service loads `/etc/trustbound/backend.env`; the private service loads that file first and then `/etc/trustbound/workspace-live.env`. The documented private paths are `/var/lib/trustbound/workspace-live/workspace.sqlite3`, `/var/lib/trustbound/workspace-live/quota.sqlite3`, and `/run/trustbound-runner.sock`.
 
-验证命令（API 测试需要本机 socket 权限；真实集成需两个服务和 Docker 已启动）：
+Use placeholders only for `VULTR_INFERENCE_API_KEY` and `TRUSTBOUND_WORKSPACE_TOKEN`. Required variables, systemd commands, release/rollback, backup, snapshot, and recovery procedures are in the [deployment operations guide](docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md). A stopped Vultr VM can still incur resource charges; snapshots may also be billed.
 
-```powershell
-.\.venv\Scripts\python.exe -B -m unittest discover -s tests -q
-.\.venv\Scripts\python.exe -B scripts/check_web_integration.py --port 5173
-```
+### Testing and limitations
 
-接口详见 [WEB_API_CONTRACT.md](docs/WEB_API_CONTRACT.md)，真实六场景证据见
-[web-integration-results.json](docs/web-integration-results.json)。这不是任意用户代码执行服务。
+Historical offline and Docker evidence is preserved in `docs/` and `benchmarks/`; it is not a claim about the current production deployment. The system is designed for bounded Python projects, not arbitrary public code execution or a multi-tenant code-hosting platform. Container isolation and recorded evidence are defense-in-depth controls, not a proof against every host or container failure.
 
+## 简体中文
 
-## Stage 2 对抗验证
+### 项目介绍
 
-Local API 中选择固定候选 `double_rounding`，再选择 Adversarial `offline` 和 `standard`，
-点击 Run Agent。在 Evidence 的 Adversarial 标签查看真实反例：正式验收 VERIFIED，
-但 1.00499 得到 101（参考 100），总体 FAILED。离线只模拟模型响应，Docker 仍真实执行。
-正确 fixed 候选无已确认反例；invalid/timeout/failure 预设明确显示阶段未完成。
-真实 Vultr 尚未验证，不把离线结果作为模型成功。
+TrustBound 将四件事明确分开：AI 只提出修改建议；人类审批修改范围；受限执行器运行；系统保存实际发生过程的证据。一次成功运行不会被自动解释为业务需求已经满足。
 
-设计、上下文边界及恢复接口建议见 [ADVERSARIAL_VERIFICATION.md](docs/ADVERSARIAL_VERIFICATION.md)。
-新增集成命令：`.\.venv\Scripts\python.exe -B scripts/check_adversarial_integration.py`。
+核心流程：**自然语言任务 → AI 规划 → 人工审批 → Executor Agent → Rootless Docker 沙箱 → 安全证据**。
 
+### 核心功能
 
-## Stage 3 有限恢复
+- 私有 Workspace 中的 Agent Chat 与 AI 辅助项目规划。
+- 人工审核并冻结可写路径、入口、约束和执行意图。
+- Executor 提案先经过服务端权限门禁。
+- 独立 Rootless Docker Runner 执行有界隔离任务。
+- 保存 Diff、运行历史、哈希、沙箱/清理证据与模型请求配额记录。
+- 仅由受信任的私有后端调用 Vultr Serverless Inference。
 
-Local API → double_rounding → Adversarial offline → Bounded Recovery offline → 正确修复。
-初始失败后最多请求两次修复，每个新候选重新执行权限、公开测试、独立验收和对抗验证。
-Evidence 的 Recovery 标签保留每轮 Diff、哈希、触发证据、结果和停止原因。
-离线模拟的只是模型提案，业务验证仍使用真实 Docker；默认不启用恢复，不自动消耗 Vultr 额度。
+### 架构与能力边界
 
-实验命令：`.\.venv\Scripts\python.exe -B scripts/check_recovery_integration.py`。
-设计、数据契约、函数学习顺序和单独启用真实模型的步骤见
-[BOUNDED_RECOVERY.md](docs/BOUNDED_RECOVERY.md)。
+公网 [Demo](https://66-42-37-36.sslip.io/) 是受限的 Billing **离线**演示。生效的 Caddy 配置可在 Basic Auth 后代理少量白名单 Billing 离线接口，但不开放 Agent Workspace，也不调用真实 Vultr LLM。
 
+私有 Live Workspace 仅监听 VM 回环地址 `127.0.0.1:8002`，通过 SSH 隧道访问，使用 Workspace Token、明确授权和配额限制。环境配置可支持真实 Vultr 调用，但仓库中没有一次生产真实模型请求成功的终端验收证据；“配置就绪”不等于“调用已验收”。
 
-本地开发时，后端导入 inference 模块会加载项目根目录 `.env` 中的
-`VULTR_INFERENCE_API_KEY`、`VULTR_MODEL`、`TRUSTBOUND_ENABLE_LIVE` 和
-`TRUSTBOUND_ENABLE_RECOVERY_LIVE`。系统注入的同名变量优先（包括空值）。
-生产环境可设置 `TRUSTBOUND_LOAD_DOTENV=0` 禁用文件加载。
-支持单行 KEY=value、单/双引号和 export；不执行变量展开或命令。
-`.env` 已被 Git 忽略。修改配置后需重启后端；读取 Key 不会自动发起推理请求。
+新 Workspace 浏览器偏好默认关闭功能验证。保留的功能验证路径只有在已批准的可信验收标准下才会给出 `VERIFIED`。默认安全执行成功的状态是 `EXECUTED_UNVERIFIED`：它只说明有界执行及安全证据完整，不说明业务正确。Adversarial Agent 与 Recovery Agent 仅保留为历史/离线或实验能力，不属于默认 Live Workspace 功能。
+
+### 本地开发、部署与文档
+
+本地启动、离线流程和限制见 [本地 Workspace 流程](docs/WORKSPACE_LOCAL_FLOW.md)。公网环境文件为 `/etc/trustbound/backend.env`；私网服务先读取它，再读取 `/etc/trustbound/workspace-live.env`。密钥和 Token 只能使用占位符，不能写入仓库。
+
+发布、健康检查、配额查询、systemd、回滚、备份与 Vultr 快照说明见 [部署与运维说明](docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md)。停止 VM 不代表资源不再计费，快照也可能继续收费。
+
+## Documentation
+
+- [Current documentation index](docs/README.md)
+- [Deployment and operations guide](docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md)
+- [Verification modes](docs/VERIFICATION_MODES.md)
+- [Public API / historical contracts](docs/WEB_API_CONTRACT.md)
+- [Historical experiments](docs/EXPERIMENTS.md)

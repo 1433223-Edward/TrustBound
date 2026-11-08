@@ -1,5 +1,7 @@
 # Stage 5B 私有 Runner
 
+> **Historical Stage Record — Not the Current Release State.** This document preserves the Stage 5B installation and validation record. The current public/private deployment boundary is documented in [the deployment operations guide](../docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md).
+
 FastAPI 继续监听 `127.0.0.1:8000`。启用私有 Runner 配置后，Web 进程只使用
 `/run/trustbound-runner.sock`。该 socket 由 systemd 创建，仅 Web 账号可连接，
 Runner 再使用 Linux peer credentials 验证对端 UID。Runner 从自己的

@@ -1,5 +1,7 @@
 # Security Attack Suite A1–A5
 
+> **Historical Stage Record — Not the Current Release State.** 本文保留 A1–A5 安全实验范围与结果；它不替代当前部署验收。
+
 这套实验由运维人员在私有 Ubuntu VM 启动。它复用独立 Runner 的 Rootless Docker
 连接检查、固定镜像、容器限制、只读挂载、超时和清理逻辑。攻击探针由 Runner
 账号下的专用 CLI 运行，Web API 和业务 Unix Socket 都没有新增攻击入口。

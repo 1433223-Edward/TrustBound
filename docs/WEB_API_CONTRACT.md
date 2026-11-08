@@ -1,5 +1,7 @@
 # TrustBound Web Workspace — 最小 API 契约
 
+> **Historical Stage Record — Not the Current Release State.** 本文保留早期 Billing Web API 与阶段扩展契约；公网当前仅允许 Caddy 白名单中的离线 Billing 路由，私有 Workspace 的当前部署边界见 [README](../README.md) 和 [部署与运维说明](TrustBound_Deployment_Operations_Guide_2026-11-08.md)。
+
 状态：**已实现本地 FastAPI 与真实 Docker 集成**。`trustbound/api.py` 提供接口，
 `web_tasks.py` 负责可信任务和模式分发，复用现有执行与验收，不修改沙盒参数。
 前端 `src/api/client.js` 仅访问同源 `/api`，不访问 Vultr，不存储 API Key。

@@ -1,5 +1,7 @@
 # Stage 4 preflight and offline validation
 
+> **Historical Stage Record — Not the Current Release State.** 本文的配置检查与离线验证不构成当前私有 Workspace 真实 Vultr 调用成功的验收。
+
 Status: BLOCKED_FOR_LIVE_CREDENTIALS_AND_APPROVAL. No paid inference was requested.
 Process and user configuration presence checks found no VULTR_INFERENCE_API_KEY or VULTR_MODEL.
 Cloud credit receipt does not establish Inference subscription or model access; neither was authenticated.

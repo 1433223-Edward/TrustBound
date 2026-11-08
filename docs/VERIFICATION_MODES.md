@@ -1,6 +1,6 @@
 # Workspace verification modes
 
-Settings -> Agent workflow -> Code Correctness Verification defaults to ON. Existing browser preferences and old run requests default to functional verification. This preference affects new Workspace runs; fixed Billing evaluations, Demo Replay evidence and system regression/security tests do not consult the browser preference.
+Settings -> Agent workflow -> Code Correctness Verification defaults to **OFF** for new browser preferences. Existing browser preferences and old run requests without an explicit value are interpreted as functional verification for compatibility. This preference affects new Workspace runs; fixed Billing evaluations, Demo Replay evidence and system regression/security tests do not consult the browser preference.
 
 ## FUNCTIONAL (default)
 

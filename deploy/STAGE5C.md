@@ -1,5 +1,7 @@
 # Stage 5C：Billing 公网离线 Demo
 
+> **Historical Stage Record — Not the Current Release State.** This is a Stage 5C rollout record. Use [the deployment operations guide](../docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md) for current operating instructions and do not infer current public exposure from this stage document.
+
 先在 VM 上验收准入，再启用带认证的 HTTPS。管理员 Live 单独走私有链路。
 公网 API 只允许 Billing 固定候选或标准 Offline Executor，可选标准离线对抗。
 Custom Task、真实推理和恢复入口都关闭。FastAPI 仍只绑定 127.0.0.1，Web 进程

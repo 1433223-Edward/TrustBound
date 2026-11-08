@@ -1,5 +1,7 @@
 # Stage 5A — Deployment Readiness
 
+> **Historical Stage Record — Not the Current Release State.** This Stage 5A baseline preserves its original deployment gates. For the current two-profile topology, paths, commands, and evidence boundary, see [the deployment operations guide](../docs/TrustBound_Deployment_Operations_Guide_2026-11-08.md).
+
 Stage 5B 的私有 Runner 接入与人工验收步骤见 [PRIVATE_RUNNER.md](PRIVATE_RUNNER.md)。
 下文保留 Stage 5A 审计基线，公网执行仍由现有 Caddy 配置阻断。
 
