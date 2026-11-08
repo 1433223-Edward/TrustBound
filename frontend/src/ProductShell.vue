@@ -11,7 +11,7 @@ const pages = {
   home: ['Home', '首页'], demo: ['Demo Replay', '演示回放'], workspace: ['Agent Workspace', '工作区'],
   documentation: ['Documentation', '文档'], settings: ['Settings', '设置'],
 }
-const defaults = { theme: 'dark', language: 'en', density: 'comfortable', wrap: false, codeView: 'both', semanticTriage: true, planSummary: true, correctnessVerification: true, challenges: true, recovery: true, execution: 'ask', model: '', start: 'home' }
+const defaults = { theme: 'dark', language: 'en', density: 'comfortable', wrap: false, codeView: 'both', semanticTriage: true, planSummary: true, correctnessVerification: false, challenges: false, recovery: false, execution: 'ask', model: '', start: 'home' }
 const storageKey = 'trustbound-interface-v1'
 function readPreferences() {
   let legacyExecution = 'ask'
@@ -28,9 +28,9 @@ function readPreferences() {
       codeView: ['original', 'candidate'].includes(saved.codeView) ? saved.codeView : 'both',
       semanticTriage: saved.semanticTriage !== false,
       planSummary: saved.planSummary !== false,
-      challenges: saved.challenges !== false,
-      correctnessVerification: saved.correctnessVerification !== false,
-      recovery: saved.recovery !== false,
+      challenges: saved.challenges === true,
+      correctnessVerification: saved.correctnessVerification === true,
+      recovery: saved.recovery === true,
       execution: ['ask', 'deny'].includes(saved.execution) ? saved.execution : legacyExecution,
       model: typeof saved.model === 'string' ? saved.model : '', 
       start: ['home', 'demo', 'workspace', 'documentation'].includes(saved.start) ? saved.start : defaults.start,

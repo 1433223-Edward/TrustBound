@@ -283,7 +283,9 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
         if request.method == "POST":
             origin = request.headers.get("origin")
             if ((public and origin != f"https://{domain}")
-                    or (not public and origin and origin not in {
+                    or (not public and origin
+                        and not (local_workspace and origin == str(request.base_url).rstrip("/"))
+                        and origin not in {
                         "http://localhost:5173", "http://127.0.0.1:5173",
                         "http://localhost:8000", "http://127.0.0.1:8000"})):
                 return JSONResponse({"error": {"code": "ORIGIN_DENIED", "message": "请求来源不在工作区白名单。"}}, status_code=403)
@@ -499,12 +501,16 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
             raise WorkspaceError("STALE_WORKSPACE_REVISION", 409)
         try:
             with inference_admission(admission):
-                draft, usage = generate_plan(project, body.goal, body.model_id)
+                draft, usage = generate_plan(project, body.goal, body.model_id,
+                    user_details=body.user_details.model_dump(mode="json") if body.user_details else None,
+                    correctness_verification=body.correctness_verification)
             draft = draft.model_copy(update={"revision": body.revision, "quick_mode": False,
                 "correctness_verification": body.correctness_verification,
                 "reference_profile": (project.get("plan") or {}).get("reference_profile", "none")})
             plan = offline_plan(project, draft)
-            decision = {**rule_triage(plan, requested=True), "source": "VULTR_PLAN", "inference_usage": usage}
+            decision = {**rule_triage(plan, requested=True), "source": "VULTR_PLAN", "inference_usage": usage,
+                        "user_requirements": {"goal": body.goal, "details": body.user_details.model_dump(mode="json") if body.user_details else {}},
+                        "proposal_notice": "Source deductions and model suggestions require human review; cases are not trusted evidence."}
             return projects.change(workspace_owner, project_id.hex, draft, "plan", planning=decision)
         except InferenceError as error:
             raise WorkspaceError(str(error), 502) from None

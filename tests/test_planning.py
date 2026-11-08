@@ -139,7 +139,7 @@ class PlanningTests(unittest.TestCase):
             call = client.return_value.complete.call_args
             messages = call.args[1]
             content = json.loads(messages[1]["content"])
-            self.assertEqual(set(content), {"goal", "files", "schema"})
+            self.assertEqual(set(content), {"goal", "files", "schema", "user_details", "correctness_verification"})
             self.assertNotIn("protected-answer", json.dumps(messages))
             self.assertEqual(call.args[2], 4096)
             client.assert_called_once_with(timeout=60, max_attempts=1, output_limit=4096)

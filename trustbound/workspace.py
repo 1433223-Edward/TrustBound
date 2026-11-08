@@ -105,7 +105,8 @@ class TriageDraft(PlanDraft):
 
 
 class GeneratePlan(Revision):
-    correctness_verification: bool = True
+    correctness_verification: bool = False
+    user_details: PlanDraft | None = None
     goal: str = Field(min_length=1, max_length=1200)
     model_id: str = Field(min_length=1, max_length=120)
     authorize_model: Literal[True]
@@ -276,6 +277,7 @@ def offline_plan(snapshot, body):
         (not body.correctness_verification or body.acceptance_basis.strip() or body.reference_profile != "none",
          "NEEDS_CONFIRMATION: 请说明独立验收期望值的需求依据及推导过程。"),
     ) if not ready]
+    questions = list(dict.fromkeys(questions))
     if body.correctness_verification and "NEEDS_CONFIRMATION" in canonical(draft).decode() and not questions:
         questions.append("NEEDS_CONFIRMATION: 请解决草案中标记的不确定规则后重新审核。")
     return {**draft, "source": "OFFLINE_RULES", "questions": questions,
@@ -637,7 +639,7 @@ class WorkspaceStore:
                     plan["questions"].extend(missing)
                 if "objective" in missing and not plan["questions"]:
                     plan["questions"].append("预期行为与成功标准是什么？")
-                state = ("CLARIFYING" if plan["questions"] or missing or decision["route"] == "CLARIFY"
+                state = ("CLARIFYING" if (plan["correctness_verification"] and plan["questions"]) or missing or decision["route"] == "CLARIFY"
                          else "PLAN_READY")
             elif project["state"] != "PLAN_READY":
                 if action == "freeze" or project["state"] != "CLARIFYING":
@@ -647,7 +649,7 @@ class WorkspaceStore:
                 checked = offline_plan(project, PlanDraft(revision=body.revision, **{
                     key: plan[key] for key in PlanDraft.model_fields if key != "revision" and key in plan}))
                 functional = checked['correctness_verification']
-                if (checked["questions"] or not checked["goal"]
+                if (functional and checked["questions"] or not checked["goal"]
                         or functional and (not checked['public_cases'] or not checked['acceptance_cases'])
                         or not checked["allowed_write_paths"]
                         or not checked["entrypoint"]):

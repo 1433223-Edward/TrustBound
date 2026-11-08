@@ -45,6 +45,65 @@ class CompletePlanTests(unittest.TestCase):
                 with self.subTest(field=field), self.assertRaises(InferenceError):
                     generate_plan(self.project, self.payload['goal'], 'test')
 
+    def test_security_only_generation_preserves_user_scope_and_constraints(self):
+        payload = {**self.payload, "public_cases": [], "acceptance_cases": [], "questions": []}
+        with patch('trustbound.planning.VultrClient') as client:
+            client.return_value.catalog.return_value = {'data': [{'id': 'test',
+                'architecture': {'output_modalities': ['text']}}]}
+            client.return_value.complete.return_value = json.dumps(payload)
+            draft, _ = generate_plan(self.project, 'Only main.py: fix the behavior', 'test',
+                correctness_verification=False,
+                user_details={'allowed_write_paths': ['main.py'], 'constraints': ['Preserve API']})
+            self.assertFalse(draft.correctness_verification)
+            self.assertEqual(draft.allowed_write_paths, ['main.py'])
+            self.assertIn('Preserve API', draft.constraints)
+            self.assertEqual(draft.public_cases, [])
+            ready = self.save(draft.model_dump())
+            self.assertEqual(ready['state'], 'PLAN_READY')
+            self.assertIsNone(ready['frozen_hash'])
+            client.return_value.complete.return_value = json.dumps(self.payload)
+            functional, _ = generate_plan(self.project, 'Fix behavior', 'test',
+                correctness_verification=True, user_details={'constraints': ['Preserve API']})
+            self.assertTrue(any('NEEDS_CONFIRMATION' in q for q in functional.questions))
+
+    def test_blank_source_generates_proposed_scope_and_new_entrypoint(self):
+        project = {"files": [{"path": "test.py", "content": "# placeholder"}]}
+        payload = {**self.payload, "allowed_write_paths": ["test.py"],
+                   "entrypoint": "test.py:bubble_sort", "correctness_verification": False}
+        with patch('trustbound.planning.VultrClient') as client:
+            client.return_value.catalog.return_value = {'data': [{'id': 'test',
+                'architecture': {'output_modalities': ['text']}}]}
+            client.return_value.complete.return_value = json.dumps(payload)
+            draft, _ = generate_plan(project, 'Implement bubble sort in test.py', 'test',
+                user_details=PlanDraft(revision=0, goal='Sort').model_dump(), correctness_verification=False)
+            sent = json.loads(client.return_value.complete.call_args.args[1][1]['content'])
+            self.assertEqual(sent['user_details'], {})
+            self.assertEqual(draft.allowed_write_paths, ['test.py'])
+            self.assertEqual(draft.entrypoint, 'test.py:bubble_sort')
+            self.assertFalse(draft.questions)
+
+    def test_repeated_incomplete_plan_saves_do_not_accumulate_questions(self):
+        payload = {**self.payload, "allowed_write_paths": [], "entrypoint": ""}
+        for _ in range(12):
+            saved = self.save(payload)
+            plan = saved['plan']
+            self.assertEqual(len(plan['questions']), 2)
+            payload = {key: plan[key] for key in PlanDraft.model_fields if key != 'revision'}
+            payload['revision'] = saved['revision']
+
+    def test_security_only_optional_questions_do_not_block_scope_approval(self):
+        payload = {**self.payload, 'correctness_verification': False,
+                   'public_cases': [], 'acceptance_cases': [],
+                   'questions': ['NEEDS_CONFIRMATION: sorting direction?']}
+        ready = self.save(payload)
+        self.assertEqual(ready['state'], 'PLAN_READY')
+        self.assertEqual(self.freeze(ready['revision'])['state'], 'FROZEN')
+        missing = self.save({**payload, 'revision': ready['revision'] + 1,
+                             'allowed_write_paths': []})
+        self.assertEqual(missing['state'], 'CLARIFYING')
+        with self.assertRaises(WorkspaceError):
+            self.freeze(missing['revision'])
+
     def test_questions_edits_approval_and_immutable_snapshot(self):
         pending = self.save({**self.payload, 'questions': ['NEEDS_CONFIRMATION: should negatives double?']})
         self.assertEqual(pending['state'], 'CLARIFYING')

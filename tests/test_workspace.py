@@ -114,6 +114,11 @@ class WorkspaceTests(unittest.TestCase):
             project_path = f"{PROJECTS}/{project.json()['project_id']}"
             self.assertEqual(local.get(project_path).status_code, 200)
             self.assertEqual(local.get(project_path, headers={"Sec-Fetch-Site": "cross-site"}).status_code, 403)
+            local.base_url = "http://127.0.0.1:57787"
+            self.assertEqual(local.post(PROJECTS, json=FILES,
+                headers={"Origin": "http://127.0.0.1:57787"}).status_code, 201)
+            self.assertEqual(local.post(PROJECTS, json=FILES,
+                headers={"Origin": "http://127.0.0.1:57788"}).status_code, 403)
             preview_db = app.state.projects.path
         self.assertFalse(preview_db.exists())
         with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)) as restarted:

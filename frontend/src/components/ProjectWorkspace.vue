@@ -75,7 +75,7 @@ const executionRequested = ref(false)
 const messages = ref([])
 const runCommand = ref(null)
 const runPanel = ref(null)
-const settings = computed(() => ({ execution: preferences.value.execution, correctnessVerification: preferences.value.correctnessVerification !== false }))
+const settings = computed(() => ({ execution: preferences.value.execution, correctnessVerification: preferences.value.correctnessVerification === true }))
 watch(model, value => { if (preferences) preferences.value.model = value })
 const needsToken = computed(() => capabilities.value.access !== 'local')
 const developerTools = computed(() => capabilities.value.access === 'local' &&
@@ -277,7 +277,7 @@ function open(snapshot) {
   constraints.value = (snapshot.plan?.constraints ?? []).join('\n')
   risks.value = (snapshot.plan?.risks ?? []).join('\n')
   acceptanceBasis.value = snapshot.plan?.acceptance_basis ?? ''
-  questions.value = (snapshot.plan?.questions ?? []).join('\n')
+  questions.value = [...new Set(snapshot.plan?.questions ?? [])].join('\n')
   confirmAcceptance.value = false
   dirty.value = false
 }
@@ -492,7 +492,7 @@ function send(text) {
     executionRequested.value = true
     if (project.value.state !== 'FROZEN' || dirty.value) {
       say(t('Approve the current plan before running checks or restoring a candidate.', '执行或回退前，请先确认当前计划。'))
-      if (goal.value.trim()) void change('triage')
+      if (goal.value.trim()) planOpen.value = true
       else if (!quickMode.value) planOpen.value = true
       else say(t('Describe the change first. Scope and trusted checks are required before execution.', '请先描述修改目标。执行前需要明确范围和可信验收条件。'), 'system')
     } else {
@@ -510,17 +510,8 @@ function prepareChange(text) {
   goal.value = clarify.value && !missing.value.includes('objective')
     ? `${goal.value}\n${intent.goal}` : intent.goal
   dirty.value = true
-  if (!entrypoint.value) {
-    const entries = project.value.files.flatMap(file => {
-      const entry = /^def (solve|quote)\(/m.exec(file.content)
-      return file.path.endsWith('.py') && entry ? [{ path: file.path, name: entry[1] }] : []
-    })
-    if (entries.length === 1) {
-      entrypoint.value = `${entries[0].path}:${entries[0].name}`
-      paths.value = [entries[0].path]
-    }
-  }
-  void change('triage')
+  planOpen.value = true
+  say(t('Click AI Generate Plan to authorize one model request with project source.', '点击 AI 生成计划书，授权一次携带项目源码的模型请求。'), 'system')
 }
 
 function quickReply(text, contextPath) {
@@ -556,10 +547,21 @@ function resolveFiles(index, allowed) {
 
 function generateWithAI() {
   return operate(async () => {
+    if (!capabilities.value.live_enabled) throw new Error(t('Live AI planning is unavailable in this preview.', '当前预览未启用 AI 计划生成。'))
     if (sourceDirty.value) throw new Error(t('Save source edits before generating a plan.', '生成计划前请先保存源码编辑。'))
     if (!model.value || !goal.value.trim()) throw new Error(t('Select a Vultr model and enter a goal first.', '请先选择 Vultr 模型并输入目标。'))
+    const details = { allowed_write_paths: paths.value, entrypoint: entrypoint.value,
+      constraints: constraints.value.split('\n').map(line => line.trim()).filter(Boolean),
+      public_cases: JSON.parse(publicCases.value), acceptance_cases: JSON.parse(acceptanceCases.value),
+      acceptance_basis: acceptanceBasis.value }
+    // Re-generation must not promote unchanged model proposals into user restrictions.
+    const requirements = { ...(planning.value?.user_requirements?.details ?? {}) }
+    for (const [key, value] of Object.entries(details)) {
+      if (JSON.stringify(value) !== JSON.stringify(project.value.plan?.[key]) && value?.length) requirements[key] = value
+    }
     const snapshot = await request('/' + project.value.project_id + '/generate-plan', {
       revision: project.value.revision, goal: goal.value, model_id: model.value, authorize_model: true, correctness_verification: settings.value.correctnessVerification,
+      user_details: { revision: project.value.revision, goal: goal.value, ...requirements },
     })
     open(snapshot)
     planOpen.value = true
@@ -646,7 +648,7 @@ function change(action, options = {}) {
     if (action === 'freeze') {
       body.confirm_acceptance = confirmAcceptance.value
       body.approval = planning.value?.route === 'DIRECT' ? 'direct' : 'formal'
-      body.adversarial_enabled = preferences?.value.challenges !== false
+      body.adversarial_enabled = false
     }
     open(await request(`/${id}/${action}`, body))
     if (action === 'triage') {
@@ -769,7 +771,7 @@ function change(action, options = {}) {
             </section>
             <SnapshotIdentity :id="project.project_id" :hash="historicalRun?.historical_source?.snapshot_hash ?? viewedVersion?.hash ?? project.snapshot_hash" :label="$t('Project snapshot', '项目快照')" />
             <div class="file-actions">
-              
+
             </div>
 
           </div>
@@ -797,7 +799,7 @@ function change(action, options = {}) {
             <div v-if="project.state === 'PLAN_READY' && !directReview" class="chat-message">
               <button class="primary-button" type="button" @click="planOpen = true">{{ $t('Review project plan', '审核项目计划书') }}</button>
             </div>
-            <form v-if="clarify" class="chat-message triage-card" @submit.prevent="change('triage')" @input="dirty = true">
+            <form v-if="clarify && settings.correctnessVerification" class="chat-message triage-card" @submit.prevent="change('triage')" @input="dirty = true">
               <strong>{{ $t('CLARIFY · Missing details', 'CLARIFY · 补充条件') }}</strong>
               <ul><li v-for="item in project.plan.questions" :key="item">{{ planText(item) }}</li></ul>
               <label v-if="missing.includes('objective')">{{ $t('Expected behavior', '预期行为') }} <textarea v-model="goal" rows="2" maxlength="1200"></textarea></label>
@@ -818,7 +820,7 @@ function change(action, options = {}) {
             <section v-if="directReview" class="chat-message triage-card">
               <strong>{{ $t('DIRECT · Quick approval', 'DIRECT · 快速确认') }}</strong>
               <p>{{ project.plan.goal }}</p>
-              <p>{{ preferences?.challenges !== false ? $t('Live execution includes one independent adversarial request. Up to two model requests per run.', '真实执行包含一次独立对抗请求。每次运行最多两次模型请求。') : $t('Independent adversarial model is off.', '独立对抗模型已关闭。') }}</p>
+                <p>{{ $t("Live: Executor and security sandbox. Adversarial / Recovery: offline Demo only.", "Live：执行 Agent 与安全沙箱；对抗与恢复仅保留离线 Demo。") }}</p>
               <p v-if="project.plan.reference_rules" class="micro">{{ project.plan.reference_rules }}</p>
               <p>{{ project.plan.allowed_write_paths.join(', ') }} · {{ project.plan.entrypoint }}</p>
               <details><summary>{{ $t('Inspect exact acceptance cases', '核对具体用例') }}</summary>
@@ -836,7 +838,7 @@ function change(action, options = {}) {
               <p>{{ $t('Send the goal and project paths to Vultr for one classification request, up to 1024 output tokens.', '授权把目标和项目路径发给 Vultr，进行一次分流判断，最多 1024 输出 Tokens。') }}</p>
               <details><summary>{{ $t('Review disclosed data', '查看发送范围') }}</summary>
                 <p>{{ project.plan.goal }}</p>
-              <p>{{ preferences?.challenges !== false ? $t('Live execution includes one independent adversarial request. Up to two model requests per run.', '真实执行包含一次独立对抗请求。每次运行最多两次模型请求。') : $t('Independent adversarial model is off.', '独立对抗模型已关闭。') }}</p>
+                <p>{{ $t("Live: Executor and security sandbox. Adversarial / Recovery: offline Demo only.", "Live：执行 Agent 与安全沙箱；对抗与恢复仅保留离线 Demo。") }}</p>
               <p v-if="project.plan.reference_rules" class="micro">{{ project.plan.reference_rules }}</p><p>{{ project.plan.entrypoint }}</p>
                 <ul><li v-for="file in project.files" :key="file.path">{{ file.path }}</li></ul>
               </details>
@@ -849,7 +851,7 @@ function change(action, options = {}) {
         <WorkspaceRunPanel ref="runPanel" @retain-draft="retainDraft" @reviewed="historicalRun = $event" v-if="project.state === 'FROZEN' || historicalRun" :key="project.frozen_hash ?? project.project_id"
           :project="project" :token="token" :capabilities="capabilities" :sample-files="sampleFiles" :dirty="dirty || sourceChangesBlockRun"
           :model="model" :settings="settings" :command="runCommand" :developer-tools="developerTools"
-          :history-record="historicalRun" :viewing-version="!!viewedVersion" :source-dirty="sourceDirty" :manual-files="manualFiles" :adversarial-enabled="preferences?.challenges !== false" :offer-recovery="preferences?.recovery !== false" @record="showRun" @note="say($event, 'system')" />
+          :history-record="historicalRun" :viewing-version="!!viewedVersion" :source-dirty="sourceDirty" :manual-files="manualFiles" :adversarial-enabled="false" :offer-recovery="false" @record="showRun" @note="say($event, 'system')" />
         <EvidenceFrame v-else>
           <template #status><span class="muted micro">{{ $t('Awaiting evidence', '等待证据') }}</span></template>
           <div class="empty-state evidence-empty"><span class="empty-symbol small">▤</span><div>
@@ -861,19 +863,25 @@ function change(action, options = {}) {
       <ProjectPlanDialog v-if="project" v-model="planOpen" :title="$t('Project plan', '项目计划书')">
           <form class="workspace-plan" @submit.prevent="change('plan')" @input="dirty = true">
             <p v-if="(project.plan?.correctness_verification ?? true) !== settings.correctnessVerification" class="product-notice">{{ $t('Update the plan to apply the selected verification mode before approval.', '批准前请更新计划，以应用所选验证模式。') }}</p>
-            <div class="panel-label">{{ $t('Plan & approval', '计划与确认') }} <span class="product-chip">r{{ project.revision }}</span></div>
+            <p v-if="error" class="product-notice" role="alert">{{ message(error) }}</p>
             <fieldset class="product-form plan-fields" :disabled="busy">
-              <div class="plan-ai-actions">
-                <p>{{ preferences?.challenges !== false ? $t('Adversarial Agent ON. Approval allows parallel Executor and independent adversarial analysis during Live runs, within host quotas. At most two 4096-token generations per run.', '对抗 Agent 已开启。批准后，Live 运行将在宿主额度内并行进行执行提案与独立对抗分析，每次运行最多两次 4096 Token 生成。') : $t('Adversarial Agent OFF. Runner protections remain required.', '对抗 Agent 已关闭，Runner 安全限制仍强制生效。') }}</p>
-                <p v-if="error" class="product-notice" role="alert">{{ message(error) }}</p>
-                <button class="primary-button" type="button" :disabled="busy || !capabilities.live_enabled || !model || !goal.trim() || sourceDirty" @click="generateWithAI">{{ $t('Generate with AI', 'AI 生成计划书') }}</button>
-                <p class="muted micro">{{ $t('Uses the selected model and source files. One paid request, up to 4096 output tokens. Proposed tests require your review.', '使用已选模型及源码。一次付费请求，最多 4096 输出 Token。建议用例需要你审核。') }}</p>
-                <p v-if="!model" class="muted micro">{{ $t('Choose a model in Agent Chat before generating.', '请先在 Agent 对话中选择模型。') }}</p>
-              </div>
               <p v-if="!settings.correctnessVerification" class="product-notice">{{ $t('Functional verification is off. Approve scope and entrypoint; business cases and expected values are optional.', '功能验证已关闭。请批准修改范围和入口；业务用例及期望值为可选项。') }}</p>
               <label>{{ $t('Development goal', '开发目标') }} <textarea v-model="goal" required maxlength="1200" rows="3" :placeholder="$t('Describe the behavior you want…', '描述你希望实现的行为…')"></textarea></label>
-              <details class="plan-criteria" open>
-                <summary>{{ $t('Scope & acceptance criteria', '修改范围与验收条件') }}</summary>
+              <label>{{ $t('Vultr model', 'Vultr 模型') }}
+                <select v-model="model" @input.stop>
+                  <option value="">{{ $t('Choose a model', '请选择模型') }}</option>
+                  <option v-if="model && !models?.includes(model)" :value="model">{{ model }}</option>
+                  <option v-for="id in models ?? []" :key="id" :value="id">{{ id }}</option>
+                </select>
+              </label>
+              <div class="product-actions">
+                <button class="product-button" type="button" @click="loadModels">{{ $t('Load available models', '查询可用模型') }}</button>
+                <button class="primary-button" type="button" @click="generateWithAI">{{ $t('Authorize AI draft', '授权 AI 生成草稿') }}</button>
+              </div>
+              <p class="muted micro">{{ $t('One paid request with your task and source. AI proposes all plan details; review and edit before approval.', '授权一次付费请求，发送任务及源码。AI 提议全部计划详情，你审核或修改后提交审批。') }}</p>
+              <p v-if="sourceDirty" class="product-notice">{{ $t('Save source changes before generating.', '请先保存源码修改，再生成草稿。') }} <button class="product-button" type="button" @click="saveSnapshot">{{ $t('Save source', '保存源码') }}</button></p>
+              <details class="plan-criteria">
+                <summary>{{ $t('Advanced Plan Details: scope & acceptance', '高级计划详情：范围与验收') }}</summary>
                 <label>{{ $t('Trusted reference profile', '可信参考规则') }}
                   <select v-model="referenceProfile">
                     <option value="none">{{ $t('No registered reference · new behavior requires confirmation', '无注册参考规则 · 新行为需人工确认') }}</option>
@@ -894,19 +902,19 @@ function change(action, options = {}) {
                 <p class="muted">{{ $t('Provide distinct input and trusted expected output for each challenge. The candidate sees only the input.', '为每个挑战提供不同的输入和可信期望值。候选只收到输入。') }}</p>
                 <label>{{ $t('Basis for independent expectations', '独立验收预期依据') }} <textarea v-model="acceptanceBasis" rows="3" maxlength="1200"></textarea></label>
                 <label>{{ $t('Open questions (one per line; clear after resolving)', '待确认问题（每行一项，解决后清除）') }} <textarea v-model="questions" rows="3"></textarea></label>
-                <label><input v-model="confirmAcceptance" type="checkbox" @input.stop>{{ settings.correctnessVerification ? $t('I reviewed the independent expected values and their basis.', '我已审核独立验收期望值及其依据。') : $t('I reviewed the execution scope and sandbox permission.', '我已审核执行范围和沙箱权限。') }}</label>
               </details>
-              <details class="plan-criteria" open>
+              <details class="plan-criteria">
                 <summary>{{ $t('Implementation, constraints & risks', '实施步骤、约束与风险') }}</summary>
                 <label>{{ $t('Implementation steps, one per line', '实施步骤，每行一项') }} <textarea v-model="implementation" rows="3" maxlength="1200"></textarea></label>
                 <label>{{ $t('Task constraints, one per line', '任务约束，每行一项') }} <textarea v-model="constraints" rows="2" maxlength="1200"></textarea></label>
                 <label>{{ $t('Risks, one per line', '风险，每行一项') }} <textarea v-model="risks" rows="2" maxlength="1200"></textarea></label>
                 <p class="muted">{{ $t('Sandbox limits and host protections are enforced separately.', '沙盒限制及宿主安全策略由控制层单独执行。') }}</p>
               </details>
+                <label><input v-model="confirmAcceptance" type="checkbox" @input.stop>{{ settings.correctnessVerification ? $t('I reviewed the independent expected values and their basis.', '我已审核独立验收期望值及其依据。') : $t('I reviewed the execution scope and sandbox permission.', '我已审核执行范围和沙箱权限。') }}</label>
               <div class="product-actions">
                 <button class="product-button" type="button" @click="planOpen = false">{{ $t("Cancel", "取消") }}</button>
-                <button class="product-button" :class="{ primary: !canApprove }" type="submit">{{ project.plan ? $t('Update plan', '更新计划') : $t('Draft offline plan', '生成离线计划') }}</button>
-                <button v-if="project.plan && !project.frozen_hash" class="product-button" type="button" @click="change('triage', { request_formal: true })">{{ $t('Regenerate formal draft', '重新生成正式草案') }}</button>
+                <button v-if="project.plan" class="product-button" :class="{ primary: !canApprove }" type="submit">{{ $t('Submit edited draft', '提交修改后的草稿') }}</button>
+
                 <button v-if="project.state === 'FROZEN' && !dirty" class="product-button" type="button" @click="downloadPlan">{{ $t('Download plan file', '下载计划书') }}</button>
                 <button v-if="canApprove && !directReview" class="product-button primary" type="button" :disabled="!confirmAcceptance" @click="change('freeze')">{{ $t('Approve & freeze', '确认并冻结') }}</button>
                 <button v-if="['CLARIFYING', 'PLAN_READY'].includes(project.state)" class="product-button subtle" type="button" @click="change('reject')">{{ $t('Reject plan', '拒绝计划') }}</button>
@@ -915,7 +923,10 @@ function change(action, options = {}) {
             <div v-if="dirty || project.plan" class="plan-review">
               <p v-if="dirty" class="muted">{{ $t('Unsaved changes. Update the plan before approving.', '有未提交的修改，请先更新计划。') }}</p>
               <template v-if="project.plan">
-                <p class="muted">{{ planning?.route ?? 'PLAN_REQUIRED' }} · {{ planning?.source === 'VULTR' ? 'Vultr' : $t('Local rules', '本地规则') }} · {{ $status(project.state) }}</p>
+                <p>{{ $t('Original goal and supplied details are user requirements. Inferred fields and candidate cases are proposals requiring review. Open questions require confirmation.', '原始目标及已填条件为用户要求；推断字段及候选用例为待审核建议，待确认问题需人工解决。') }}</p>
+                <pre v-if="planning?.user_requirements" class="product-code">{{ JSON.stringify(planning.user_requirements, null, 2) }}</pre>
+                <pre class="product-code">{{ JSON.stringify({ goal: project.plan.goal, allowed_write_paths: project.plan.allowed_write_paths, entrypoint: project.plan.entrypoint, implementation: project.plan.implementation, constraints: project.plan.constraints, risks: project.plan.risks, public_cases: project.plan.public_cases, independent_acceptance: project.plan.acceptance_cases, acceptance_basis: project.plan.acceptance_basis }, null, 2) }}</pre>
+                <p class="muted">{{ planning?.route ?? 'PLAN_REQUIRED' }} · {{ ['VULTR', 'VULTR_PLAN'].includes(planning?.source) ? 'Vultr' : $t('Local rules', '本地规则') }} · {{ $status(project.state) }}</p>
                 <ul v-if="planning?.risk_flags.length"><li v-for="risk in planning.risk_flags" :key="risk">{{ $status(risk) }}</li></ul>
                 <p v-if="planning?.fallback_reason">{{ $t('Semantic review was unavailable. Formal approval remains required.', '语义判断未完成，仍需正式计划批准。') }}</p>
                 <p v-if="planning?.inference_usage?.live_request_count">{{ $t('Vultr requests', 'Vultr 请求') }} {{ planning.inference_usage.live_request_count }} · {{ $t('Output tokens', '输出 Tokens') }} {{ planning.inference_usage.completion_tokens ?? '—' }}</p>
