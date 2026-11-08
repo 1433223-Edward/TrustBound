@@ -1,0 +1,22 @@
+[
+  {
+    "pid": 18596,
+    "name": "python.exe",
+    "preview_launcher_present": false,
+    "explicit_numeric_limits": {
+      "MaxRuns": [],
+      "MaxModelCalls": [],
+      "MaxOutputTokens": []
+    }
+  },
+  {
+    "pid": 42336,
+    "name": "pwsh.exe",
+    "preview_launcher_present": true,
+    "explicit_numeric_limits": {
+      "MaxRuns": [],
+      "MaxModelCalls": [],
+      "MaxOutputTokens": []
+    }
+  }
+]

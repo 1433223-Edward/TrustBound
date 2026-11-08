@@ -1,0 +1,9 @@
+﻿source,source_class,run_id,container_name,case,phase,execution_status,exit_code,cleanup_confirmed,limits_verified,workspace_unchanged,started_at,finished_at,actual_model_id,cost
+docs/environment-smoke.json,HISTORICAL_LOCAL_DOCKER_RECORD,,trustbound-check-a5a79dd2f9654f6f87fa5ef2ca81f684,normal,smoke,EXITED,0,True,,,2026-11-03T05:31:22.33378669Z,2026-11-03T05:31:22.868968279Z,,
+docs/environment-smoke.json,HISTORICAL_LOCAL_DOCKER_RECORD,,trustbound-check-103f2047d9744decb8a1214ed5a3f85e,timeout,smoke,TIMED_OUT,137,True,,,2026-11-03T05:31:24.715658028Z,2026-11-03T05:31:28.163577147Z,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,a2120e8515de405d8371efcd26021efb,trustbound-c9863e9c8b4342a2a56c8e15515e61df,original,public,EXITED,1,True,True,True,,,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,b04b3556a87b4504a792958773d26dce,trustbound-9458549cfd3047fbada1f6d4329019f9,fixed,public,EXITED,0,True,True,True,,,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,b04b3556a87b4504a792958773d26dce,trustbound-0188a4a48b3d4497826fa99cfee64ce6,fixed,acceptance,EXITED,0,True,True,True,,,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,328cf52715044e3d8e9e7611f0cad8b4,trustbound-8bf436e22fa24b4193e9f932f363c132,public_only,public,EXITED,0,True,True,True,,,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,328cf52715044e3d8e9e7611f0cad8b4,trustbound-785e78c5b8994745a49e00a7281363e0,public_only,acceptance,EXITED,1,True,True,True,,,,
+docs/day1-results.json,HISTORICAL_LOCAL_DOCKER_RECORD,09dd12f6b5d947cf8d0e86b3d46cec56,trustbound-a06bf246c77f4619a9309371176b7a34,timeout,public,TIMED_OUT,137,True,True,True,,,,

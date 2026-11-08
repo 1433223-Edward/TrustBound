@@ -1,0 +1,50 @@
+{
+  "files": [
+    {
+      "path": "main.py",
+      "content": "def solve(value):\n    return value + 1\n"
+    }
+  ],
+  "plan": {
+    "revision": 0,
+    "goal": "Change solve to return value + 2",
+    "entrypoint": "main.py:solve",
+    "allowed_write_paths": [
+      "main.py"
+    ],
+    "public_cases": [
+      {
+        "input": 0,
+        "expected": 2
+      }
+    ],
+    "acceptance_cases": [
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ],
+    "acceptance_basis": "Reviewed integer addition contract"
+  },
+  "metadata": {
+    "total_files": 1,
+    "total_source_bytes": 39,
+    "estimated_source_tokens": 10,
+    "directory_depth": 1,
+    "dependency_edges": 0,
+    "expected_files_modified": 1,
+    "source_hash": "aa6bbeb0c4761bfa2f05a9d4cc650c358e57b92c70ef6342fe288354212b5ff3",
+    "eligibility": "ELIGIBLE",
+    "task": "Change solve to return value + 2",
+    "cases": [
+      {
+        "input": 0,
+        "expected": 2
+      },
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ]
+  }
+}

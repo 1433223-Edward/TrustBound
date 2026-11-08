@@ -50,18 +50,18 @@ async function run() {
 
 <template>
   <details class="custom-task">
-    <summary>Custom Task v1 · Private / Offline</summary>
-    <p>仅限单文件 <code>solve(value)</code> 和整数用例。可提交人工候选，Docker 真实执行；本模式不调用模型。</p>
+    <summary>{{ $t('Custom Task v1 · Private / Offline', '自定义任务 v1 · 私有 / 离线') }}</summary>
+    <p>{{ $t('Submit a single Python function and integer cases for real Docker checks.', '提交单文件 Python 函数及整数用例，由 Docker 真实执行。') }} <code>solve(value)</code></p>
     <form @submit.prevent="run">
-      <label>需求 <textarea v-model="requirements" rows="2" maxlength="800" required /></label>
-      <label>原始 Python <textarea v-model="source" rows="4" maxlength="2000" required /></label>
-      <label>人工候选（可选） <textarea v-model="replacement" rows="4" maxlength="2000" /></label>
-      <label>固定用例 JSON <textarea v-model="cases" rows="9" required /></label>
+      <label>{{ $t('Requirements', '需求') }} <textarea v-model="requirements" rows="2" maxlength="800" required /></label>
+      <label>{{ $t('Original Python', '原始 Python') }} <textarea v-model="source" rows="4" maxlength="2000" required /></label>
+      <label>{{ $t('Manual candidate (optional)', '人工候选（可选）') }} <textarea v-model="replacement" rows="4" maxlength="2000" /></label>
+      <label>{{ $t('Test cases (JSON)', '固定用例 JSON') }} <textarea v-model="cases" rows="9" required /></label>
       <button class="run-button" :disabled="running">{{ running ? 'Running…' : 'Run private checks' }}</button>
     </form>
-    <p v-if="error" role="alert">{{ error }}</p>
+    <p v-if="error" role="alert">{{ $message(error) }}</p>
     <section v-if="result" aria-live="polite">
-      <p><strong>{{ result.final_decision.status }}</strong> · {{ result.final_decision.reason }}</p>
+      <p><strong>{{ $status(result.final_decision.status) }}</strong> · {{ result.final_decision.reason }}</p>
       <p>{{ result.final_decision.scope }}</p>
       <p class="mono">Run {{ result.run_id }}</p>
       <details><summary>Diff and evidence</summary><pre>{{ result.verification.diff }}</pre><pre>{{ JSON.stringify({ executions: result.verification.executions, ...result.custom_evidence }, null, 2) }}</pre></details>

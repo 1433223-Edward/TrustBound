@@ -1,0 +1,42 @@
+{
+  "status": "NOT_READY_NOT_AUTHORIZED",
+  "first_batch": {
+    "proposed_model": "deepseek-v4.1-flash-1017",
+    "B_baseline_tasks": 1,
+    "D_ON_tasks": 1,
+    "max_generation_requests": 2,
+    "max_output_tokens_per_request": 4096,
+    "max_reserved_output_tokens_total": 8192,
+    "retries": 0
+  },
+  "historical_pricing_date": "2026-11-03",
+  "assumed_input_tokens_per_request": 16000,
+  "planning_estimate_usd": "0.00971520",
+  "estimate_is_hard_cap": false,
+  "live_pricing_verified": false,
+  "backend_USD_hard_cap_available": false,
+  "observed_quota": {
+    "runs": 40,
+    "model_calls": 8,
+    "output_tokens": 30720
+  },
+  "current_launcher_defaults": {
+    "max_runs": 40,
+    "max_model_calls": 48,
+    "max_output_tokens": 196608
+  },
+  "proposed_limits_if_separately_approved": {
+    "max_runs": 42,
+    "max_model_calls": 10,
+    "max_output_tokens": 38912,
+    "note": "Not applied; preserve ledger and recheck consumption before changes"
+  },
+  "C": "Deferred: needs prepared frozen scale projects and 4 more generation requests in a subsequent batch",
+  "multi_model_B": "Blocked: only one advertised model",
+  "approval_required": [
+    "fixed model and 2-request batch",
+    "fee allowance and explicit acceptance or solution of missing USD hard cap",
+    "current pricing confirmation",
+    "explicit quota/restart change if required"
+  ]
+}

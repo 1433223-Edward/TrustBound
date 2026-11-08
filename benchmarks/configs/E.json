@@ -1,0 +1,21 @@
+{
+  "experiment_id": "E-v1",
+  "experiment_type": "E",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": null,
+  "source_hash": null,
+  "project_id": null,
+  "pair_id": null,
+  "group": "baseline",
+  "base_url": "http://127.0.0.1:5173",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": 0,
+    "mode": "original",
+    "model_id": null,
+    "authorize_source": false,
+    "adversarial_enabled": false,
+    "correctness_verification": true
+  }
+}

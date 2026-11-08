@@ -1,0 +1,22 @@
+[
+  {
+    "experiment": "E",
+    "pair_id": "interactive-20261108T153111+0800-E-01",
+    "status": "MATCHED",
+    "reason": "Fixed candidate, no recovery; observations limited to this pair",
+    "latency_delta_ms": -12250.999999931082,
+    "cost_delta_usd": 0.0
+  },
+  {
+    "experiment": "D",
+    "pair_id": "interactive-20261108T153111+0800-D-01",
+    "status": "MATCHED",
+    "reason": "Fixed candidate, no recovery; observations limited to this pair",
+    "latency_delta_ms": 9140.000000130385,
+    "cost_delta_usd": 0.00075075,
+    "confirmed_findings": 3,
+    "non_confirmed": 0,
+    "comparison_valid": true,
+    "final_verified_delta": -1
+  }
+]

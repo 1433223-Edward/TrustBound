@@ -1,5 +1,9 @@
 import { createApp } from 'vue'
-import App from './App.vue'
+import ProductShell from './ProductShell.vue'
+import { t, statusText, message } from './i18n.js'
 import './style.css'
+import './product.css'
 
-createApp(App).mount('#app')
+const app = createApp(ProductShell)
+Object.assign(app.config.globalProperties, { $t: t, $status: statusText, $message: message })
+app.mount('#app')

@@ -1,0 +1,47 @@
+[
+  {
+    "experiment": "E-OFF",
+    "server_run_id": "1efbe5db76fb44d9b3a2db5f10a655aa",
+    "client_record_id": "f3f1553655424fcda3bf55c20290de90",
+    "classification": "REAL_LOCAL_DOCKER_NO_MODEL",
+    "execution_status": "COMPLETED",
+    "verification_status": "EXECUTED_UNVERIFIED",
+    "containers": 1,
+    "cleanup_confirmed": true,
+    "limits_verified": true,
+    "client_latency_ms": 16468.999999924563,
+    "model_generation_requests": 0,
+    "estimated_model_cost_usd": "0",
+    "evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\f3f1553655424fcda3bf55c20290de90"
+  },
+  {
+    "experiment": "E-ON",
+    "server_run_id": "003b9588dfcf4958a54fd75f13915177",
+    "client_record_id": "548f36d09bd54ec9af1118a8e3c136d0",
+    "classification": "REAL_LOCAL_DOCKER_NO_MODEL",
+    "execution_status": "COMPLETED",
+    "verification_status": "FAILED",
+    "containers": 1,
+    "cleanup_confirmed": true,
+    "limits_verified": true,
+    "client_latency_ms": 4217.999999993481,
+    "model_generation_requests": 0,
+    "estimated_model_cost_usd": "0",
+    "evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\548f36d09bd54ec9af1118a8e3c136d0"
+  },
+  {
+    "experiment": "D-OFF",
+    "server_run_id": "962d3363196d46edaa3fff403def161b",
+    "client_record_id": "9242ecaad5b24718ba43d0af14354553",
+    "classification": "REAL_LOCAL_DOCKER_NO_MODEL",
+    "execution_status": "COMPLETED",
+    "verification_status": "VERIFIED",
+    "containers": 2,
+    "cleanup_confirmed": true,
+    "limits_verified": true,
+    "client_latency_ms": 10312.999999965541,
+    "model_generation_requests": 0,
+    "estimated_model_cost_usd": "0",
+    "evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\9242ecaad5b24718ba43d0af14354553"
+  }
+]

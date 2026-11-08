@@ -1,0 +1,8 @@
+{
+  "url": "http://127.0.0.1:5173/api/health",
+  "checked_at": "2026-11-07T23:40:50.587209+00:00",
+  "method": "GET",
+  "status": "UNAVAILABLE",
+  "error_type": "URLError",
+  "reason_type": "PermissionError"
+}

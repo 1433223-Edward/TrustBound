@@ -1,0 +1,26 @@
+[
+  {
+    "id": "B-simple",
+    "sample": "inventory",
+    "category": "simple",
+    "goal": "Fix order validation and aggregate duplicate SKUs."
+  },
+  {
+    "id": "B-ambiguous",
+    "sample": "inventory",
+    "category": "ambiguous",
+    "goal": "Make inventory handling reliable; use the approved acceptance rules."
+  },
+  {
+    "id": "B-long",
+    "sample": "logs",
+    "category": "long",
+    "goal": "Count log levels using the approved reference. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. Preserve the interval boundaries and count malformed lines separately. "
+  },
+  {
+    "id": "B-boundary",
+    "sample": "logs",
+    "category": "boundary",
+    "goal": "Handle empty windows, malformed lines, unknown levels, and exact interval endpoints."
+  }
+]

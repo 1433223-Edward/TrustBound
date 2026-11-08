@@ -1,0 +1,28 @@
+{
+  "experiment_id": "paid-20261108T154723+0800-B",
+  "experiment_type": "B",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+  "project_id": "69e7990423e3492a8b572205116b12b2",
+  "pair_id": null,
+  "group": "baseline",
+  "base_url": "http://127.0.0.1:8000",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": 2,
+    "mode": "live",
+    "model_id": "deepseek-v4.1-flash-1017",
+    "authorize_source": true,
+    "adversarial_enabled": false,
+    "correctness_verification": true,
+    "authorize_explanation": false
+  },
+  "source_tree_sha256": "3364341f9b1f347b2781180bebdd72c4143df4abd09890d9ea5e8319168b37cf",
+  "source_working_tree_dirty": true,
+  "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+  "approval_status": "AUTHORIZED_FIXED_TWO_GENERATION_BATCH",
+  "proposed_model_id": "deepseek-v4.1-flash-1017",
+  "authorization_batch": "paid-20261108T154723+0800"
+}

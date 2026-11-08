@@ -1,0 +1,65 @@
+{
+  "batch": "paid-20261108T154723+0800",
+  "completed_at": "2026-11-08T15:54:53.292251+08:00",
+  "completed_tasks": 2,
+  "infrastructure_failures": 0,
+  "model_requests": 2,
+  "input_tokens": 1108,
+  "output_tokens": 2725,
+  "total_tokens": 3833,
+  "reserved_output_tokens": 8192,
+  "estimated_cost_usd": "0.00180120",
+  "billing_status": "ESTIMATED_NOT_INVOICE",
+  "containers": 8,
+  "all_cleanup_confirmed": true,
+  "run_ids": [
+    {
+      "experiment": "B",
+      "server_run_id": "8c14ca0f80024019bef48bafd1572b57",
+      "client_record_id": "79e75a42c3a84d43b3fcecc69bffae48",
+      "actual_model_id": "deepseek-v4.1-flash-1017",
+      "status": "VERIFIED",
+      "input_tokens": 787,
+      "output_tokens": 1554,
+      "total_tokens": 2341,
+      "generation_requests": 1,
+      "reserved_output_tokens": 4096,
+      "estimated_cost_usd": "0.00105045",
+      "latency_ms": 37890.99999994505,
+      "containers": 5,
+      "cleanup_confirmed": true,
+      "classification": "REAL_VULTR_MODEL_AND_LOCAL_DOCKER",
+      "raw_evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\79e75a42c3a84d43b3fcecc69bffae48"
+    },
+    {
+      "experiment": "D-ON",
+      "server_run_id": "74ac28e0760e48bea4c3c735f5ffec06",
+      "client_record_id": "a33ff7cc38d74f71803414f019225025",
+      "actual_model_id": "deepseek-v4.1-flash-1017",
+      "status": "FAILED",
+      "input_tokens": 321,
+      "output_tokens": 1171,
+      "total_tokens": 1492,
+      "generation_requests": 1,
+      "reserved_output_tokens": 4096,
+      "estimated_cost_usd": "0.00075075",
+      "latency_ms": 19453.000000095926,
+      "containers": 3,
+      "cleanup_confirmed": true,
+      "classification": "REAL_VULTR_MODEL_AND_LOCAL_DOCKER",
+      "raw_evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\a33ff7cc38d74f71803414f019225025"
+    }
+  ],
+  "quota_before": {
+    "runs": 40,
+    "calls": 8,
+    "tokens": 30720
+  },
+  "quota_after": {
+    "runs": 42,
+    "calls": 10,
+    "tokens": 38912
+  },
+  "campaign_call_cap": 100,
+  "USD_hard_cap": false
+}

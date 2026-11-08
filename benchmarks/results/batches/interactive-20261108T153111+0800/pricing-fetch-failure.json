@@ -1,0 +1,9 @@
+{
+  "method": "GET",
+  "endpoint": "https://api.vultrinference.com/v1/models?format=openrouter",
+  "credentials_supplied": false,
+  "generation_requests": 0,
+  "status": "CONNECTION_TIMEOUT_WINERROR_10060",
+  "retried": false,
+  "live_pricing_verified": false
+}

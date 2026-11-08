@@ -1,0 +1,50 @@
+{
+  "batch": "D:\\Projects\\TrustBound\\benchmarks\\results\\batches\\paid-20261108T154723+0800",
+  "quota_before": {
+    "runs": 40,
+    "calls": 8,
+    "tokens": 30720,
+    "last_run": 1794123219
+  },
+  "journal_states": {
+    "FINALIZED": 2
+  },
+  "health": {
+    "status": "ok",
+    "active_run_id": null,
+    "max_concurrent_runs": 1,
+    "docker": "checked_by_execution_not_health",
+    "public_demo": false,
+    "persistent_quota": true,
+    "custom_task": {
+      "enabled": false
+    },
+    "workspace": {
+      "enabled": true,
+      "execution": "LOCAL_DOCKER",
+      "access": "local",
+      "retry_enabled": true,
+      "live_enabled": true
+    },
+    "modes": {
+      "fixture": {
+        "enabled": true
+      },
+      "offline_executor": {
+        "enabled": true
+      },
+      "live_executor": {
+        "enabled": true,
+        "reason": "CONFIGURED_NOT_AUTHENTICATED_UNTIL_REQUEST"
+      }
+    }
+  },
+  "batch_caps": {
+    "max_runs": 42,
+    "max_model_calls": 10,
+    "max_output_tokens": 38912
+  },
+  "campaign_model_calls_cap": 100,
+  "implementation_model_calls_ceiling": 100,
+  "requested_campaign_ceiling": 2000
+}

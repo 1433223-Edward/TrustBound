@@ -1,0 +1,12 @@
+{
+  "manifests_json_parsed": 12,
+  "inventory_bound": 6,
+  "logs_blocked": 6,
+  "new_generations": 0,
+  "paid_approval": false,
+  "configuration_mutations_to_service": 0,
+  "per_request_output": 4096,
+  "full_target_output_reservation": 192512,
+  "current_plus_full_target": 239616,
+  "hard_limit_remaining_generation_capacity": 37
+}

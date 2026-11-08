@@ -1,0 +1,12 @@
+from rules import order_totals
+
+
+def solve(value):
+    stock = dict(value["stock"])
+    totals = order_totals(value["order"])
+    if (totals is None or any(type(count) is not int or count < 0 for count in stock.values())
+            or any(stock.get(sku, 0) < quantity for sku, quantity in totals.items())):
+        return {"ok": False, "stock": stock}
+    for sku, quantity in totals.items():
+        stock[sku] -= quantity
+    return {"ok": True, "stock": stock}

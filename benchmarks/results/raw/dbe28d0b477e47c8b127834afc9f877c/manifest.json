@@ -1,0 +1,30 @@
+{
+  "experiment_id": "closure-20261108T163222+0800-GLM-diagnostic",
+  "experiment_type": "B",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+  "project_id": "69e7990423e3492a8b572205116b12b2",
+  "pair_id": null,
+  "group": "protocol_diagnostic",
+  "base_url": "http://127.0.0.1:8000",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": 2,
+    "mode": "live",
+    "model_id": "glm-5.3-flash",
+    "authorize_source": true,
+    "adversarial_enabled": false,
+    "correctness_verification": true,
+    "authorize_explanation": false
+  },
+  "source_tree_sha256": "26d209426c6d2a910ba9cfa8fc03b5a1d9353823d90442cc02acc3f0e1bf146f",
+  "source_working_tree_dirty": true,
+  "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+  "approval_status": "EXPLICITLY_APPROVED_ONE_GENERATION_NO_RETRY",
+  "proposed_model_id": "glm-5.3-flash",
+  "authorization_batch": "glm-final-20261108T163733+0800",
+  "diagnostic_patch_sha256": "b29630639e730fcf79108301774a38a8a7de9ef0571b7d8b7d746c66196149fd",
+  "previous_server_run_id": "7a9d0a259e8546fd85b2903bb8fe393f"
+}

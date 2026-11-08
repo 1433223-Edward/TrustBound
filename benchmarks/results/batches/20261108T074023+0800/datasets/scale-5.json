@@ -1,0 +1,66 @@
+{
+  "files": [
+    {
+      "path": "main.py",
+      "content": "def solve(value):\n    return value + 1\n"
+    },
+    {
+      "path": "helper_1.py",
+      "content": "VALUE = 1\n"
+    },
+    {
+      "path": "helper_2.py",
+      "content": "VALUE = 2\n"
+    },
+    {
+      "path": "helper_3.py",
+      "content": "VALUE = 3\n"
+    },
+    {
+      "path": "helper_4.py",
+      "content": "VALUE = 4\n"
+    }
+  ],
+  "plan": {
+    "revision": 0,
+    "goal": "Change solve to return value + 2",
+    "entrypoint": "main.py:solve",
+    "allowed_write_paths": [
+      "main.py"
+    ],
+    "public_cases": [
+      {
+        "input": 0,
+        "expected": 2
+      }
+    ],
+    "acceptance_cases": [
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ],
+    "acceptance_basis": "Reviewed integer addition contract"
+  },
+  "metadata": {
+    "total_files": 5,
+    "total_source_bytes": 79,
+    "estimated_source_tokens": 20,
+    "directory_depth": 1,
+    "dependency_edges": 0,
+    "expected_files_modified": 1,
+    "source_hash": "09bbeb9677259ae5e38206fdc3008dbc26af0163fac6614d07c3e10b9b799dd3",
+    "eligibility": "ELIGIBLE",
+    "task": "Change solve to return value + 2",
+    "cases": [
+      {
+        "input": 0,
+        "expected": 2
+      },
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ]
+  }
+}

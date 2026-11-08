@@ -1,0 +1,17 @@
+{
+  "fixed_paid_batch_authorized": false,
+  "approved_cost_cap": null,
+  "models": {
+    "repository_default_reference": "deepseek-v4.1-flash-1017",
+    "baseline": null,
+    "candidate_1": null,
+    "candidate_2": null,
+    "confirmed_by_operator": false,
+    "max_requests_reference": 14,
+    "max_output_tokens_reference": 14336,
+    "price_per_million_input": null,
+    "price_per_million_output": null
+  },
+  "decision": "DO_NOT_SUBMIT",
+  "reason": "No explicit fixed paid batch and total budget approval; model confirmation and manifests incomplete"
+}

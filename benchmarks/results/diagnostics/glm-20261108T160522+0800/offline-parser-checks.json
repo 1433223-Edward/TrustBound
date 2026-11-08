@@ -1,0 +1,86 @@
+[
+  {
+    "source": "CURRENT",
+    "fixture": "valid",
+    "accepted": true,
+    "exception_type": null,
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "CURRENT",
+    "fixture": "invalid_json",
+    "accepted": false,
+    "exception_type": "JSONDecodeError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "CURRENT",
+    "fixture": "duplicate_json_key",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "CURRENT",
+    "fixture": "unexpected_top_level_key",
+    "accepted": false,
+    "exception_type": "WorkspaceError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "CURRENT",
+    "fixture": "files_list",
+    "accepted": false,
+    "exception_type": "WorkspaceError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "CURRENT",
+    "fixture": "invalid_explanation",
+    "accepted": false,
+    "exception_type": "ValidationError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "valid",
+    "accepted": true,
+    "exception_type": null,
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "invalid_json",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "duplicate_json_key",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "unexpected_top_level_key",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "files_list",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  },
+  {
+    "source": "PROPOSED_NOT_APPLIED",
+    "fixture": "invalid_explanation",
+    "accepted": false,
+    "exception_type": "ProposalError",
+    "classification": "SYNTHETIC_DIAGNOSTIC_FIXTURE_NOT_BENCHMARK"
+  }
+]

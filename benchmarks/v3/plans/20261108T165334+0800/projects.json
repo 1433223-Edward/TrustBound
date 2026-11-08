@@ -1,0 +1,107 @@
+[
+  {
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "revision": 2,
+    "state": "FROZEN",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "56a2da08f6964f7aa56e42b097852562",
+    "revision": 2,
+    "state": "FROZEN",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "0aa1f8f2cfbf44c997b591a00587dba7",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Count only the parsed log level inside [start, end). Count malformed lines separately. Always return INFO, WARN and ERROR counts, including zeros.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "5b7abbc12c334c9d9090dc974f69d497",
+    "revision": 5,
+    "state": "FROZEN",
+    "title": "hello deepseek",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "2fcdbeae21af414a8f1f2adc9b6cf43d",
+    "revision": 5,
+    "state": "FROZEN",
+    "title": "Round decimal amounts to the nearest cent, half away from zero.",
+    "first_file": "billing.py"
+  },
+  {
+    "project_id": "732408e76ce74d319a7c7635176ade5b",
+    "revision": 5,
+    "state": "CLARIFYING",
+    "title": "\u7ef4\u62a4\u4e00\u4e2a\u8fd0\u8d39\u62a5\u4ef7\u6a21\u5757\u3002\u5728\u4e0d\u7834\u574f\u73b0\u6709\u516c\u5f00\u63a5\u53e3\uff08shipping.quote\u3001policy \u4e2d\u7684\u5e38\u91cf\u4e0e\u6a21\u5757\u540d\uff09\u7684\u524d\u63d0\u4e0b\u5b8c\u6210\u6539\u9020\uff0c\u53ef\u81ea\u7531\u589e\u5220\u6539\u6587\u4ef6\uff1a\n\n\u8fb9\u754c\u4fee\u590d\uff1a\u8fbe\u5230\u514d\u8fd0\u8d39\u95e8\u69db\u65f6\u5e94\u6536 0 \u5143\uff08\u5f53\u524d\u6070\u597d\u7b49\u4e8e\u95e8\u69db\u4ecd\u6536\u8d39\uff0c\u5c5e bug\uff09\u3002\n\n\u56fd\u9645\u5206\u6863\uff1a\u56fd\u9645\u8fd0\u8d39\u6309\u56fd\u5bb6\u5dee\u5f02\u5316\u5b9a\u4ef7\uff0c\u914d\u7f6e\u653e policy.py\uff1b\u672a\u77e5/\u7f3a\u5931\u56fd\u5bb6\u8d70\u539f\u515c\u5e95\u4ef7\uff0c\u539f\u5e38\u91cf\u4fdd\u7559\u3002\n\n\u6279\u91cf\u63a5\u53e3\uff1a\u65b0\u589e quote_batch(orders)\uff0c\u8fd4\u56de\u4e0e\u5165\u53c2\u540c\u5e8f\u7684\u7ed3\u679c\uff0c\u4e14\u4e0d\u4fee\u6539\u5165\u53c2\u3002\n\n\u6e05\u7406\uff1a\u5220\u9664\u5e9f\u5f03\u6587\u4ef6 legacy_rates.py\uff0c\u5e76\u6e05\u9664\u5176\u5f15\u7528\u3002\n\n\u81ea\u6d4b\uff1a\u5728 tests/ \u4e0b\u8865\u9f50\u8986\u76d6\u4e0a\u8ff0\u884c\u4e3a\u7684\u5355\u5143\u6d4b\u8bd5\uff0cpytest -q \u5168\u7eff\u3002\n\u7ea6\u675f\uff1a\u4e0d\u6539\u65e2\u6709\u5e38\u91cf\u7684\u503c\u4e0e\u6587\u4ef6\u540d\uff0c\u4e0d\u65b0\u5efa\u65e0\u5173\u76ee\u5f55\u3002",
+    "first_file": "policy.py"
+  },
+  {
+    "project_id": "1b928f481a7240509cdf17f1ed5282d5",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Count only the parsed log level inside [start, end). Count malformed lines separately. Always return INFO, WARN and ERROR counts, including zeros.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "841db0edba8d4e439159ea22bb6f9de1",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Count only the parsed log level inside [start, end). Count malformed lines separately. Always return INFO, WARN and ERROR counts, including zeros.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "404c6436a43c40278cd69d53382a1c72",
+    "revision": 4,
+    "state": "PLAN_READY",
+    "title": "\u4f60\u597d",
+    "first_file": "billing.py"
+  },
+  {
+    "project_id": "19b1977cc34545f3b94b352b8fc955d3",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "67482148619a4524b6af549519ad4791",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Round decimal amounts to the nearest cent, half away from zero.",
+    "first_file": "billing.py"
+  },
+  {
+    "project_id": "4d8d97fd92304f8ca365ced6358ceb51",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "47348c8831c149ec8b9f6b7e6e7f7dbd",
+    "revision": 1,
+    "state": "PLAN_READY",
+    "title": "Count only the parsed log level inside [start, end). Count malformed lines separately. Always return INFO, WARN and ERROR counts, including zeros.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "138a2c5ea391473c8fdd6648006a1908",
+    "revision": 3,
+    "state": "FROZEN",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  },
+  {
+    "project_id": "62ad2f2dd6e246878917b176adcad07c",
+    "revision": 2,
+    "state": "FROZEN",
+    "title": "Validate positive quantities and aggregate duplicate SKUs. Reject invalid or insufficient orders without changing any stock. Reject negative stock. Return ok and the resulting stock.",
+    "first_file": "README.md"
+  }
+]

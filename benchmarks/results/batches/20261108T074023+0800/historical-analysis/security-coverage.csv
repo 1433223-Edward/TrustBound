@@ -1,0 +1,14 @@
+﻿dimension,scenario,status,evidence,observation,gap
+Process Isolation,Read-only root and non-root smoke,INCONCLUSIVE,docs/environment-smoke.json#/normal,"sum: 6
+uid: 65534
+interfaces: [(1, 'lo')]
+root_write_errno: 30
+",Historical local observation only; no Rootless A1 runtime report; mount/process boundaries incomplete
+Process Isolation,A1 unauthorized permission gate,INCONCLUSIVE,docs/day1-results.json#candidate_id=unauthorized,REJECTED,Policy-layer rejection is not container filesystem isolation evidence
+Process Isolation,A2 network isolation,INCONCLUSIVE,docs/environment-smoke.json#/normal,"NetworkMode=none;  [(1, 'lo')]",lo/inspect observed historically; no dedicated A2 route probe report
+Secret Hygiene,A3 synthetic secret / Web-Runner isolation,NOT_TESTED,,,No original Rootless A3 observations; no fresh secret test performed
+Resource Limits,A4 host execution timeout,INCONCLUSIVE,docs/environment-smoke.json#/timeout; docs/day1-results.json#candidate_id=timeout,Historical timeout/137 and cleanup records,Bounded historical timeout evidence; no Rootless A4 probe report
+Resource Limits,A5 cgroup OOM termination,NOT_TESTED,,,Memory configuration is not OOM enforcement evidence
+Resource Limits,CPU and PID enforcement under load,NOT_TESTED,docs/environment-smoke.json#/normal/limits,Configured NanoCpus=500000000; PidsLimit=32,Inspect only; no runtime CPU/PID trigger test
+Lifecycle Discipline,Normal / failed / timed-out cleanup,INCONCLUSIVE,historical-executions.csv,8/8 historical cleanup confirmations,Historical bounded executions only; not systematic lifecycle proof
+Lifecycle Discipline,Orphan recovery / long-run leaks,NOT_TESTED,,,No real fault-injection or sustained resource telemetry report

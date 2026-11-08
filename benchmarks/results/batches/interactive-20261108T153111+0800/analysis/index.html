@@ -1,0 +1,59 @@
+<html><meta charset="utf-8"><title>TrustBound Benchmark v2</title><h1>Observed results — exploratory</h1><aside style="padding:16px;background:#fff3cd"><b>Interpretation:</b> group1=E-ON; group2=D-OFF; group3=E-OFF. Real local Docker, zero model calls. E-ON detected a known mismatch and stopped after its first case. One pair cannot establish performance overhead; negative latency delta is not acceleration evidence. D only has OFF, so no adversarial benefit comparison is valid.</aside><p>Source: D:\Projects\TrustBound\benchmarks\results\raw</p><p>Missing data remain unknown. See statistics.json and pairs.json for denominators and valid comparisons.</p><img style="max-width:100%" src="paired-overhead.svg"><img style="max-width:100%" src="success.svg"><img style="max-width:100%" src="latency.svg"><img style="max-width:100%" src="cost.svg"><img style="max-width:100%" src="cost_per_verified.svg"><img style="max-width:100%" src="cost-success.svg"><pre>[
+  {
+    &quot;label&quot;: &quot;[\&quot;E\&quot;, \&quot;OFFLINE_MODEL_DOCKER\&quot;, null, \&quot;on\&quot;, \&quot;a4371cc70059e589e028caaaa12251a2e51fe5e2\&quot;, \&quot;5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247\&quot;, \&quot;workspace-reviewed-v1\&quot;, null, true, null]&quot;,
+    &quot;n&quot;: 1,
+    &quot;completed&quot;: 1,
+    &quot;execution_counts&quot;: {
+      &quot;COMPLETED&quot;: 1
+    },
+    &quot;verification_counts&quot;: {
+      &quot;FAILED&quot;: 1
+    },
+    &quot;unknown_billing&quot;: 0,
+    &quot;missing_models&quot;: 1,
+    &quot;verified&quot;: 0,
+    &quot;success&quot;: 0.0,
+    &quot;latency&quot;: 4217.999999993481,
+    &quot;latency_sd&quot;: null,
+    &quot;cost&quot;: 0.0,
+    &quot;cost_per_verified&quot;: null
+  },
+  {
+    &quot;label&quot;: &quot;[\&quot;D\&quot;, \&quot;OFFLINE_MODEL_DOCKER\&quot;, null, \&quot;off\&quot;, \&quot;a4371cc70059e589e028caaaa12251a2e51fe5e2\&quot;, \&quot;941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b\&quot;, \&quot;billing-v1\&quot;, null, null, null]&quot;,
+    &quot;n&quot;: 1,
+    &quot;completed&quot;: 1,
+    &quot;execution_counts&quot;: {
+      &quot;COMPLETED&quot;: 1
+    },
+    &quot;verification_counts&quot;: {
+      &quot;VERIFIED&quot;: 1
+    },
+    &quot;unknown_billing&quot;: 0,
+    &quot;missing_models&quot;: 1,
+    &quot;verified&quot;: 1,
+    &quot;success&quot;: 1.0,
+    &quot;latency&quot;: 10312.999999965541,
+    &quot;latency_sd&quot;: null,
+    &quot;cost&quot;: 0.0,
+    &quot;cost_per_verified&quot;: 0.0
+  },
+  {
+    &quot;label&quot;: &quot;[\&quot;E\&quot;, \&quot;OFFLINE_MODEL_DOCKER\&quot;, null, \&quot;off\&quot;, \&quot;a4371cc70059e589e028caaaa12251a2e51fe5e2\&quot;, \&quot;5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247\&quot;, \&quot;workspace-reviewed-v1\&quot;, null, false, null]&quot;,
+    &quot;n&quot;: 1,
+    &quot;completed&quot;: 1,
+    &quot;execution_counts&quot;: {
+      &quot;COMPLETED&quot;: 1
+    },
+    &quot;verification_counts&quot;: {
+      &quot;EXECUTED_UNVERIFIED&quot;: 1
+    },
+    &quot;unknown_billing&quot;: 0,
+    &quot;missing_models&quot;: 1,
+    &quot;verified&quot;: 0,
+    &quot;success&quot;: 0.0,
+    &quot;latency&quot;: 16468.999999924563,
+    &quot;latency_sd&quot;: null,
+    &quot;cost&quot;: 0.0,
+    &quot;cost_per_verified&quot;: null
+  }
+]</pre></html>

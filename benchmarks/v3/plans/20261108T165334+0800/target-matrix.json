@@ -1,0 +1,376 @@
+{
+  "paid_target": 47,
+  "new_tasks": 52,
+  "B": 30,
+  "C": 12,
+  "D_ON": 5,
+  "D_OFF": 5,
+  "E": "reuse existing paired evidence, no new generation",
+  "A": "reuse historical evidence only",
+  "rows": [
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "inventory",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "inventory",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "inventory",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "inventory",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "inventory",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "logs",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "logs",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "logs",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "logs",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "logs",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "inventory",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "inventory",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "inventory",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "inventory",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "inventory",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "logs",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "logs",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "logs",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "logs",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "glm-5.3-flash",
+      "task": "logs",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "inventory",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "inventory",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "inventory",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "inventory",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "inventory",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "logs",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "logs",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "logs",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "logs",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "B",
+      "model": "mimo-v2.6-flash",
+      "task": "logs",
+      "repeat": 5,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-1",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-1",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-1",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-5",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-5",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-5",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-10",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-10",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-10",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-20",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-20",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "C",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "scale-20",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "D",
+      "model": null,
+      "task": "double_rounding-off",
+      "repeat": 1,
+      "generation_requests": 0
+    },
+    {
+      "experiment": "D",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "double_rounding-on",
+      "repeat": 1,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "D",
+      "model": null,
+      "task": "double_rounding-off",
+      "repeat": 2,
+      "generation_requests": 0
+    },
+    {
+      "experiment": "D",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "double_rounding-on",
+      "repeat": 2,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "D",
+      "model": null,
+      "task": "double_rounding-off",
+      "repeat": 3,
+      "generation_requests": 0
+    },
+    {
+      "experiment": "D",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "double_rounding-on",
+      "repeat": 3,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "D",
+      "model": null,
+      "task": "double_rounding-off",
+      "repeat": 4,
+      "generation_requests": 0
+    },
+    {
+      "experiment": "D",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "double_rounding-on",
+      "repeat": 4,
+      "generation_requests": 1
+    },
+    {
+      "experiment": "D",
+      "model": null,
+      "task": "double_rounding-off",
+      "repeat": 5,
+      "generation_requests": 0
+    },
+    {
+      "experiment": "D",
+      "model": "deepseek-v4.1-flash-1017",
+      "task": "double_rounding-on",
+      "repeat": 5,
+      "generation_requests": 1
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+--- a/trustbound/workspace_execution.py
++++ b/trustbound/workspace_execution.py
+@@ -17,7 +17,7 @@
+ from pydantic import Field, JsonValue, model_validator
+ 
+ from .contracts import ExecutionResult, execution_passed
+-from .executor import unique_object
++from .executor import ProposalError, unique_object
+ from .inference import InferenceError, TaskInferenceBudget, VultrClient, select_model, task_inference_budget
+ from .recovery import MAX_RECOVERY_ATTEMPTS
+ from .admission import model_request_identity
+@@ -190,12 +190,18 @@
+     model = select_model(client.catalog(), identifier)
+     reasoning = 1536 if model.get("reasoning", {}).get("supports_max_tokens") is True else None
+     text = client.complete(model, messages, MAX_COMPLETION_TOKENS, json_mode=True, reasoning_tokens=reasoning)
+-    value = json.loads(text, object_pairs_hook=unique_object)
++    try:
++        value = json.loads(text, object_pairs_hook=unique_object)
++    except json.JSONDecodeError:
++        raise ProposalError('WORKSPACE_PROPOSAL_INVALID_JSON') from None
+     if (type(value) is not dict or not {'files'} <= set(value) <= {'files', 'explanation'}
+             or type(value['files']) is not dict or not value['files']):
+-        raise WorkspaceError("INVALID_WORKSPACE_PROPOSAL")
++        raise ProposalError('WORKSPACE_PROPOSAL_INVALID_SHAPE')
+     if value.get('explanation') is not None:
+-        value['explanation'] = PublicExplanation.model_validate(value['explanation']).model_dump()
++        try:
++            value['explanation'] = PublicExplanation.model_validate(value['explanation']).model_dump()
++        except ValueError:
++            raise ProposalError('WORKSPACE_PROPOSAL_INVALID_EXPLANATION') from None
+     return value
+ 
+ 
+@@ -344,6 +350,8 @@
+             with model_request_identity(run_id, role), task_inference_budget(budget):
+                 result = operation()
+         except (InferenceError, JournalError) as error:
++            failure = str(error)
++        except ProposalError as error:
+             failure = str(error)
+         except (ValueError, TypeError, RecursionError):
+             failure = "INVALID_WORKSPACE_PROPOSAL"

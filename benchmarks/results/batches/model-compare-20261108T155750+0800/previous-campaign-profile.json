@@ -1,0 +1,13 @@
+{
+  "scope": "local development only",
+  "max_model_calls": 100,
+  "max_runs": 42,
+  "max_output_tokens": 38912,
+  "preserve_ledger": true,
+  "do_not_initialize_or_reset_ledger": true,
+  "per_request_output_tokens": 4096,
+  "current_paid_batch_complete": true,
+  "new_generation_requests_authorized": 0,
+  "launch_command": "pwsh -NoProfile -File scripts/start_workspace_preview.ps1 -MaxRuns 42 -MaxModelCalls 100 -MaxOutputTokens 38912",
+  "note": "Calls cap raised 48 to 100 within existing validator ceiling. Run/output reservations exhausted intentionally until next approved batch. Not a dollar hard cap."
+}

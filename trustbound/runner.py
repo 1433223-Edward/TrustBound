@@ -41,24 +41,31 @@ def checked(*arguments):
 
 
 def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds: int, *, work_root=None, worker_owned=False):
-    """Internal primitive: only the fixed-task service selects payloads and tests.
+    """Stage the fixed candidate and independently selected test file."""
+    return _execute_sandbox({"billing.py": code, "checks.py": tests}, "checks.py", phase,
+                            sha256(code), sha256(tests), timeout_seconds,
+                            work_root=work_root, worker_owned=worker_owned)
 
-    The host stages exactly two files, never executes them, and mounts only that
-    temporary directory read-only. Independent verification calls this again with
-    a fresh workspace and a new container; no executor outputs are trusted as tests.
-    """
+
+def _execute_sandbox(payload, script, phase, artifact_hash, test_hash, timeout_seconds,
+                     *, work_root=None, worker_owned=False):
+    """Stage validated bytes and run a trusted, fixed script path inside Docker."""
     name = "trustbound-" + uuid.uuid4().hex
     state, stdout, stderr, reason, error = {}, "", "", None, None
     status, cleanup, limits_verified = "ERROR", False, False
     with tempfile.TemporaryDirectory(prefix="trustbound-", dir=work_root) as directory:
         workspace = Path(directory)
-        (workspace / "billing.py").write_bytes(code)
-        (workspace / "checks.py").write_bytes(tests)
+        for filename, data in payload.items():
+            path = workspace / filename
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            if work_root is not None:
+                path.chmod(0o444)
         if work_root is not None:
-            # The host-only parent stays private. The mapped container UID can
-            # traverse and read just the directory exposed by the bind mount.
-            for filename in ("billing.py", "checks.py"):
-                (workspace / filename).chmod(0o444)
+            # Only the mounted staging tree is readable by the mapped UID.
+            for directory in workspace.rglob("*"):
+                if directory.is_dir():
+                    directory.chmod(0o755)
             workspace.chmod(0o755)
         try:
             checked(
@@ -71,7 +78,7 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
                 "--pids-limit", str(PID_LIMIT), "--log-driver", "local",
                 "--log-opt", "max-size=1m", "--log-opt", "max-file=2",
                 "--mount", f"type=bind,src={workspace},dst=/work,readonly",
-                IMAGE, "python", "-I", "-B", "-u", "/work/checks.py",
+                IMAGE, "python", "-I", "-B", "-u", f"/work/{script}",
             )
             inspected = json.loads(checked("inspect", name))[0]
             host, mounts = inspected["HostConfig"], inspected["Mounts"]
@@ -114,10 +121,13 @@ def _execute_fixed_tests(code: bytes, tests: bytes, phase: str, timeout_seconds:
                            and not remaining.stdout.strip())
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
                 error = f"{error or ''} Cleanup error: {exc}"
-        unchanged = ((workspace / "billing.py").read_bytes() == code
-                     and (workspace / "checks.py").read_bytes() == tests)
+        try:
+            unchanged = all((workspace / filename).read_bytes() == data
+                            for filename, data in payload.items())
+        except OSError:
+            unchanged = False
     return ExecutionResult(
-        phase, name, IMAGE, sha256(code), sha256(tests), status,
+        phase, name, IMAGE, artifact_hash, test_hash, status,
         state.get("ExitCode"), stdout, stderr, reason, cleanup, unchanged,
         limits_verified, error,
         oom_killed=state.get("OOMKilled") if type(state.get("OOMKilled")) is bool else None,

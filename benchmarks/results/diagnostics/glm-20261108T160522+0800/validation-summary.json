@@ -1,0 +1,22 @@
+{
+  "results": [
+    {
+      "pattern": "test_workspace_proposal_diagnostics.py",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_invalid_explanation_has_constant_code_without_echoing_input (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_explanation_has_constant_code_without_echoing_input) ... ok\ntest_invalid_json_and_duplicate_keys_have_distinct_codes (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_json_and_duplicate_keys_have_distinct_codes) ... ok\ntest_invalid_shapes_remain_rejected (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_shapes_remain_rejected) ... ok\ntest_specific_codes_reach_report_without_running_sandbox (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_specific_codes_reach_report_without_running_sandbox) ... ok\ntest_valid_proposal_and_optional_explanation_still_accepted (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_valid_proposal_and_optional_explanation_still_accepted) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.022s\n\nOK\n",
+      "status": "PASSED"
+    },
+    {
+      "pattern": "test_workspace_parallel.py",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_counterexample_is_confirmed_and_recovery_revalidates (test_workspace_parallel.ParallelWorkspaceTests.test_counterexample_is_confirmed_and_recovery_revalidates) ... ok\ntest_generation_error_or_unconfirmed_requirements_never_certify_success (test_workspace_parallel.ParallelWorkspaceTests.test_generation_error_or_unconfirmed_requirements_never_certify_success) ... ok\ntest_independent_contexts_and_actual_parallel_entry (test_workspace_parallel.ParallelWorkspaceTests.test_independent_contexts_and_actual_parallel_entry) ... ok\ntest_input_generation_does_not_trust_expected_values (test_workspace_parallel.ParallelWorkspaceTests.test_input_generation_does_not_trust_expected_values) ... ok\ntest_off_switch_and_unapproved_on (test_workspace_parallel.ParallelWorkspaceTests.test_off_switch_and_unapproved_on) ... ok\ntest_parallel_http_contract_preserves_admission_and_separate_usage (test_workspace_parallel.ParallelWorkspaceTests.test_parallel_http_contract_preserves_admission_and_separate_usage) ... ok\ntest_reference_rules_cover_atomicity_and_log_boundaries (test_workspace_parallel.ParallelWorkspaceTests.test_reference_rules_cover_atomicity_and_log_boundaries) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.064s\n\nOK\n",
+      "status": "PASSED"
+    }
+  ],
+  "http_integration": "INTERRUPTED_NO_PROGRESS_FIRST_CASE",
+  "real_model_calls": 0,
+  "docker_runs": 0,
+  "service_restarted": false
+}

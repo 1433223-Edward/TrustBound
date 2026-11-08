@@ -15,6 +15,7 @@ from .runner import WEB_WORKER_LABEL, _execute_fixed_tests, checked, sha256
 from .runner_ipc import (MAX_CANDIDATE_BYTES, MAX_OUTPUT_CHARS, MAX_REQUEST,
                          MAX_RESPONSE, read_message, write_message)
 from .service import CANDIDATES, ROOT, TASK
+from .workspace_execution import PROFILE, run_workspace_case
 
 
 SOCKET_PATH = "/run/trustbound-runner.sock"
@@ -44,6 +45,10 @@ def _challenge_driver(cases):
 
 
 def execute_request(request):
+    if type(request) is dict and request.get("task_id") == PROFILE:
+        if os.environ.get("TRUSTBOUND_ENABLE_WORKSPACE") != "1":
+            raise ValueError("Workspace runner tasks are disabled")
+        return run_workspace_case(request, work_root=WORK_ROOT)
     if type(request) is not dict or request.get("task_id") not in (TASK.task_id, CUSTOM_TASK.task_id):
         raise ValueError("Unknown task")
     custom = request["task_id"] == CUSTOM_TASK.task_id

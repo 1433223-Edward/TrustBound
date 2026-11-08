@@ -1,0 +1,7 @@
+{
+  "pattern": "test_workspace_proposal_diagnostics.py",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_invalid_explanation_has_constant_code_without_echoing_input (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_explanation_has_constant_code_without_echoing_input) ... ok\ntest_invalid_json_and_duplicate_keys_have_distinct_codes (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_json_and_duplicate_keys_have_distinct_codes) ... ok\ntest_invalid_shapes_remain_rejected (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_invalid_shapes_remain_rejected) ... ok\ntest_specific_codes_reach_report_without_running_sandbox (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_specific_codes_reach_report_without_running_sandbox) ... ok\ntest_valid_proposal_and_optional_explanation_still_accepted (test_workspace_proposal_diagnostics.ProposalDiagnosticsTests.test_valid_proposal_and_optional_explanation_still_accepted) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.022s\n\nOK\n",
+  "status": "PASSED"
+}

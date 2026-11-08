@@ -1,0 +1,33 @@
+{
+  "experiment_id": "20261108T165334+0800-v3-B-logs-deepseek-v4.1-flash-1017-r02",
+  "experiment_type": "B",
+  "dataset_version": "trustbound-v3-fixed-tasks-1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "ec76437478d007b3ce15ba614029eb6b9c65c3cf26e5522511dd0c9b2779dc9f",
+  "project_id": "0aa1f8f2cfbf44c997b591a00587dba7",
+  "pair_id": null,
+  "group": "v3-main",
+  "base_url": "http://127.0.0.1:8000",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": null,
+    "mode": "live",
+    "model_id": "deepseek-v4.1-flash-1017",
+    "authorize_source": true,
+    "adversarial_enabled": false,
+    "correctness_verification": true,
+    "authorize_explanation": false
+  },
+  "source_tree_sha256": "26d209426c6d2a910ba9cfa8fc03b5a1d9353823d90442cc02acc3f0e1bf146f",
+  "source_working_tree_dirty": true,
+  "frozen_hash": null,
+  "approval_status": "NOT_AUTHORIZED",
+  "proposed_model_id": "deepseek-v4.1-flash-1017",
+  "authorization_batch": "V3-BATCH01-PENDING",
+  "criteria_hash": "fa410d8786a80ee3048e71b79d8c3d743ab7389cce4ac286dabeaeed0e5209c1",
+  "requested_model_id": "deepseek-v4.1-flash-1017",
+  "repeat_index": 2,
+  "task_name": "logs",
+  "preparation_status": "BLOCKED_LOGS_NOT_FROZEN"
+}

@@ -1,0 +1,8 @@
+{
+  "max_output_tokens": 47104,
+  "max_model_calls": 12,
+  "max_runs": 44,
+  "default_model_unchanged": true,
+  "additional_allowlist": "glm-5.3-flash,mimo-v2.6-flash",
+  "launcher_pid": 31216
+}

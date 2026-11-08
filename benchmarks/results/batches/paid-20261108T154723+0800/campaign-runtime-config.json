@@ -1,0 +1,9 @@
+{
+  "remaining_batch_output_reservation": 0,
+  "max_output_tokens": 38912,
+  "note": "Campaign call cap raised within existing validation. No extra batch requests authorized.",
+  "remaining_batch_run_slots": 0,
+  "max_model_calls": 100,
+  "launcher_pid": 37164,
+  "max_runs": 42
+}

@@ -1,0 +1,13 @@
+{
+  "raw": "benchmarks\\results\\raw\\79e75a42c3a84d43b3fcecc69bffae48",
+  "server_run_id": "8c14ca0f80024019bef48bafd1572b57",
+  "checks": {
+    "complete": true,
+    "one_generation": true,
+    "actual_model": true,
+    "known_cost": true,
+    "limits_and_cleanup": true,
+    "security": true,
+    "run_id": true
+  }
+}

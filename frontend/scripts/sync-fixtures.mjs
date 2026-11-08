@@ -6,8 +6,20 @@ const candidates = Object.fromEntries(await Promise.all(
   ['original', 'fixed', 'public_only', 'timeout'].map(async (id) => [id, await read(`fixtures/billing/${id}.py`)]),
 ))
 candidates.unauthorized = candidates.fixed
+const collaboration = {}
+for (const [id, path, experiment] of [
+  ['adversarial_recorded', 'docs/adversarial-integration-results.json', 'E2'],
+  ['recovery_recorded', 'docs/recovery-integration-results.json', 'R1'],
+]) {
+  const record = JSON.parse(await read(path)).find(row => row.experiment === experiment)
+  if (!record?.snapshot?.verification) throw new Error(`Missing recorded evidence: ${path} ${experiment}`)
+  const fields = ['run_id', 'task_id', 'verification', 'adversarial_report', 'final_decision',
+    'recovery_report', 'adversarial_mode', 'recovery_mode', 'candidate']
+  collaboration[id] = { source: path, snapshot: Object.fromEntries(fields.map(key => [key, record.snapshot[key]])) }
+}
 const data = {
   source: 'docs/day1-results.json',
+  publicTests: { path: 'fixtures/billing/public_tests.py', content: await read('fixtures/billing/public_tests.py') },
   tasks: [{
     spec: reports[0].task,
     title: 'Currency rounding',
@@ -16,7 +28,7 @@ const data = {
     constraints: ['Only billing.py may change', 'Acceptance tests are protected', 'No network · no host credentials', '3s execution deadline'],
     acceptance_goals: ['1.239 → 124 cents', '1.005 → 101 cents', '−1.005 → −101 cents'],
     original: { path: 'billing.py', content: candidates.original },
-  }], reports, candidates,
+  }], reports, candidates, collaboration,
 }
 await mkdir(new URL('../src/data/', import.meta.url), { recursive: true })
 await writeFile(new URL('../src/data/demo.json', import.meta.url), JSON.stringify(data, null, 2) + '\n')

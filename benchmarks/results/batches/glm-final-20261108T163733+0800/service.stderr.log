@@ -1,0 +1,9 @@
+INFO:     Started server process [35888]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Exception: D:\Projects\TrustBound\scripts\start_workspace_preview.ps1:48
+Line |
+  48 |      if ($LASTEXITCODE -ne 0) { throw 'Preview API failed.' }
+     |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Preview API failed.

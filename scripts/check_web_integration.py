@@ -9,6 +9,8 @@ from urllib import error, request
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, choices=[8000, 5173], default=5173)
+    parser.add_argument("--output", type=Path,
+                        default=Path(__file__).resolve().parents[1] / "artifacts/web-integration-results.json")
     args = parser.parse_args()
     base = f"http://127.0.0.1:{args.port}/api"
 
@@ -43,7 +45,7 @@ def main():
             raise AssertionError("Real HTTP run exceeded integration deadline")
         snapshots.append(snapshot)
         # Save real evidence even if an assertion later fails.
-        output = Path(__file__).resolve().parents[1] / "artifacts/web-integration-results.json"
+        output = args.output
         output.write_text(json.dumps(snapshots, indent=2, ensure_ascii=False), encoding="utf-8")
         assert snapshot["state"] == "COMPLETED", snapshot["error"]
         report = snapshot["verification"]

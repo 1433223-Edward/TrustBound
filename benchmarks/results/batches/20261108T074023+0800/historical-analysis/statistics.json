@@ -1,0 +1,107 @@
+{
+  "dataset": "historical-security-audit-v1",
+  "evidence_class": "HISTORICAL_LOCAL_DOCKER_RECORD",
+  "new_docker_executions": 0,
+  "new_model_requests": 0,
+  "historical_task_count": 5,
+  "historical_container_count": 8,
+  "historical_timed_out_count": 2,
+  "historical_cleanup_confirmed": 8,
+  "historical_cleanup_observed_denominator": 8,
+  "rootless_a1_a5_complete_reports_found": 0,
+  "containment_rate": null,
+  "false_rejection_rate": null,
+  "secret_exposure_rate": null,
+  "resource_enforcement_rate": null,
+  "limitations": "No dedicated Rootless suite report; different tasks/phases are not independent repetitions. No universal security conclusions.",
+  "sources": [
+    {
+      "source": "docs\\environment-smoke.json",
+      "archive": "historical-raw\\environment-smoke.json",
+      "sha256": "fec2674f17bb6065437237f9cb8d8ea53e60f633e2c416449481903291e27e4f",
+      "classification": "HISTORICAL_LOCAL_DOCKER_RECORD",
+      "origin_verified_by_new_execution": false
+    },
+    {
+      "source": "docs\\day1-results.json",
+      "archive": "historical-raw\\day1-results.json",
+      "sha256": "8abd180aa85869b5491b127816b7e1f990530cbfa310a0687e50932f0315a7cf",
+      "classification": "HISTORICAL_LOCAL_DOCKER_RECORD",
+      "origin_verified_by_new_execution": false
+    }
+  ],
+  "coverage": [
+    {
+      "dimension": "Process Isolation",
+      "scenario": "Read-only root and non-root smoke",
+      "status": "INCONCLUSIVE",
+      "evidence": "docs/environment-smoke.json#/normal",
+      "observation": "sum: 6\nuid: 65534\ninterfaces: [(1, 'lo')]\nroot_write_errno: 30\n",
+      "gap": "Historical local observation only; no Rootless A1 runtime report; mount/process boundaries incomplete"
+    },
+    {
+      "dimension": "Process Isolation",
+      "scenario": "A1 unauthorized permission gate",
+      "status": "INCONCLUSIVE",
+      "evidence": "docs/day1-results.json#candidate_id=unauthorized",
+      "observation": "REJECTED",
+      "gap": "Policy-layer rejection is not container filesystem isolation evidence"
+    },
+    {
+      "dimension": "Process Isolation",
+      "scenario": "A2 network isolation",
+      "status": "INCONCLUSIVE",
+      "evidence": "docs/environment-smoke.json#/normal",
+      "observation": "NetworkMode=none;  [(1, 'lo')]",
+      "gap": "lo/inspect observed historically; no dedicated A2 route probe report"
+    },
+    {
+      "dimension": "Secret Hygiene",
+      "scenario": "A3 synthetic secret / Web-Runner isolation",
+      "status": "NOT_TESTED",
+      "evidence": null,
+      "observation": null,
+      "gap": "No original Rootless A3 observations; no fresh secret test performed"
+    },
+    {
+      "dimension": "Resource Limits",
+      "scenario": "A4 host execution timeout",
+      "status": "INCONCLUSIVE",
+      "evidence": "docs/environment-smoke.json#/timeout; docs/day1-results.json#candidate_id=timeout",
+      "observation": "Historical timeout/137 and cleanup records",
+      "gap": "Bounded historical timeout evidence; no Rootless A4 probe report"
+    },
+    {
+      "dimension": "Resource Limits",
+      "scenario": "A5 cgroup OOM termination",
+      "status": "NOT_TESTED",
+      "evidence": null,
+      "observation": null,
+      "gap": "Memory configuration is not OOM enforcement evidence"
+    },
+    {
+      "dimension": "Resource Limits",
+      "scenario": "CPU and PID enforcement under load",
+      "status": "NOT_TESTED",
+      "evidence": "docs/environment-smoke.json#/normal/limits",
+      "observation": "Configured NanoCpus=500000000; PidsLimit=32",
+      "gap": "Inspect only; no runtime CPU/PID trigger test"
+    },
+    {
+      "dimension": "Lifecycle Discipline",
+      "scenario": "Normal / failed / timed-out cleanup",
+      "status": "INCONCLUSIVE",
+      "evidence": "historical-executions.csv",
+      "observation": "8/8 historical cleanup confirmations",
+      "gap": "Historical bounded executions only; not systematic lifecycle proof"
+    },
+    {
+      "dimension": "Lifecycle Discipline",
+      "scenario": "Orphan recovery / long-run leaks",
+      "status": "NOT_TESTED",
+      "evidence": null,
+      "observation": null,
+      "gap": "No real fault-injection or sustained resource telemetry report"
+    }
+  ]
+}

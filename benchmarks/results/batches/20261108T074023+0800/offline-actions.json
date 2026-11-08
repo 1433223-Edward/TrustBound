@@ -1,0 +1,39 @@
+[
+  {
+    "action": "prepare",
+    "command": [
+      "D:\\Projects\\TrustBound\\.venv\\Scripts\\python.exe",
+      "benchmarks/benchmark.py",
+      "prepare",
+      "--out",
+      "D:\\Projects\\TrustBound\\benchmarks\\results\\batches\\20261108T074023+0800\\datasets"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "action": "check",
+    "command": [
+      "D:\\Projects\\TrustBound\\.venv\\Scripts\\python.exe",
+      "benchmarks/benchmark.py",
+      "check"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "No raw records found\n"
+  },
+  {
+    "action": "analyze",
+    "command": [
+      "D:\\Projects\\TrustBound\\.venv\\Scripts\\python.exe",
+      "benchmarks/benchmark.py",
+      "analyze",
+      "--out",
+      "D:\\Projects\\TrustBound\\benchmarks\\results\\batches\\20261108T074023+0800\\existing-analysis"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "No raw observations; no charts generated\n"
+  }
+]

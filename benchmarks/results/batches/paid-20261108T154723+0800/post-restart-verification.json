@@ -1,0 +1,13 @@
+{
+  "ledger_unchanged": true,
+  "project_frozen_unchanged": true,
+  "configured_batch_caps": {
+    "max_runs": 42,
+    "max_model_calls": 10,
+    "max_output_tokens": 38912
+  },
+  "model": "deepseek-v4.1-flash-1017",
+  "max_generation_requests": 2,
+  "max_output_tokens": 8192,
+  "dollar_hard_cap": false
+}

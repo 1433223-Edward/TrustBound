@@ -1,0 +1,33 @@
+{
+  "experiment_id": "20261108T165334+0800-v3-B-inventory-mimo-v2.6-flash-r02",
+  "experiment_type": "B",
+  "dataset_version": "trustbound-v3-fixed-tasks-1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+  "project_id": "69e7990423e3492a8b572205116b12b2",
+  "pair_id": null,
+  "group": "v3-main",
+  "base_url": "http://127.0.0.1:8000",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": 2,
+    "mode": "live",
+    "model_id": "mimo-v2.6-flash",
+    "authorize_source": true,
+    "adversarial_enabled": false,
+    "correctness_verification": true,
+    "authorize_explanation": false
+  },
+  "source_tree_sha256": "26d209426c6d2a910ba9cfa8fc03b5a1d9353823d90442cc02acc3f0e1bf146f",
+  "source_working_tree_dirty": true,
+  "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+  "approval_status": "NOT_AUTHORIZED",
+  "proposed_model_id": "deepseek-v4.1-flash-1017",
+  "authorization_batch": "V3-BATCH01-PENDING",
+  "criteria_hash": "c32bf608660783bdb65ef830b2f5a6045258770a20b79c046533788449e19a05",
+  "requested_model_id": "mimo-v2.6-flash",
+  "repeat_index": 2,
+  "task_name": "inventory",
+  "preparation_status": "PROJECT_BOUND_AWAITING_PAID_APPROVAL"
+}

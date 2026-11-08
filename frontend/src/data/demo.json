@@ -1,5 +1,9 @@
 {
   "source": "docs/day1-results.json",
+  "publicTests": {
+    "path": "fixtures/billing/public_tests.py",
+    "content": "\"\"\"Public examples; formal tie cases are maintained separately.\"\"\"\nimport sys\nfrom pathlib import Path\nimport unittest\n\nsys.path.insert(0, str(Path(__file__).parent))\nfrom billing import to_cents\n\n\nclass PublicTests(unittest.TestCase):\n    def test_whole_cents(self):\n        for amount, expected in [(\"0\", 0), (\"1.23\", 123), (\"12.30\", 1230)]:\n            with self.subTest(amount=amount):\n                self.assertEqual(to_cents(amount), expected)\n\n    def test_round_fraction(self):\n        self.assertEqual(to_cents(\"1.239\"), 124)\n\n\nif __name__ == \"__main__\":\n    unittest.main(verbosity=2)\n"
+  },
   "tasks": [
     {
       "spec": {
@@ -267,5 +271,907 @@
     "public_only": "\"\"\"Deliberately incomplete candidate: passes public tests, fails half-cent ties.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_EVEN\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_EVEN))\n",
     "timeout": "\"\"\"Controlled timeout fixture; this file must only run inside the container.\"\"\"\n\n\ndef to_cents(amount: str) -> int:\n    while True:\n        pass\n",
     "unauthorized": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+  },
+  "collaboration": {
+    "adversarial_recorded": {
+      "source": "docs/adversarial-integration-results.json",
+      "snapshot": {
+        "run_id": "ef623f7908c548a281df8ef0b8771767",
+        "task_id": "billing-rounding-01",
+        "verification": {
+          "run_id": "9c670f2ca8444a019df79e25681726aa",
+          "task": {
+            "task_id": "billing-rounding-01",
+            "acceptance_id": "billing-v1",
+            "allowed_write_paths": [
+              "billing.py"
+            ],
+            "timeout_seconds": 3
+          },
+          "candidate_id": "double_rounding",
+          "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+          "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+          "status": "VERIFIED",
+          "policy_reason": "Allowed: all proposed writes are within billing.py",
+          "changed_paths": [
+            "billing.py"
+          ],
+          "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+          "executions": [
+            {
+              "phase": "public",
+              "container_name": "trustbound-0e58cf9c04b248eda198739fce443d42",
+              "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+              "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+              "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+              "status": "EXITED",
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+              "timeout_reason": null,
+              "cleanup_confirmed": true,
+              "workspace_unchanged": true,
+              "limits_verified": true,
+              "error": null
+            },
+            {
+              "phase": "acceptance",
+              "container_name": "trustbound-293c34460da64d218938c7e50929ad8b",
+              "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+              "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+              "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+              "status": "EXITED",
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+              "timeout_reason": null,
+              "cleanup_confirmed": true,
+              "workspace_unchanged": true,
+              "limits_verified": true,
+              "error": null
+            }
+          ],
+          "limitations": [
+            "Only fixed billing tasks and declared billing-v1 cases are supported",
+            "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+            "Repository and Docker controller are trusted; containers are not a VM security proof"
+          ]
+        },
+        "adversarial_report": {
+          "task_id": "billing-rounding-01",
+          "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+          "status": "COMPLETED",
+          "source": "OFFLINE_TEST",
+          "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+          "context": {
+            "task_id": "billing-rounding-01",
+            "requirement_id": "billing-v1.round-half-up",
+            "requirement": "Convert a finite decimal amount string to integer cents; nearest rounding, half-cent ties away from zero, including negatives.",
+            "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+            "candidate": {
+              "path": "billing.py",
+              "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+            }
+          },
+          "challenges": [
+            {
+              "challenge": {
+                "challenge_id": "challenge-1",
+                "amount": "1.00499",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Premature rounding can cross the half-cent boundary"
+              },
+              "status": "CONFIRMED",
+              "expected": 100,
+              "actual": 101,
+              "actual_type": "int",
+              "reason": "Observed mismatch against trusted integer oracle"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-2",
+                "amount": "-1.00499",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Check the same boundary for negative amounts"
+              },
+              "status": "CONFIRMED",
+              "expected": -100,
+              "actual": -101,
+              "actual_type": "int",
+              "reason": "Observed mismatch against trusted integer oracle"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-3",
+                "amount": "NaN",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Invalid finite amount should be rejected by the host"
+              },
+              "status": "INVALID",
+              "expected": null,
+              "actual": null,
+              "actual_type": null,
+              "reason": "INVALID_AMOUNT: outside supported finite decimal format"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-4",
+                "amount": "1.005",
+                "requirement_id": "bankers-rounding",
+                "reason": "Untrusted alternative rule should be rejected"
+              },
+              "status": "INVALID",
+              "expected": null,
+              "actual": null,
+              "actual_type": null,
+              "reason": "UNTRUSTED_REQUIREMENT: model cannot change the business rule"
+            }
+          ],
+          "execution": {
+            "phase": "adversarial",
+            "container_name": "trustbound-73fbda0ae9d14e42b77359b6acf28978",
+            "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+            "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+            "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+            "status": "EXITED",
+            "exit_code": 1,
+            "stdout": "{\"results\": [{\"id\": \"challenge-1\", \"amount\": \"1.00499\", \"actual\": 101, \"actual_type\": \"int\"}, {\"id\": \"challenge-2\", \"amount\": \"-1.00499\", \"actual\": -101, \"actual_type\": \"int\"}]}\n",
+            "stderr": "",
+            "timeout_reason": null,
+            "cleanup_confirmed": true,
+            "workspace_unchanged": true,
+            "limits_verified": true,
+            "error": null
+          },
+          "driver_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+          "raw_response": "{\"challenges\": [{\"amount\": \"1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Premature rounding can cross the half-cent boundary\"}, {\"amount\": \"-1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Check the same boundary for negative amounts\"}, {\"amount\": \"NaN\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Invalid finite amount should be rejected by the host\"}, {\"amount\": \"1.005\", \"requirement_id\": \"bankers-rounding\", \"reason\": \"Untrusted alternative rule should be rejected\"}]}",
+          "calls": [
+            {
+              "attempt": 1,
+              "model": "deepseek-v4.1-flash-1017",
+              "max_completion_tokens": 768,
+              "started_at": "2026-11-04T03:03:17.184308+00:00",
+              "status": "COMPLETED",
+              "usage": null,
+              "estimated_usd": null,
+              "billing_status": "UNKNOWN"
+            }
+          ],
+          "generated_count": 4,
+          "valid_count": 2,
+          "confirmed_count": 2,
+          "generation_parsed": true,
+          "budget": {
+            "max_challenges": 4,
+            "max_completion_tokens": 768,
+            "timeout_seconds": 30,
+            "max_attempts": 2
+          }
+        },
+        "final_decision": {
+          "status": "FAILED",
+          "formal_status": "VERIFIED",
+          "formal_report_id": "9c670f2ca8444a019df79e25681726aa",
+          "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+          "adversarial_status": "COMPLETED",
+          "reason": "Confirmed business counterexample; formal test success is insufficient",
+          "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+        },
+        "adversarial_mode": "offline",
+        "candidate": {
+          "path": "billing.py",
+          "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+          "source": "FIXTURE"
+        }
+      }
+    },
+    "recovery_recorded": {
+      "source": "docs/recovery-integration-results.json",
+      "snapshot": {
+        "run_id": "ef96d5a19fb5460a897aea44d2a6de3f",
+        "task_id": "billing-rounding-01",
+        "verification": {
+          "run_id": "5da78fb241c94519988963781c87d318",
+          "task": {
+            "task_id": "billing-rounding-01",
+            "acceptance_id": "billing-v1",
+            "allowed_write_paths": [
+              "billing.py"
+            ],
+            "timeout_seconds": 3
+          },
+          "candidate_id": "executor",
+          "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+          "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+          "status": "VERIFIED",
+          "policy_reason": "Allowed: all proposed writes are within billing.py",
+          "changed_paths": [
+            "billing.py"
+          ],
+          "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+          "executions": [
+            {
+              "phase": "public",
+              "container_name": "trustbound-627d746dada64317b58416258158002f",
+              "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+              "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+              "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+              "status": "EXITED",
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+              "timeout_reason": null,
+              "cleanup_confirmed": true,
+              "workspace_unchanged": true,
+              "limits_verified": true,
+              "error": null
+            },
+            {
+              "phase": "acceptance",
+              "container_name": "trustbound-a9c5dcdf4c82478ea15a63f4701177f9",
+              "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+              "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+              "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+              "status": "EXITED",
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+              "timeout_reason": null,
+              "cleanup_confirmed": true,
+              "workspace_unchanged": true,
+              "limits_verified": true,
+              "error": null
+            }
+          ],
+          "limitations": [
+            "Only fixed billing tasks and declared billing-v1 cases are supported",
+            "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+            "Repository and Docker controller are trusted; containers are not a VM security proof"
+          ]
+        },
+        "adversarial_report": {
+          "task_id": "billing-rounding-01",
+          "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+          "status": "COMPLETED",
+          "source": "OFFLINE_TEST",
+          "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+          "context": {
+            "task_id": "billing-rounding-01",
+            "requirement_id": "billing-v1.round-half-up",
+            "requirement": "Convert a finite decimal amount string to integer cents; nearest rounding, half-cent ties away from zero, including negatives.",
+            "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+            "candidate": {
+              "path": "billing.py",
+              "content": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+            }
+          },
+          "challenges": [
+            {
+              "challenge": {
+                "challenge_id": "challenge-1",
+                "amount": "1.00499",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Premature rounding can cross the half-cent boundary"
+              },
+              "status": "NOT_CONFIRMED",
+              "expected": 100,
+              "actual": 100,
+              "actual_type": "int",
+              "reason": "Observed output matches trusted oracle"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-2",
+                "amount": "-1.00499",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Check the same boundary for negative amounts"
+              },
+              "status": "NOT_CONFIRMED",
+              "expected": -100,
+              "actual": -100,
+              "actual_type": "int",
+              "reason": "Observed output matches trusted oracle"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-3",
+                "amount": "NaN",
+                "requirement_id": "billing-v1.round-half-up",
+                "reason": "Invalid finite amount should be rejected by the host"
+              },
+              "status": "INVALID",
+              "expected": null,
+              "actual": null,
+              "actual_type": null,
+              "reason": "INVALID_AMOUNT: outside supported finite decimal format"
+            },
+            {
+              "challenge": {
+                "challenge_id": "challenge-4",
+                "amount": "1.005",
+                "requirement_id": "bankers-rounding",
+                "reason": "Untrusted alternative rule should be rejected"
+              },
+              "status": "INVALID",
+              "expected": null,
+              "actual": null,
+              "actual_type": null,
+              "reason": "UNTRUSTED_REQUIREMENT: model cannot change the business rule"
+            }
+          ],
+          "execution": {
+            "phase": "adversarial",
+            "container_name": "trustbound-ec61c735f37341cfbcd4829f6ad519dd",
+            "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+            "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+            "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+            "status": "EXITED",
+            "exit_code": 0,
+            "stdout": "{\"results\": [{\"id\": \"challenge-1\", \"amount\": \"1.00499\", \"actual\": 100, \"actual_type\": \"int\"}, {\"id\": \"challenge-2\", \"amount\": \"-1.00499\", \"actual\": -100, \"actual_type\": \"int\"}]}\n",
+            "stderr": "",
+            "timeout_reason": null,
+            "cleanup_confirmed": true,
+            "workspace_unchanged": true,
+            "limits_verified": true,
+            "error": null
+          },
+          "driver_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+          "raw_response": "{\"challenges\": [{\"amount\": \"1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Premature rounding can cross the half-cent boundary\"}, {\"amount\": \"-1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Check the same boundary for negative amounts\"}, {\"amount\": \"NaN\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Invalid finite amount should be rejected by the host\"}, {\"amount\": \"1.005\", \"requirement_id\": \"bankers-rounding\", \"reason\": \"Untrusted alternative rule should be rejected\"}]}",
+          "calls": [
+            {
+              "attempt": 1,
+              "model": "deepseek-v4.1-flash-1017",
+              "max_completion_tokens": 768,
+              "started_at": "2026-11-04T03:34:57.282960+00:00",
+              "status": "COMPLETED",
+              "usage": null,
+              "estimated_usd": null,
+              "billing_status": "UNKNOWN"
+            }
+          ],
+          "generated_count": 4,
+          "valid_count": 2,
+          "confirmed_count": 0,
+          "generation_parsed": true,
+          "budget": {
+            "max_challenges": 4,
+            "max_completion_tokens": 768,
+            "timeout_seconds": 30,
+            "max_attempts": 2
+          }
+        },
+        "final_decision": {
+          "status": "VERIFIED",
+          "formal_status": "VERIFIED",
+          "formal_report_id": "5da78fb241c94519988963781c87d318",
+          "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+          "adversarial_status": "COMPLETED",
+          "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+          "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+        },
+        "recovery_report": {
+          "run_id": "ef96d5a19fb5460a897aea44d2a6de3f",
+          "max_attempts": 2,
+          "status": "COMPLETED",
+          "attempts": [
+            {
+              "run_id": "ef96d5a19fb5460a897aea44d2a6de3f",
+              "attempt_index": 0,
+              "candidate_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+              "previous_candidate_hash": null,
+              "recovery_trigger": "INITIAL",
+              "confirmed_failure_evidence": [],
+              "context": null,
+              "model_source": "NONE",
+              "model_call_metadata": [],
+              "stop_reason": null,
+              "diff_from_previous": "",
+              "proposal": null,
+              "candidate": {
+                "path": "billing.py",
+                "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+                "source": "FIXTURE"
+              },
+              "verification": {
+                "run_id": "83dcb86a96d6408c8f3026cbd39a31f1",
+                "task": {
+                  "task_id": "billing-rounding-01",
+                  "acceptance_id": "billing-v1",
+                  "allowed_write_paths": [
+                    "billing.py"
+                  ],
+                  "timeout_seconds": 3
+                },
+                "candidate_id": "double_rounding",
+                "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+                "status": "VERIFIED",
+                "policy_reason": "Allowed: all proposed writes are within billing.py",
+                "changed_paths": [
+                  "billing.py"
+                ],
+                "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+                "executions": [
+                  {
+                    "phase": "public",
+                    "container_name": "trustbound-03458de599354df9b99714255176b1dc",
+                    "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                    "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                    "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+                    "status": "EXITED",
+                    "exit_code": 0,
+                    "stdout": "",
+                    "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+                    "timeout_reason": null,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true,
+                    "error": null
+                  },
+                  {
+                    "phase": "acceptance",
+                    "container_name": "trustbound-80523f22d817450e97d4a86ccb839a6f",
+                    "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                    "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                    "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+                    "status": "EXITED",
+                    "exit_code": 0,
+                    "stdout": "",
+                    "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+                    "timeout_reason": null,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true,
+                    "error": null
+                  }
+                ],
+                "limitations": [
+                  "Only fixed billing tasks and declared billing-v1 cases are supported",
+                  "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+                  "Repository and Docker controller are trusted; containers are not a VM security proof"
+                ]
+              },
+              "executor": null,
+              "llm_source": "NONE",
+              "error": null,
+              "adversarial_report": {
+                "task_id": "billing-rounding-01",
+                "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                "status": "COMPLETED",
+                "source": "OFFLINE_TEST",
+                "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+                "context": {
+                  "task_id": "billing-rounding-01",
+                  "requirement_id": "billing-v1.round-half-up",
+                  "requirement": "Convert a finite decimal amount string to integer cents; nearest rounding, half-cent ties away from zero, including negatives.",
+                  "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                  "candidate": {
+                    "path": "billing.py",
+                    "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+                  }
+                },
+                "challenges": [
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-1",
+                      "amount": "1.00499",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Premature rounding can cross the half-cent boundary"
+                    },
+                    "status": "CONFIRMED",
+                    "expected": 100,
+                    "actual": 101,
+                    "actual_type": "int",
+                    "reason": "Observed mismatch against trusted integer oracle"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-2",
+                      "amount": "-1.00499",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Check the same boundary for negative amounts"
+                    },
+                    "status": "CONFIRMED",
+                    "expected": -100,
+                    "actual": -101,
+                    "actual_type": "int",
+                    "reason": "Observed mismatch against trusted integer oracle"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-3",
+                      "amount": "NaN",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Invalid finite amount should be rejected by the host"
+                    },
+                    "status": "INVALID",
+                    "expected": null,
+                    "actual": null,
+                    "actual_type": null,
+                    "reason": "INVALID_AMOUNT: outside supported finite decimal format"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-4",
+                      "amount": "1.005",
+                      "requirement_id": "bankers-rounding",
+                      "reason": "Untrusted alternative rule should be rejected"
+                    },
+                    "status": "INVALID",
+                    "expected": null,
+                    "actual": null,
+                    "actual_type": null,
+                    "reason": "UNTRUSTED_REQUIREMENT: model cannot change the business rule"
+                  }
+                ],
+                "execution": {
+                  "phase": "adversarial",
+                  "container_name": "trustbound-cef3c55e516e4d59adbeb79ab5189973",
+                  "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                  "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                  "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                  "status": "EXITED",
+                  "exit_code": 1,
+                  "stdout": "{\"results\": [{\"id\": \"challenge-1\", \"amount\": \"1.00499\", \"actual\": 101, \"actual_type\": \"int\"}, {\"id\": \"challenge-2\", \"amount\": \"-1.00499\", \"actual\": -101, \"actual_type\": \"int\"}]}\n",
+                  "stderr": "",
+                  "timeout_reason": null,
+                  "cleanup_confirmed": true,
+                  "workspace_unchanged": true,
+                  "limits_verified": true,
+                  "error": null
+                },
+                "driver_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                "raw_response": "{\"challenges\": [{\"amount\": \"1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Premature rounding can cross the half-cent boundary\"}, {\"amount\": \"-1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Check the same boundary for negative amounts\"}, {\"amount\": \"NaN\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Invalid finite amount should be rejected by the host\"}, {\"amount\": \"1.005\", \"requirement_id\": \"bankers-rounding\", \"reason\": \"Untrusted alternative rule should be rejected\"}]}",
+                "calls": [
+                  {
+                    "attempt": 1,
+                    "model": "deepseek-v4.1-flash-1017",
+                    "max_completion_tokens": 768,
+                    "started_at": "2026-11-04T03:34:47.316129+00:00",
+                    "status": "COMPLETED",
+                    "usage": null,
+                    "estimated_usd": null,
+                    "billing_status": "UNKNOWN"
+                  }
+                ],
+                "generated_count": 4,
+                "valid_count": 2,
+                "confirmed_count": 2,
+                "generation_parsed": true,
+                "budget": {
+                  "max_challenges": 4,
+                  "max_completion_tokens": 768,
+                  "timeout_seconds": 30,
+                  "max_attempts": 2
+                }
+              },
+              "final_decision": {
+                "status": "FAILED",
+                "formal_status": "VERIFIED",
+                "formal_report_id": "83dcb86a96d6408c8f3026cbd39a31f1",
+                "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                "adversarial_status": "COMPLETED",
+                "reason": "Confirmed business counterexample; formal test success is insufficient",
+                "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+              }
+            },
+            {
+              "run_id": "ef96d5a19fb5460a897aea44d2a6de3f",
+              "attempt_index": 1,
+              "candidate_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+              "previous_candidate_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+              "recovery_trigger": "CONFIRMED_ADVERSARIAL",
+              "confirmed_failure_evidence": [
+                {
+                  "amount": "1.00499",
+                  "expected": 100,
+                  "actual": 101,
+                  "error_type": "OUTPUT_MISMATCH",
+                  "actual_type": "int",
+                  "evidence": {
+                    "phase": "adversarial",
+                    "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                    "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                    "exit_code": 1,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true
+                  }
+                },
+                {
+                  "amount": "-1.00499",
+                  "expected": -100,
+                  "actual": -101,
+                  "error_type": "OUTPUT_MISMATCH",
+                  "actual_type": "int",
+                  "evidence": {
+                    "phase": "adversarial",
+                    "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                    "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                    "exit_code": 1,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true
+                  }
+                }
+              ],
+              "context": {
+                "task_id": "billing-rounding-01",
+                "requirement": "Convert a finite decimal amount string to integer cents; nearest rounding, half-cent ties away from zero, including negatives.",
+                "candidate": {
+                  "path": "billing.py",
+                  "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+                  "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b"
+                },
+                "confirmed_failures": [
+                  {
+                    "amount": "1.00499",
+                    "expected": 100,
+                    "actual": 101,
+                    "error_type": "OUTPUT_MISMATCH",
+                    "actual_type": "int",
+                    "evidence": {
+                      "phase": "adversarial",
+                      "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                      "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                      "exit_code": 1,
+                      "cleanup_confirmed": true,
+                      "workspace_unchanged": true,
+                      "limits_verified": true
+                    }
+                  },
+                  {
+                    "amount": "-1.00499",
+                    "expected": -100,
+                    "actual": -101,
+                    "error_type": "OUTPUT_MISMATCH",
+                    "actual_type": "int",
+                    "evidence": {
+                      "phase": "adversarial",
+                      "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+                      "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                      "exit_code": 1,
+                      "cleanup_confirmed": true,
+                      "workspace_unchanged": true,
+                      "limits_verified": true
+                    }
+                  }
+                ],
+                "remaining_recovery_attempts": 1
+              },
+              "model_source": "OFFLINE_TEST",
+              "model_call_metadata": [
+                {
+                  "attempt": 1,
+                  "model": "deepseek-v4.1-flash-1017",
+                  "max_completion_tokens": 1024,
+                  "started_at": "2026-11-04T03:34:50.279048+00:00",
+                  "status": "COMPLETED",
+                  "usage": null,
+                  "estimated_usd": null,
+                  "billing_status": "UNKNOWN"
+                }
+              ],
+              "stop_reason": "VERIFIED",
+              "diff_from_previous": "--- attempt-0/billing.py\n+++ attempt-1/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\n+\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\n from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+              "proposal": {
+                "analysis": "OFFLINE recovery response; not real LLM inference",
+                "files": {
+                  "billing.py": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+                }
+              },
+              "candidate": {
+                "path": "billing.py",
+                "content": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+                "source": "RECOVERY_PROPOSAL"
+              },
+              "verification": {
+                "run_id": "5da78fb241c94519988963781c87d318",
+                "task": {
+                  "task_id": "billing-rounding-01",
+                  "acceptance_id": "billing-v1",
+                  "allowed_write_paths": [
+                    "billing.py"
+                  ],
+                  "timeout_seconds": 3
+                },
+                "candidate_id": "executor",
+                "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+                "status": "VERIFIED",
+                "policy_reason": "Allowed: all proposed writes are within billing.py",
+                "changed_paths": [
+                  "billing.py"
+                ],
+                "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+                "executions": [
+                  {
+                    "phase": "public",
+                    "container_name": "trustbound-627d746dada64317b58416258158002f",
+                    "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                    "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                    "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+                    "status": "EXITED",
+                    "exit_code": 0,
+                    "stdout": "",
+                    "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+                    "timeout_reason": null,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true,
+                    "error": null
+                  },
+                  {
+                    "phase": "acceptance",
+                    "container_name": "trustbound-a9c5dcdf4c82478ea15a63f4701177f9",
+                    "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                    "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                    "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+                    "status": "EXITED",
+                    "exit_code": 0,
+                    "stdout": "",
+                    "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+                    "timeout_reason": null,
+                    "cleanup_confirmed": true,
+                    "workspace_unchanged": true,
+                    "limits_verified": true,
+                    "error": null
+                  }
+                ],
+                "limitations": [
+                  "Only fixed billing tasks and declared billing-v1 cases are supported",
+                  "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+                  "Repository and Docker controller are trusted; containers are not a VM security proof"
+                ]
+              },
+              "executor": null,
+              "llm_source": "OFFLINE_TEST",
+              "error": null,
+              "adversarial_report": {
+                "task_id": "billing-rounding-01",
+                "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                "status": "COMPLETED",
+                "source": "OFFLINE_TEST",
+                "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+                "context": {
+                  "task_id": "billing-rounding-01",
+                  "requirement_id": "billing-v1.round-half-up",
+                  "requirement": "Convert a finite decimal amount string to integer cents; nearest rounding, half-cent ties away from zero, including negatives.",
+                  "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                  "candidate": {
+                    "path": "billing.py",
+                    "content": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n"
+                  }
+                },
+                "challenges": [
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-1",
+                      "amount": "1.00499",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Premature rounding can cross the half-cent boundary"
+                    },
+                    "status": "NOT_CONFIRMED",
+                    "expected": 100,
+                    "actual": 100,
+                    "actual_type": "int",
+                    "reason": "Observed output matches trusted oracle"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-2",
+                      "amount": "-1.00499",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Check the same boundary for negative amounts"
+                    },
+                    "status": "NOT_CONFIRMED",
+                    "expected": -100,
+                    "actual": -100,
+                    "actual_type": "int",
+                    "reason": "Observed output matches trusted oracle"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-3",
+                      "amount": "NaN",
+                      "requirement_id": "billing-v1.round-half-up",
+                      "reason": "Invalid finite amount should be rejected by the host"
+                    },
+                    "status": "INVALID",
+                    "expected": null,
+                    "actual": null,
+                    "actual_type": null,
+                    "reason": "INVALID_AMOUNT: outside supported finite decimal format"
+                  },
+                  {
+                    "challenge": {
+                      "challenge_id": "challenge-4",
+                      "amount": "1.005",
+                      "requirement_id": "bankers-rounding",
+                      "reason": "Untrusted alternative rule should be rejected"
+                    },
+                    "status": "INVALID",
+                    "expected": null,
+                    "actual": null,
+                    "actual_type": null,
+                    "reason": "UNTRUSTED_REQUIREMENT: model cannot change the business rule"
+                  }
+                ],
+                "execution": {
+                  "phase": "adversarial",
+                  "container_name": "trustbound-ec61c735f37341cfbcd4829f6ad519dd",
+                  "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+                  "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                  "test_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                  "status": "EXITED",
+                  "exit_code": 0,
+                  "stdout": "{\"results\": [{\"id\": \"challenge-1\", \"amount\": \"1.00499\", \"actual\": 100, \"actual_type\": \"int\"}, {\"id\": \"challenge-2\", \"amount\": \"-1.00499\", \"actual\": -100, \"actual_type\": \"int\"}]}\n",
+                  "stderr": "",
+                  "timeout_reason": null,
+                  "cleanup_confirmed": true,
+                  "workspace_unchanged": true,
+                  "limits_verified": true,
+                  "error": null
+                },
+                "driver_hash": "e3b802061f10bd218a7d713eb247a4f25b81767b68e1469f41d025f56d0ed7c5",
+                "raw_response": "{\"challenges\": [{\"amount\": \"1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Premature rounding can cross the half-cent boundary\"}, {\"amount\": \"-1.00499\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Check the same boundary for negative amounts\"}, {\"amount\": \"NaN\", \"requirement_id\": \"billing-v1.round-half-up\", \"reason\": \"Invalid finite amount should be rejected by the host\"}, {\"amount\": \"1.005\", \"requirement_id\": \"bankers-rounding\", \"reason\": \"Untrusted alternative rule should be rejected\"}]}",
+                "calls": [
+                  {
+                    "attempt": 1,
+                    "model": "deepseek-v4.1-flash-1017",
+                    "max_completion_tokens": 768,
+                    "started_at": "2026-11-04T03:34:57.282960+00:00",
+                    "status": "COMPLETED",
+                    "usage": null,
+                    "estimated_usd": null,
+                    "billing_status": "UNKNOWN"
+                  }
+                ],
+                "generated_count": 4,
+                "valid_count": 2,
+                "confirmed_count": 0,
+                "generation_parsed": true,
+                "budget": {
+                  "max_challenges": 4,
+                  "max_completion_tokens": 768,
+                  "timeout_seconds": 30,
+                  "max_attempts": 2
+                }
+              },
+              "final_decision": {
+                "status": "VERIFIED",
+                "formal_status": "VERIFIED",
+                "formal_report_id": "5da78fb241c94519988963781c87d318",
+                "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+                "adversarial_status": "COMPLETED",
+                "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+                "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+              },
+              "raw_response": "{\"analysis\": \"OFFLINE recovery response; not real LLM inference\", \"files\": {\"billing.py\": \"\\\"\\\"\\\"Fixed replacement for billing.py: decimal strings, ties away from zero.\\\"\\\"\\\"\\nfrom decimal import Decimal, ROUND_HALF_UP\\n\\n\\ndef to_cents(amount: str) -> int:\\n    return int((Decimal(amount) * 100).quantize(Decimal(\\\"1\\\"), rounding=ROUND_HALF_UP))\\n\"}}"
+            }
+          ],
+          "current_attempt": 1,
+          "stop_reason": "VERIFIED",
+          "final_status": "VERIFIED",
+          "final_decision": {
+            "status": "VERIFIED",
+            "formal_status": "VERIFIED",
+            "formal_report_id": "5da78fb241c94519988963781c87d318",
+            "artifact_hash": "3475bf0da5959416ea9129c88181d2124c6fe5bea7b38feca64d83b0c0409360",
+            "adversarial_status": "COMPLETED",
+            "reason": "Only valid executed challenges count; no counterexample is not a correctness proof",
+            "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+          },
+          "validated_attempt_index": 1
+        },
+        "adversarial_mode": "offline",
+        "recovery_mode": "offline",
+        "candidate": {
+          "path": "billing.py",
+          "content": "\"\"\"Fixed replacement for billing.py: decimal strings, ties away from zero.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+          "source": "RECOVERY_PROPOSAL"
+        }
+      }
+    }
   }
 }

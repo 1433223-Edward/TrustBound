@@ -1,0 +1,5 @@
+{
+  "experiment_type": "F",
+  "status": "DEFERRED",
+  "reason": "Scope frozen; no concurrency benchmark"
+}

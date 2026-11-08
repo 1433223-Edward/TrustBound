@@ -1,0 +1,18 @@
+{
+  "scope": "local development only",
+  "max_model_calls": 100,
+  "max_runs": 43,
+  "max_output_tokens": 43008,
+  "per_request_output_tokens": 4096,
+  "additional_workspace_models": [
+    "glm-5.3-flash",
+    "mimo-v2.6-flash"
+  ],
+  "default_model": "deepseek-v4.1-flash-1017",
+  "default_model_changed": false,
+  "preserve_ledger": true,
+  "new_generation_requests_authorized": 0,
+  "batch_status": "STOPPED",
+  "launch_command": "Set TRUSTBOUND_WORKSPACE_MODELS=glm-5.3-flash,mimo-v2.6-flash in process environment; pwsh -NoProfile -File scripts/start_workspace_preview.ps1 -MaxRuns 43 -MaxModelCalls 100 -MaxOutputTokens 43008",
+  "note": "Call cap remains 100, within existing validator. Run/output reservation caps intentionally exhausted until next approval. No dollar hard cap."
+}

@@ -1,0 +1,11 @@
+# 诊断补丁应用与离线验证
+
+已应用此前审核的PROPOSED_DIAGNOSTICS.patch，仅修改trustbound/workspace_execution.py中的提案解析错误分类及错误码传递。新增tests/test_workspace_proposal_diagnostics.py进行针对性测试。
+
+错误分类：WORKSPACE_PROPOSAL_INVALID_JSON、DUPLICATE_JSON_KEY、WORKSPACE_PROPOSAL_INVALID_SHAPE、WORKSPACE_PROPOSAL_INVALID_EXPLANATION。未改变允许的字段、JSON键去重、非空files、严格解释Schema、Permission Gate或沙箱限制。不保存模型响应正文、真实密钥或推理内容。
+
+新增5项离线测试全部通过；既有test_workspace_parallel.py的7项mock回归全部通过，共12项。另通过Python AST语法检查。测试显式关闭dotenv加载，使用假客户端/Mock Runner，不调用真实模型或Docker。完整结果在validation-summary.json及两份.validation.json。
+
+既有test_workspace_execution.py的HTTP集成回归首个用例长时间无进展，已中止，不能报通过；原因尚未确认。没有为此修改依赖或无关代码。
+
+未重启实际服务、未修改配额、未运行GLM重试或MiMo。当前运行服务尚未加载新补丁，需后续明确安排重启才能生效。新错误分类不能追溯恢复历史GLM响应正文，也不能证明原始拒绝的具体原因。没有Commit/Push。

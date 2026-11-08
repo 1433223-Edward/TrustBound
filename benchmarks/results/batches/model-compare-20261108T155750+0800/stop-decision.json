@@ -1,0 +1,48 @@
+{
+  "status": "BATCH_STOPPED",
+  "reason": "INVALID_WORKSPACE_PROPOSAL; no trusted business execution evidence",
+  "retry": false,
+  "skipped_model": "mimo-v2.6-flash",
+  "quota": {
+    "runs": 43,
+    "calls": 11,
+    "tokens": 43008
+  },
+  "journal": {
+    "FINALIZED": 4
+  },
+  "health": {
+    "status": "ok",
+    "active_run_id": null,
+    "max_concurrent_runs": 1,
+    "docker": "checked_by_execution_not_health",
+    "public_demo": false,
+    "persistent_quota": true,
+    "custom_task": {
+      "enabled": false
+    },
+    "workspace": {
+      "enabled": true,
+      "execution": "LOCAL_DOCKER",
+      "access": "local",
+      "retry_enabled": true,
+      "live_enabled": true
+    },
+    "modes": {
+      "fixture": {
+        "enabled": true
+      },
+      "offline_executor": {
+        "enabled": true
+      },
+      "live_executor": {
+        "enabled": true,
+        "reason": "CONFIGURED_NOT_AUTHENTICATED_UNTIL_REQUEST"
+      }
+    }
+  },
+  "server_parent": 36152,
+  "server_child": 28116,
+  "paid_requests_submitted": 1,
+  "remaining_authorized_requests_not_submitted": 1
+}

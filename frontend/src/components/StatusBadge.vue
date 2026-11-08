@@ -7,4 +7,4 @@ const tone = computed(() => ['VERIFIED', 'PASSED', 'ALLOWED', 'RECORDED', 'CONNE
       : ['LOADING', 'CONNECTING', 'RUNNING'].includes(props.status) ? 'active' : 'neutral')
 </script>
 
-<template><span class="status-badge" :class="tone"><i aria-hidden="true"></i>{{ label || status.replaceAll('_', ' ') }}</span></template>
+<template><span class="status-badge" :class="tone" :title="status"><i aria-hidden="true"></i>{{ label || $status(status) }}</span></template>

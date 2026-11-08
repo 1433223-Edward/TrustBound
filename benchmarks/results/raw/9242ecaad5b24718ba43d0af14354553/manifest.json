@@ -1,0 +1,20 @@
+{
+  "experiment_id": "interactive-20261108T153111+0800-D",
+  "experiment_type": "D",
+  "dataset_version": "billing-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+  "pair_id": "interactive-20261108T153111+0800-D-01",
+  "group": "off",
+  "base_url": "http://127.0.0.1:8000",
+  "request": {
+    "task_id": "billing-rounding-01",
+    "mode": "fixture",
+    "candidate_id": "double_rounding",
+    "adversarial_mode": "off",
+    "recovery_mode": "off"
+  },
+  "source_tree_sha256": "3364341f9b1f347b2781180bebdd72c4143df4abd09890d9ea5e8319168b37cf",
+  "source_working_tree_dirty": true,
+  "acceptance_sha256": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801"
+}

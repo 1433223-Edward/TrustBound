@@ -1,0 +1,21 @@
+{
+  "experiment_id": "B-v1",
+  "experiment_type": "B",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": null,
+  "source_hash": null,
+  "project_id": null,
+  "pair_id": null,
+  "group": "baseline",
+  "base_url": "http://127.0.0.1:5173",
+  "poll_deadline_seconds": 300,
+  "concurrency": 1,
+  "request": {
+    "revision": 0,
+    "mode": "live",
+    "model_id": null,
+    "authorize_source": true,
+    "adversarial_enabled": false,
+    "correctness_verification": true
+  }
+}

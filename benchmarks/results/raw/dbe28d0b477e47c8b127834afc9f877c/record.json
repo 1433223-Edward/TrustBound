@@ -1,0 +1,176 @@
+{
+  "experiment_id": "closure-20261108T163222+0800-GLM-diagnostic",
+  "experiment_type": "B",
+  "run_id": "dbe28d0b477e47c8b127834afc9f877c",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+  "configuration": {
+    "experiment_id": "closure-20261108T163222+0800-GLM-diagnostic",
+    "experiment_type": "B",
+    "dataset_version": "workspace-reviewed-v1",
+    "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+    "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "pair_id": null,
+    "group": "protocol_diagnostic",
+    "base_url": "http://127.0.0.1:8000",
+    "poll_deadline_seconds": 300,
+    "concurrency": 1,
+    "request": {
+      "revision": 2,
+      "mode": "live",
+      "model_id": "glm-5.3-flash",
+      "authorize_source": true,
+      "adversarial_enabled": false,
+      "correctness_verification": true,
+      "authorize_explanation": false
+    },
+    "source_tree_sha256": "26d209426c6d2a910ba9cfa8fc03b5a1d9353823d90442cc02acc3f0e1bf146f",
+    "source_working_tree_dirty": true,
+    "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+    "approval_status": "EXPLICITLY_APPROVED_ONE_GENERATION_NO_RETRY",
+    "proposed_model_id": "glm-5.3-flash",
+    "authorization_batch": "glm-final-20261108T163733+0800",
+    "diagnostic_patch_sha256": "b29630639e730fcf79108301774a38a8a7de9ef0571b7d8b7d746c66196149fd",
+    "previous_server_run_id": "7a9d0a259e8546fd85b2903bb8fe393f"
+  },
+  "actual_model_id": [
+    "glm-5.3-flash"
+  ],
+  "started_at": "2026-11-08T08:37:56.835153+00:00",
+  "completed_at": "2026-11-08T08:38:07.143722+00:00",
+  "input_tokens": 741,
+  "output_tokens": 1969,
+  "estimated_cost": "0.00076325",
+  "latency_ms": 10312.999999965541,
+  "execution_status": "COMPLETED",
+  "verification_status": "INCONCLUSIVE",
+  "security_status": "NOT_OBSERVED",
+  "evidence_reference": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\dbe28d0b477e47c8b127834afc9f877c",
+  "failure_reason": null,
+  "formal_verification_status": "INCONCLUSIVE",
+  "model_request_latency_ms": null,
+  "phase_timings": {
+    "server_started_at": "2026-11-08T08:37:56.912446+00:00",
+    "server_finished_at": "2026-11-08T08:38:06.453451+00:00"
+  },
+  "cpu_peak": null,
+  "memory_peak": null,
+  "pid_peak": null,
+  "evidence_source": "LIVE_MODEL_DOCKER",
+  "report": {
+    "adversarial_enabled": false,
+    "adversarial_report": {
+      "challenges": [],
+      "source": "NONE",
+      "status": "NOT_REQUESTED"
+    },
+    "agent_events": [
+      {
+        "at": "2026-11-08T08:37:56.920805+00:00",
+        "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+        "model": null,
+        "role": "executor",
+        "stage": "Candidate generation",
+        "status": "RUNNING"
+      },
+      {
+        "at": "2026-11-08T08:38:06.433401+00:00",
+        "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+        "model": "glm-5.3-flash",
+        "role": "executor",
+        "stage": "Generation failed",
+        "status": "ERROR"
+      },
+      {
+        "at": "2026-11-08T08:38:06.441323+00:00",
+        "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+        "model": null,
+        "role": "verifier",
+        "stage": "Final decision",
+        "status": "INCONCLUSIVE"
+      }
+    ],
+    "approved_policy": {
+      "cpu_nanos": 500000000,
+      "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+      "memory_bytes": 134217728,
+      "model_output_tokens": 4096,
+      "model_requests": 1,
+      "network": "none",
+      "pids": 32,
+      "read_only_root": true,
+      "timeout_per_case_seconds": 3,
+      "user": "65534:65534"
+    },
+    "artifact_hash": null,
+    "cases": [],
+    "changed_paths": [],
+    "diff": "",
+    "formal_status": "INCONCLUSIVE",
+    "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+    "functional_verification": {
+      "status": "INCONCLUSIVE"
+    },
+    "inference_usage": {
+      "billing_status": "ESTIMATED_NOT_INVOICE",
+      "calls": [
+        {
+          "attempt": 1,
+          "billing_status": "ESTIMATED",
+          "content_chars": 1454,
+          "content_is_string": true,
+          "estimated_usd": "0.00076325",
+          "finish_reason": "stop",
+          "max_completion_tokens": 4096,
+          "model": "glm-5.3-flash",
+          "provider_request_id": "chatcmpl-37daa5df-cbea-4d17-b1d1-041f98418b85",
+          "reasoning_max_tokens": 1536,
+          "reasoning_tokens": 1546,
+          "response_format": "json_object",
+          "response_model": "glm-5.3-flash",
+          "source": "VULTR_LIVE_HTTP",
+          "started_at": "2026-11-08T08:37:58.446100+00:00",
+          "status": "COMPLETED",
+          "usage": {
+            "completion_tokens": 1969,
+            "prompt_tokens": 741,
+            "total_tokens": 2710
+          }
+        }
+      ],
+      "completion_tokens": 1969,
+      "estimated_usd": "0.00076325",
+      "live_request_count": 1,
+      "max_output_tokens": 4096,
+      "max_requests": 1,
+      "offline_request_count": 0,
+      "prompt_tokens": 741,
+      "request_count": 1,
+      "reserved_output_tokens": 4096
+    },
+    "planning_route": "PLAN_REQUIRED",
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "quick_mode": false,
+    "reason": "WORKSPACE_PROPOSAL_INVALID_SHAPE",
+    "replacements": {},
+    "restored_from": null,
+    "retried_from": null,
+    "retry_attempt": 0,
+    "retry_evidence": null,
+    "revision": 2,
+    "run_id": "2434e519a3394b2abc1d7b156f08dadd",
+    "security_evidence": {
+      "executions": [],
+      "permission": "NOT_CHECKED",
+      "scope": "Sandbox containment and execution evidence integrity",
+      "status": "NOT_OBSERVED"
+    },
+    "snapshot_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "source": "LIVE",
+    "status": "INCONCLUSIVE",
+    "transport": "LOCAL_DOCKER",
+    "verification_mode": "FUNCTIONAL"
+  }
+}

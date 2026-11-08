@@ -1,0 +1,379 @@
+<html lang="zh"><meta charset="utf-8"><title>TrustBound 有限批次报告</title><style>body{font:16px sans-serif;max-width:1200px;margin:30px auto;padding:20px}img{max-width:100%}pre{white-space:pre-wrap}</style><h1>有限批次报告：未提交新实验</h1><p>prepare完成；现有Benchmark原始目录为空。D-OFF/E-OFF/E-ON配置缺失，服务健康接口访问被权限拒绝，因此跳过。B/C/D-ON未获固定付费批次授权。A未启动攻击。</p><h2>历史Docker证据（不是本轮实验）</h2><p>以下图表仅来自存档历史报告，不包含Demo Replay或合成结果。所有安全维度为INCONCLUSIVE或NOT_TESTED。</p><img src="security-coverage.svg"><img src="historical-execution-status.svg"><h2>历史统计与来源</h2><pre>{
+  &quot;dataset&quot;: &quot;historical-security-audit-v1&quot;,
+  &quot;evidence_class&quot;: &quot;HISTORICAL_LOCAL_DOCKER_RECORD&quot;,
+  &quot;new_docker_executions&quot;: 0,
+  &quot;new_model_requests&quot;: 0,
+  &quot;historical_task_count&quot;: 5,
+  &quot;historical_container_count&quot;: 8,
+  &quot;historical_timed_out_count&quot;: 2,
+  &quot;historical_cleanup_confirmed&quot;: 8,
+  &quot;historical_cleanup_observed_denominator&quot;: 8,
+  &quot;rootless_a1_a5_complete_reports_found&quot;: 0,
+  &quot;containment_rate&quot;: null,
+  &quot;false_rejection_rate&quot;: null,
+  &quot;secret_exposure_rate&quot;: null,
+  &quot;resource_enforcement_rate&quot;: null,
+  &quot;limitations&quot;: &quot;No dedicated Rootless suite report; different tasks/phases are not independent repetitions. No universal security conclusions.&quot;,
+  &quot;sources&quot;: [
+    {
+      &quot;source&quot;: &quot;docs\\environment-smoke.json&quot;,
+      &quot;archive&quot;: &quot;historical-raw\\environment-smoke.json&quot;,
+      &quot;sha256&quot;: &quot;fec2674f17bb6065437237f9cb8d8ea53e60f633e2c416449481903291e27e4f&quot;,
+      &quot;classification&quot;: &quot;HISTORICAL_LOCAL_DOCKER_RECORD&quot;,
+      &quot;origin_verified_by_new_execution&quot;: false
+    },
+    {
+      &quot;source&quot;: &quot;docs\\day1-results.json&quot;,
+      &quot;archive&quot;: &quot;historical-raw\\day1-results.json&quot;,
+      &quot;sha256&quot;: &quot;8abd180aa85869b5491b127816b7e1f990530cbfa310a0687e50932f0315a7cf&quot;,
+      &quot;classification&quot;: &quot;HISTORICAL_LOCAL_DOCKER_RECORD&quot;,
+      &quot;origin_verified_by_new_execution&quot;: false
+    }
+  ],
+  &quot;coverage&quot;: [
+    {
+      &quot;dimension&quot;: &quot;Process Isolation&quot;,
+      &quot;scenario&quot;: &quot;Read-only root and non-root smoke&quot;,
+      &quot;status&quot;: &quot;INCONCLUSIVE&quot;,
+      &quot;evidence&quot;: &quot;docs/environment-smoke.json#/normal&quot;,
+      &quot;observation&quot;: &quot;sum: 6\nuid: 65534\ninterfaces: [(1, &#x27;lo&#x27;)]\nroot_write_errno: 30\n&quot;,
+      &quot;gap&quot;: &quot;Historical local observation only; no Rootless A1 runtime report; mount/process boundaries incomplete&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Process Isolation&quot;,
+      &quot;scenario&quot;: &quot;A1 unauthorized permission gate&quot;,
+      &quot;status&quot;: &quot;INCONCLUSIVE&quot;,
+      &quot;evidence&quot;: &quot;docs/day1-results.json#candidate_id=unauthorized&quot;,
+      &quot;observation&quot;: &quot;REJECTED&quot;,
+      &quot;gap&quot;: &quot;Policy-layer rejection is not container filesystem isolation evidence&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Process Isolation&quot;,
+      &quot;scenario&quot;: &quot;A2 network isolation&quot;,
+      &quot;status&quot;: &quot;INCONCLUSIVE&quot;,
+      &quot;evidence&quot;: &quot;docs/environment-smoke.json#/normal&quot;,
+      &quot;observation&quot;: &quot;NetworkMode=none;  [(1, &#x27;lo&#x27;)]&quot;,
+      &quot;gap&quot;: &quot;lo/inspect observed historically; no dedicated A2 route probe report&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Secret Hygiene&quot;,
+      &quot;scenario&quot;: &quot;A3 synthetic secret / Web-Runner isolation&quot;,
+      &quot;status&quot;: &quot;NOT_TESTED&quot;,
+      &quot;evidence&quot;: null,
+      &quot;observation&quot;: null,
+      &quot;gap&quot;: &quot;No original Rootless A3 observations; no fresh secret test performed&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Resource Limits&quot;,
+      &quot;scenario&quot;: &quot;A4 host execution timeout&quot;,
+      &quot;status&quot;: &quot;INCONCLUSIVE&quot;,
+      &quot;evidence&quot;: &quot;docs/environment-smoke.json#/timeout; docs/day1-results.json#candidate_id=timeout&quot;,
+      &quot;observation&quot;: &quot;Historical timeout/137 and cleanup records&quot;,
+      &quot;gap&quot;: &quot;Bounded historical timeout evidence; no Rootless A4 probe report&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Resource Limits&quot;,
+      &quot;scenario&quot;: &quot;A5 cgroup OOM termination&quot;,
+      &quot;status&quot;: &quot;NOT_TESTED&quot;,
+      &quot;evidence&quot;: null,
+      &quot;observation&quot;: null,
+      &quot;gap&quot;: &quot;Memory configuration is not OOM enforcement evidence&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Resource Limits&quot;,
+      &quot;scenario&quot;: &quot;CPU and PID enforcement under load&quot;,
+      &quot;status&quot;: &quot;NOT_TESTED&quot;,
+      &quot;evidence&quot;: &quot;docs/environment-smoke.json#/normal/limits&quot;,
+      &quot;observation&quot;: &quot;Configured NanoCpus=500000000; PidsLimit=32&quot;,
+      &quot;gap&quot;: &quot;Inspect only; no runtime CPU/PID trigger test&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Lifecycle Discipline&quot;,
+      &quot;scenario&quot;: &quot;Normal / failed / timed-out cleanup&quot;,
+      &quot;status&quot;: &quot;INCONCLUSIVE&quot;,
+      &quot;evidence&quot;: &quot;historical-executions.csv&quot;,
+      &quot;observation&quot;: &quot;8/8 historical cleanup confirmations&quot;,
+      &quot;gap&quot;: &quot;Historical bounded executions only; not systematic lifecycle proof&quot;
+    },
+    {
+      &quot;dimension&quot;: &quot;Lifecycle Discipline&quot;,
+      &quot;scenario&quot;: &quot;Orphan recovery / long-run leaks&quot;,
+      &quot;status&quot;: &quot;NOT_TESTED&quot;,
+      &quot;evidence&quot;: null,
+      &quot;observation&quot;: null,
+      &quot;gap&quot;: &quot;No real fault-injection or sustained resource telemetry report&quot;
+    }
+  ]
+}</pre><h2>运行/授权缺口</h2><pre>[
+  {
+    &quot;experiment&quot;: &quot;D-off&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\D-off.json&quot;,
+    &quot;sha256&quot;: &quot;38f21378296234367ced55f42be3c3c8b918650a27927da666d0a485e0106377&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;real_pair_id&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;D-fixed-v2&quot;,
+      &quot;experiment_type&quot;: &quot;D&quot;,
+      &quot;dataset_version&quot;: &quot;billing-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;pair_id&quot;: &quot;fill-pair-id&quot;,
+      &quot;group&quot;: &quot;off&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;request&quot;: {
+        &quot;task_id&quot;: &quot;billing-rounding-01&quot;,
+        &quot;mode&quot;: &quot;fixture&quot;,
+        &quot;candidate_id&quot;: &quot;double_rounding&quot;,
+        &quot;adversarial_mode&quot;: &quot;off&quot;,
+        &quot;recovery_mode&quot;: &quot;off&quot;
+      }
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_APPLICABLE_FIXED_BILLING&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  },
+  {
+    &quot;experiment&quot;: &quot;E-off&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\E-off.json&quot;,
+    &quot;sha256&quot;: &quot;ef1f94885ddc3c25b6731bb3addd763df90fcba1bc2a0f15a9cd865c060ba5ce&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;project_id&quot;,
+      &quot;real_pair_id&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;E-v1&quot;,
+      &quot;experiment_type&quot;: &quot;E&quot;,
+      &quot;dataset_version&quot;: &quot;workspace-reviewed-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;project_id&quot;: null,
+      &quot;pair_id&quot;: &quot;fill-pair-id&quot;,
+      &quot;group&quot;: &quot;off&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;poll_deadline_seconds&quot;: 300,
+      &quot;concurrency&quot;: 1,
+      &quot;request&quot;: {
+        &quot;revision&quot;: 0,
+        &quot;mode&quot;: &quot;original&quot;,
+        &quot;model_id&quot;: null,
+        &quot;authorize_source&quot;: false,
+        &quot;adversarial_enabled&quot;: false,
+        &quot;correctness_verification&quot;: false,
+        &quot;execution_input&quot;: 0
+      }
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  },
+  {
+    &quot;experiment&quot;: &quot;E-on&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\E-on.json&quot;,
+    &quot;sha256&quot;: &quot;e5f2482eca949b3d079c525a631126c2dd19192bc2c62abc6e7ba60c1498e747&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;project_id&quot;,
+      &quot;real_pair_id&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;E-v1&quot;,
+      &quot;experiment_type&quot;: &quot;E&quot;,
+      &quot;dataset_version&quot;: &quot;workspace-reviewed-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;project_id&quot;: null,
+      &quot;pair_id&quot;: &quot;fill-pair-id&quot;,
+      &quot;group&quot;: &quot;on&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;poll_deadline_seconds&quot;: 300,
+      &quot;concurrency&quot;: 1,
+      &quot;request&quot;: {
+        &quot;revision&quot;: 0,
+        &quot;mode&quot;: &quot;original&quot;,
+        &quot;model_id&quot;: null,
+        &quot;authorize_source&quot;: false,
+        &quot;adversarial_enabled&quot;: false,
+        &quot;correctness_verification&quot;: true
+      }
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  },
+  {
+    &quot;experiment&quot;: &quot;B&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\B.json&quot;,
+    &quot;sha256&quot;: &quot;a176e1e6fb543b7ae2040803547b04b8c85f7874fbf94f1cc57c9bdb764bd5be&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;project_id&quot;,
+      &quot;confirmed_model_id&quot;,
+      &quot;fixed_paid_batch_approval&quot;,
+      &quot;approved_total_cost_cap&quot;,
+      &quot;effective_server_budget_verification&quot;,
+      &quot;authorized_environment_verification&quot;,
+      &quot;exact_single_and_batch_request_counts&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;B-v1&quot;,
+      &quot;experiment_type&quot;: &quot;B&quot;,
+      &quot;dataset_version&quot;: &quot;workspace-reviewed-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;project_id&quot;: null,
+      &quot;pair_id&quot;: null,
+      &quot;group&quot;: &quot;baseline&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;poll_deadline_seconds&quot;: 300,
+      &quot;concurrency&quot;: 1,
+      &quot;request&quot;: {
+        &quot;revision&quot;: 0,
+        &quot;mode&quot;: &quot;live&quot;,
+        &quot;model_id&quot;: null,
+        &quot;authorize_source&quot;: true,
+        &quot;adversarial_enabled&quot;: false,
+        &quot;correctness_verification&quot;: true
+      }
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  },
+  {
+    &quot;experiment&quot;: &quot;C&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\C.json&quot;,
+    &quot;sha256&quot;: &quot;237f77a812132360a41995d0e91d79d38939ae3f3f4d25bbd3736651a938f23d&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;project_id&quot;,
+      &quot;confirmed_model_id&quot;,
+      &quot;fixed_paid_batch_approval&quot;,
+      &quot;approved_total_cost_cap&quot;,
+      &quot;effective_server_budget_verification&quot;,
+      &quot;authorized_environment_verification&quot;,
+      &quot;exact_single_and_batch_request_counts&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;C-v1&quot;,
+      &quot;experiment_type&quot;: &quot;C&quot;,
+      &quot;dataset_version&quot;: &quot;workspace-reviewed-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;project_id&quot;: null,
+      &quot;pair_id&quot;: null,
+      &quot;group&quot;: &quot;baseline&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;poll_deadline_seconds&quot;: 300,
+      &quot;concurrency&quot;: 1,
+      &quot;request&quot;: {
+        &quot;revision&quot;: 0,
+        &quot;mode&quot;: &quot;live&quot;,
+        &quot;model_id&quot;: null,
+        &quot;authorize_source&quot;: true,
+        &quot;adversarial_enabled&quot;: false,
+        &quot;correctness_verification&quot;: true
+      },
+      &quot;file_count&quot;: 1
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  },
+  {
+    &quot;experiment&quot;: &quot;D-on&quot;,
+    &quot;manifest&quot;: &quot;benchmarks\\configs\\D-on.json&quot;,
+    &quot;sha256&quot;: &quot;4a157ae61948acf0878701a4b15e60f3baa53f3133f685c212b52987def2438d&quot;,
+    &quot;status&quot;: &quot;SKIPPED&quot;,
+    &quot;submitted&quot;: false,
+    &quot;run_id&quot;: null,
+    &quot;actual_cost&quot;: null,
+    &quot;model_requests&quot;: 0,
+    &quot;missing&quot;: [
+      &quot;source_commit&quot;,
+      &quot;source_hash&quot;,
+      &quot;real_pair_id&quot;,
+      &quot;fixed_paid_batch_approval&quot;,
+      &quot;approved_total_cost_cap&quot;,
+      &quot;effective_server_budget_verification&quot;,
+      &quot;authorized_environment_verification&quot;,
+      &quot;exact_single_and_batch_request_counts&quot;
+    ],
+    &quot;configuration&quot;: {
+      &quot;experiment_id&quot;: &quot;D-fixed-v2&quot;,
+      &quot;experiment_type&quot;: &quot;D&quot;,
+      &quot;dataset_version&quot;: &quot;billing-v1&quot;,
+      &quot;source_commit&quot;: null,
+      &quot;source_hash&quot;: null,
+      &quot;pair_id&quot;: &quot;fill-pair-id&quot;,
+      &quot;group&quot;: &quot;on&quot;,
+      &quot;base_url&quot;: &quot;http://127.0.0.1:5173&quot;,
+      &quot;request&quot;: {
+        &quot;task_id&quot;: &quot;billing-rounding-01&quot;,
+        &quot;mode&quot;: &quot;fixture&quot;,
+        &quot;candidate_id&quot;: &quot;double_rounding&quot;,
+        &quot;adversarial_mode&quot;: &quot;live&quot;,
+        &quot;recovery_mode&quot;: &quot;off&quot;
+      }
+    },
+    &quot;preconditions&quot;: {
+      &quot;manifest_valid&quot;: false,
+      &quot;service_health&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;frozen_project&quot;: &quot;NOT_APPLICABLE_FIXED_BILLING&quot;,
+      &quot;idle_task&quot;: &quot;NOT_VERIFIED&quot;,
+      &quot;runner_runtime_limits&quot;: &quot;NOT_VERIFIED&quot;
+    }
+  }
+]</pre></html>

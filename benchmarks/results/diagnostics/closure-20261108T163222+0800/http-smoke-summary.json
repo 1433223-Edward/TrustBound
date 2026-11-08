@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "check": "backend-health",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "proxy-health",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "task-metadata",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "project-detail",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "invalid-mode-rejected",
+      "status": 422,
+      "expected": 422,
+      "passed": true
+    }
+  ],
+  "quota_unchanged": true,
+  "model_calls": 0,
+  "docker_runs": 0,
+  "service_pid": 35876,
+  "service_cwd": "D:\\Projects\\TrustBound",
+  "patch_sha256": "b29630639e730fcf79108301774a38a8a7de9ef0571b7d8b7d746c66196149fd",
+  "patch_file_predates_service": true,
+  "http_integration_suite": "PREVIOUSLY_INTERRUPTED_NOT_PASSED"
+}

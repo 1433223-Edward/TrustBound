@@ -1,0 +1,43 @@
+{
+  "completed_at": "2026-11-08T16:02:47.446429+08:00",
+  "status": "STOPPED_AFTER_INVALID_PROPOSAL",
+  "submitted_model_requests": 1,
+  "known_cost_usd": "0.00077235",
+  "unknown_billing": false,
+  "retries": 0,
+  "skipped_model": "mimo-v2.6-flash",
+  "skipped_reason": "Stopped at inconclusive proposal per retained boundary",
+  "quota_before": {
+    "runs": 42,
+    "calls": 10,
+    "tokens": 38912
+  },
+  "quota_after": {
+    "runs": 43,
+    "calls": 11,
+    "tokens": 43008
+  },
+  "campaign_model_calls_cap": 100,
+  "additional_batch_run_slots": 0,
+  "additional_batch_output_tokens": 0,
+  "result": {
+    "experiment": "B-candidate-GLM",
+    "server_run_id": "7a9d0a259e8546fd85b2903bb8fe393f",
+    "client_record_id": "26d86766e6b84f4ab442f9db8c645083",
+    "actual_model_id": "glm-5.3-flash",
+    "execution_status": "COMPLETED",
+    "verification_status": "INCONCLUSIVE",
+    "failure_reason": "INVALID_WORKSPACE_PROPOSAL",
+    "generation_requests": 1,
+    "input_tokens": 741,
+    "output_tokens": 1995,
+    "total_tokens": 2736,
+    "estimated_cost_usd": "0.00077235",
+    "latency_ms": 7265.999999945052,
+    "containers_created": 0,
+    "cleanup": "NOT_APPLICABLE_NO_CONTAINER_CREATED",
+    "raw_integrity": "PASS",
+    "raw_evidence": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\26d86766e6b84f4ab442f9db8c645083",
+    "classification": "REAL_VULTR_MODEL_RESPONSE_PROPOSAL_REJECTED_BEFORE_DOCKER"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "server_run_id": "2434e519a3394b2abc1d7b156f08dadd",
+  "client_record_id": "dbe28d0b477e47c8b127834afc9f877c",
+  "status": "INCONCLUSIVE",
+  "reason": "WORKSPACE_PROPOSAL_INVALID_SHAPE",
+  "containers": 0,
+  "usage": {
+    "billing_status": "ESTIMATED_NOT_INVOICE",
+    "calls": [
+      {
+        "attempt": 1,
+        "billing_status": "ESTIMATED",
+        "content_chars": 1454,
+        "content_is_string": true,
+        "estimated_usd": "0.00076325",
+        "finish_reason": "stop",
+        "max_completion_tokens": 4096,
+        "model": "glm-5.3-flash",
+        "provider_request_id": "chatcmpl-37daa5df-cbea-4d17-b1d1-041f98418b85",
+        "reasoning_max_tokens": 1536,
+        "reasoning_tokens": 1546,
+        "response_format": "json_object",
+        "response_model": "glm-5.3-flash",
+        "source": "VULTR_LIVE_HTTP",
+        "started_at": "2026-11-08T08:37:58.446100+00:00",
+        "status": "COMPLETED",
+        "usage": {
+          "completion_tokens": 1969,
+          "prompt_tokens": 741,
+          "total_tokens": 2710
+        }
+      }
+    ],
+    "completion_tokens": 1969,
+    "estimated_usd": "0.00076325",
+    "live_request_count": 1,
+    "max_output_tokens": 4096,
+    "max_requests": 1,
+    "offline_request_count": 0,
+    "prompt_tokens": 741,
+    "request_count": 1,
+    "reserved_output_tokens": 4096
+  },
+  "latency_ms": 10312.999999965541,
+  "raw_integrity": "PASS"
+}

@@ -1,0 +1,14 @@
+{
+  "raw": "benchmarks\\results\\raw\\a33ff7cc38d74f71803414f019225025",
+  "server_run_id": "74ac28e0760e48bea4c3c735f5ffec06",
+  "checks": {
+    "complete": true,
+    "one_generation": true,
+    "actual_model": true,
+    "known_cost": true,
+    "limits_and_cleanup": true,
+    "adversarial_complete": true,
+    "run_id": true,
+    "candidate": true
+  }
+}

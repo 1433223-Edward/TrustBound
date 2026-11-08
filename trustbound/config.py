@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT_ENV = Path(__file__).resolve().parents[1] / ".env"
 LOCAL_KEYS = {"VULTR_INFERENCE_API_KEY", "VULTR_MODEL", "TRUSTBOUND_ENABLE_LIVE",
-              "TRUSTBOUND_ENABLE_RECOVERY_LIVE"}
+              "TRUSTBOUND_ENABLE_RECOVERY_LIVE", "TRUSTBOUND_ENABLE_WORKSPACE_LIVE"}
 
 
 def load_local_env(path=ROOT_ENV, environ=None):

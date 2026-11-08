@@ -1,0 +1,273 @@
+[
+  {
+    "experiment": "D-off",
+    "manifest": "benchmarks\\configs\\D-off.json",
+    "sha256": "38f21378296234367ced55f42be3c3c8b918650a27927da666d0a485e0106377",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "real_pair_id"
+    ],
+    "configuration": {
+      "experiment_id": "D-fixed-v2",
+      "experiment_type": "D",
+      "dataset_version": "billing-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "pair_id": "fill-pair-id",
+      "group": "off",
+      "base_url": "http://127.0.0.1:5173",
+      "request": {
+        "task_id": "billing-rounding-01",
+        "mode": "fixture",
+        "candidate_id": "double_rounding",
+        "adversarial_mode": "off",
+        "recovery_mode": "off"
+      }
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_APPLICABLE_FIXED_BILLING",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  },
+  {
+    "experiment": "E-off",
+    "manifest": "benchmarks\\configs\\E-off.json",
+    "sha256": "ef1f94885ddc3c25b6731bb3addd763df90fcba1bc2a0f15a9cd865c060ba5ce",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "project_id",
+      "real_pair_id"
+    ],
+    "configuration": {
+      "experiment_id": "E-v1",
+      "experiment_type": "E",
+      "dataset_version": "workspace-reviewed-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "project_id": null,
+      "pair_id": "fill-pair-id",
+      "group": "off",
+      "base_url": "http://127.0.0.1:5173",
+      "poll_deadline_seconds": 300,
+      "concurrency": 1,
+      "request": {
+        "revision": 0,
+        "mode": "original",
+        "model_id": null,
+        "authorize_source": false,
+        "adversarial_enabled": false,
+        "correctness_verification": false,
+        "execution_input": 0
+      }
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_VERIFIED",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  },
+  {
+    "experiment": "E-on",
+    "manifest": "benchmarks\\configs\\E-on.json",
+    "sha256": "e5f2482eca949b3d079c525a631126c2dd19192bc2c62abc6e7ba60c1498e747",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "project_id",
+      "real_pair_id"
+    ],
+    "configuration": {
+      "experiment_id": "E-v1",
+      "experiment_type": "E",
+      "dataset_version": "workspace-reviewed-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "project_id": null,
+      "pair_id": "fill-pair-id",
+      "group": "on",
+      "base_url": "http://127.0.0.1:5173",
+      "poll_deadline_seconds": 300,
+      "concurrency": 1,
+      "request": {
+        "revision": 0,
+        "mode": "original",
+        "model_id": null,
+        "authorize_source": false,
+        "adversarial_enabled": false,
+        "correctness_verification": true
+      }
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_VERIFIED",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  },
+  {
+    "experiment": "B",
+    "manifest": "benchmarks\\configs\\B.json",
+    "sha256": "a176e1e6fb543b7ae2040803547b04b8c85f7874fbf94f1cc57c9bdb764bd5be",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "project_id",
+      "confirmed_model_id",
+      "fixed_paid_batch_approval",
+      "approved_total_cost_cap",
+      "effective_server_budget_verification",
+      "authorized_environment_verification",
+      "exact_single_and_batch_request_counts"
+    ],
+    "configuration": {
+      "experiment_id": "B-v1",
+      "experiment_type": "B",
+      "dataset_version": "workspace-reviewed-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "project_id": null,
+      "pair_id": null,
+      "group": "baseline",
+      "base_url": "http://127.0.0.1:5173",
+      "poll_deadline_seconds": 300,
+      "concurrency": 1,
+      "request": {
+        "revision": 0,
+        "mode": "live",
+        "model_id": null,
+        "authorize_source": true,
+        "adversarial_enabled": false,
+        "correctness_verification": true
+      }
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_VERIFIED",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  },
+  {
+    "experiment": "C",
+    "manifest": "benchmarks\\configs\\C.json",
+    "sha256": "237f77a812132360a41995d0e91d79d38939ae3f3f4d25bbd3736651a938f23d",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "project_id",
+      "confirmed_model_id",
+      "fixed_paid_batch_approval",
+      "approved_total_cost_cap",
+      "effective_server_budget_verification",
+      "authorized_environment_verification",
+      "exact_single_and_batch_request_counts"
+    ],
+    "configuration": {
+      "experiment_id": "C-v1",
+      "experiment_type": "C",
+      "dataset_version": "workspace-reviewed-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "project_id": null,
+      "pair_id": null,
+      "group": "baseline",
+      "base_url": "http://127.0.0.1:5173",
+      "poll_deadline_seconds": 300,
+      "concurrency": 1,
+      "request": {
+        "revision": 0,
+        "mode": "live",
+        "model_id": null,
+        "authorize_source": true,
+        "adversarial_enabled": false,
+        "correctness_verification": true
+      },
+      "file_count": 1
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_VERIFIED",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  },
+  {
+    "experiment": "D-on",
+    "manifest": "benchmarks\\configs\\D-on.json",
+    "sha256": "4a157ae61948acf0878701a4b15e60f3baa53f3133f685c212b52987def2438d",
+    "status": "SKIPPED",
+    "submitted": false,
+    "run_id": null,
+    "actual_cost": null,
+    "model_requests": 0,
+    "missing": [
+      "source_commit",
+      "source_hash",
+      "real_pair_id",
+      "fixed_paid_batch_approval",
+      "approved_total_cost_cap",
+      "effective_server_budget_verification",
+      "authorized_environment_verification",
+      "exact_single_and_batch_request_counts"
+    ],
+    "configuration": {
+      "experiment_id": "D-fixed-v2",
+      "experiment_type": "D",
+      "dataset_version": "billing-v1",
+      "source_commit": null,
+      "source_hash": null,
+      "pair_id": "fill-pair-id",
+      "group": "on",
+      "base_url": "http://127.0.0.1:5173",
+      "request": {
+        "task_id": "billing-rounding-01",
+        "mode": "fixture",
+        "candidate_id": "double_rounding",
+        "adversarial_mode": "live",
+        "recovery_mode": "off"
+      }
+    },
+    "preconditions": {
+      "manifest_valid": false,
+      "service_health": "UNAVAILABLE",
+      "frozen_project": "NOT_APPLICABLE_FIXED_BILLING",
+      "idle_task": "NOT_VERIFIED",
+      "runner_runtime_limits": "NOT_VERIFIED"
+    }
+  }
+]

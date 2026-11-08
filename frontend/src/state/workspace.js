@@ -12,6 +12,8 @@ export function createWorkspace({ demo, client, sleep = ms => new Promise(resolv
   const task = computed(() => state.tasks.find(item => item.spec.task_id === state.taskId))
   const busy = computed(() => state.phase === 'LOADING')
   const trace = computed(() => traceFor(state.report, state.proposal, state.mode, state.executionMode, state.recoveryReport?.final_status ? { ...state.finalDecision, status: state.recoveryReport.final_status, reason: state.recoveryReport.stop_reason } : state.finalDecision))
+  const isFixedRecord = id => demo.reports.some(item => item.candidate_id === id)
+  const isCollaborationRecord = id => Object.hasOwn(demo.collaboration ?? {}, id)
 
   function reset() {
     generation++
@@ -24,7 +26,8 @@ export function createWorkspace({ demo, client, sleep = ms => new Promise(resolv
     state.taskId = id
   }
   function selectScenario(id) {
-    if (!demo.reports.some(item => item.candidate_id === id) && !(state.mode === 'LIVE' && id === 'double_rounding')) throw new Error('Unknown sample.')
+    if (!isFixedRecord(id) && !(state.mode === 'DEMO' && isCollaborationRecord(id))
+        && !(state.mode === 'LIVE' && id === 'double_rounding')) throw new Error('Unknown sample.')
     reset()
     state.scenario = id
   }
@@ -32,7 +35,8 @@ export function createWorkspace({ demo, client, sleep = ms => new Promise(resolv
     if (!['DEMO', 'LIVE'].includes(mode)) throw new Error('Unknown mode.')
     reset()
     state.mode = mode
-    if (mode === 'DEMO' && !demo.reports.some(item => item.candidate_id === state.scenario)) state.scenario = 'public_only'
+    if ((mode === 'DEMO' && !isFixedRecord(state.scenario) && !isCollaborationRecord(state.scenario))
+        || (mode === 'LIVE' && isCollaborationRecord(state.scenario))) state.scenario = 'public_only'
     state.tasks = demo.tasks
     state.taskId = demo.tasks[0].spec.task_id
     state.connection = 'DISCONNECTED'
@@ -74,6 +78,19 @@ export function createWorkspace({ demo, client, sleep = ms => new Promise(resolv
     try {
       await sleep(450)
       if (token !== generation) return
+      if (isCollaborationRecord(state.scenario)) {
+        const snapshot = structuredClone(demo.collaboration[state.scenario].snapshot)
+        validateReport(snapshot.verification, state.taskId)
+        validateAdversarialEnvelope(snapshot, snapshot.adversarial_mode || 'off')
+        validateRecoveryReport(snapshot, snapshot.recovery_mode || 'off')
+        state.report = snapshot.verification
+        state.adversarialReport = snapshot.adversarial_report || null
+        state.finalDecision = snapshot.final_decision
+        state.recoveryReport = snapshot.recovery_report || null
+        state.candidate = snapshot.candidate?.content || ''
+        state.phase = 'READY'
+        return
+      }
       const report = structuredClone(demo.reports.find(item => item.candidate_id === state.scenario && item.task.task_id === state.taskId))
       validateReport(report, state.taskId)
       state.report = report

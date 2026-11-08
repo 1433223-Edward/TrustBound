@@ -92,9 +92,12 @@ def complete_verification(outcome, task_id, adversarial_mode, adversarial_fixtur
         else:
             # Fresh client and freshly constructed messages; executor conversations
             # and its explanation never cross this boundary into the challenger.
-            client = offline_adversarial_client(adversarial_fixture) if adversarial_mode == "offline" else VultrClient()
-            adversarial = run_adversarial(code, artifact_hash, client,
-                                          model_id=DEFAULT_MODEL if adversarial_mode == "offline" else None)
+            if adversarial_mode == "offline":
+                adversarial = run_adversarial(code, artifact_hash, offline_adversarial_client(adversarial_fixture),
+                                              model_id=DEFAULT_MODEL)
+            else:
+                client = VultrClient(timeout=60, max_attempts=1, output_limit=4096)
+                adversarial = run_adversarial(code, artifact_hash, client, completion_tokens=4096, compact=True)
     outcome["adversarial_report"] = adversarial.to_dict() if adversarial else None
     outcome["final_decision"] = final_decision(verification, adversarial) if verification else None
     return outcome

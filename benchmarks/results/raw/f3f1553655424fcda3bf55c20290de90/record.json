@@ -1,0 +1,188 @@
+{
+  "experiment_id": "interactive-20261108T153111+0800-E",
+  "experiment_type": "E",
+  "run_id": "f3f1553655424fcda3bf55c20290de90",
+  "dataset_version": "workspace-reviewed-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+  "configuration": {
+    "experiment_id": "interactive-20261108T153111+0800-E",
+    "experiment_type": "E",
+    "dataset_version": "workspace-reviewed-v1",
+    "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+    "source_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "pair_id": "interactive-20261108T153111+0800-E-01",
+    "group": "off",
+    "base_url": "http://127.0.0.1:8000",
+    "poll_deadline_seconds": 300,
+    "concurrency": 1,
+    "request": {
+      "revision": 2,
+      "mode": "original",
+      "model_id": null,
+      "authorize_source": false,
+      "adversarial_enabled": false,
+      "correctness_verification": false,
+      "execution_input": {
+        "order": [
+          [
+            "a",
+            1
+          ],
+          [
+            "b",
+            1
+          ]
+        ],
+        "stock": {
+          "a": 3,
+          "b": 0
+        }
+      },
+      "authorize_explanation": false
+    },
+    "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+    "source_tree_sha256": "3364341f9b1f347b2781180bebdd72c4143df4abd09890d9ea5e8319168b37cf",
+    "source_working_tree_dirty": true
+  },
+  "actual_model_id": null,
+  "started_at": "2026-11-08T07:32:08.451369+00:00",
+  "completed_at": "2026-11-08T07:32:24.922133+00:00",
+  "input_tokens": null,
+  "output_tokens": null,
+  "estimated_cost": "0",
+  "latency_ms": 16468.999999924563,
+  "execution_status": "COMPLETED",
+  "verification_status": "EXECUTED_UNVERIFIED",
+  "security_status": "CONFIRMED",
+  "evidence_reference": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\f3f1553655424fcda3bf55c20290de90",
+  "failure_reason": null,
+  "formal_verification_status": "NOT_REQUESTED",
+  "model_request_latency_ms": null,
+  "phase_timings": {
+    "server_started_at": "2026-11-08T07:32:08.518646+00:00",
+    "server_finished_at": "2026-11-08T07:32:24.687583+00:00"
+  },
+  "cpu_peak": null,
+  "memory_peak": null,
+  "pid_peak": null,
+  "evidence_source": "OFFLINE_MODEL_DOCKER",
+  "report": {
+    "adversarial_enabled": false,
+    "adversarial_report": {
+      "candidate_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+      "challenges": [],
+      "source": "NONE",
+      "status": "NOT_REQUESTED",
+      "verification_status": "NOT_RUN_FUNCTIONAL_VERIFICATION_DISABLED"
+    },
+    "agent_events": [
+      {
+        "at": "2026-11-08T07:32:08.530164+00:00",
+        "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+        "model": null,
+        "role": "verifier",
+        "stage": "Security execution",
+        "status": "RUNNING"
+      },
+      {
+        "at": "2026-11-08T07:32:24.675201+00:00",
+        "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+        "model": null,
+        "role": "verifier",
+        "stage": "Final decision",
+        "status": "EXECUTED_UNVERIFIED"
+      }
+    ],
+    "approved_policy": {
+      "cpu_nanos": 500000000,
+      "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+      "memory_bytes": 134217728,
+      "model_output_tokens": 4096,
+      "model_requests": 1,
+      "network": "none",
+      "pids": 32,
+      "read_only_root": true,
+      "timeout_per_case_seconds": 3,
+      "user": "65534:65534"
+    },
+    "artifact_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "cases": [
+      {
+        "execution": {
+          "artifact_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+          "cleanup_confirmed": true,
+          "container_name": "trustbound-d3c91df6d9b940e3820de35b6d97e099",
+          "error": null,
+          "exit_code": 0,
+          "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+          "limits_verified": true,
+          "oom_killed": false,
+          "phase": "execution",
+          "status": "EXITED",
+          "stderr": "",
+          "stdout": "{\"ok\":false,\"stock\":{\"a\":2,\"b\":0}}\n",
+          "test_hash": "1442573876c59fee1f51e2dd4093fea1daf63996322a75550623c1b9d59392e3",
+          "timeout_reason": null,
+          "workspace_unchanged": true
+        },
+        "index": 1,
+        "input": {
+          "order": [
+            [
+              "a",
+              1
+            ],
+            [
+              "b",
+              1
+            ]
+          ],
+          "stock": {
+            "a": 3,
+            "b": 0
+          }
+        },
+        "phase": "execution",
+        "status": "EXECUTED"
+      }
+    ],
+    "changed_paths": [],
+    "diff": "",
+    "formal_status": "NOT_REQUESTED",
+    "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4",
+    "functional_verification": {
+      "status": "NOT_REQUESTED"
+    },
+    "inference_usage": null,
+    "planning_route": "PLAN_REQUIRED",
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "quick_mode": false,
+    "reason": "EXECUTED_WITHOUT_FUNCTIONAL_VERIFICATION",
+    "replacements": {},
+    "restored_from": null,
+    "retried_from": null,
+    "retry_attempt": 0,
+    "retry_evidence": null,
+    "revision": 2,
+    "run_id": "1efbe5db76fb44d9b3a2db5f10a655aa",
+    "security_evidence": {
+      "executions": [
+        {
+          "index": 1,
+          "intact": true,
+          "phase": "execution"
+        }
+      ],
+      "permission": "ALLOWED",
+      "scope": "Sandbox containment and execution evidence integrity",
+      "status": "CONFIRMED"
+    },
+    "snapshot_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "source": "ORIGINAL",
+    "status": "EXECUTED_UNVERIFIED",
+    "transport": "LOCAL_DOCKER",
+    "verification_mode": "SECURITY_ONLY"
+  }
+}

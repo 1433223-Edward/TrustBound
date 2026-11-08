@@ -72,6 +72,10 @@ def run_through_worker(code, tests, phase, *, cases=None, task_id=TASK_ID):
                "candidate_sha256": artifact_hash}
     if cases is not None:
         request["cases"] = cases
+    return run_worker_request(request, phase, artifact_hash, test_hash)
+
+
+def run_worker_request(request, phase, artifact_hash, test_hash):
     try:
         with _connect(os.environ["TRUSTBOUND_RUNNER_SOCKET"]) as connection:
             write_message(connection, request, MAX_REQUEST, 3)

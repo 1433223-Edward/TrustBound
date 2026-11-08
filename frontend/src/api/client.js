@@ -1,6 +1,6 @@
 export function createApiClient({ fetcher = globalThis.fetch, now = Date.now,
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), requestTimeout = 10000, runTimeout = 300000 } = {}) {
-  async function request(path, { signal, ...options } = {}, timeout = requestTimeout) {
+  async function request(path, { signal, headers, download, ...options } = {}, timeout = requestTimeout) {
     const controller = new AbortController()
     const abort = () => controller.abort()
     if (signal?.aborted) controller.abort()
@@ -8,11 +8,12 @@ export function createApiClient({ fetcher = globalThis.fetch, now = Date.now,
     const timer = setTimeout(abort, timeout)
     try {
       const response = await fetcher(`/api${path}`, { ...options, signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' } })
+        headers: { 'Content-Type': 'application/json', ...headers } })
       if (!response.ok) {
         const body = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null
         throw new Error(`HTTP ${response.status} · ${body?.error?.code || 'API_ERROR'}: ${body?.error?.message || '后端尚未连接或请求失败。'}`)
       }
+      if (download) return await response.blob()
       if (!response.headers.get('content-type')?.includes('application/json')) {
         throw new Error('Backend not connected: API did not return JSON. 当前页面仅提供前端。')
       }
@@ -73,6 +74,11 @@ export function createApiClient({ fetcher = globalThis.fetch, now = Date.now,
     throw new Error('等待结果超时，后端状态未知；未产生验收结论。')
   }
   return { listTasks, startRun, startCustom, waitForRun,
+    workspaceProject: (path, token, body, signal, download = false) => request(`/workspace/projects${path}`, {
+      signal, download, headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      cache: 'no-store', redirect: 'error',
+      ...(body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) }),
+    }, path.endsWith('/generate-plan') ? 75000 : requestTimeout),
     health: signal => request('/health', { signal }),
     getTask: (id, signal) => request(`/tasks/${encodeURIComponent(id)}`, { signal }),
   }

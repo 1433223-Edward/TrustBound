@@ -1,0 +1,160 @@
+{
+  "experiment_id": "interactive-20261108T153111+0800-D",
+  "experiment_type": "D",
+  "run_id": "9242ecaad5b24718ba43d0af14354553",
+  "dataset_version": "billing-v1",
+  "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+  "source_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+  "configuration": {
+    "experiment_id": "interactive-20261108T153111+0800-D",
+    "experiment_type": "D",
+    "dataset_version": "billing-v1",
+    "source_commit": "a4371cc70059e589e028caaaa12251a2e51fe5e2",
+    "source_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+    "pair_id": "interactive-20261108T153111+0800-D-01",
+    "group": "off",
+    "base_url": "http://127.0.0.1:8000",
+    "request": {
+      "task_id": "billing-rounding-01",
+      "mode": "fixture",
+      "candidate_id": "double_rounding",
+      "adversarial_mode": "off",
+      "recovery_mode": "off"
+    },
+    "source_tree_sha256": "3364341f9b1f347b2781180bebdd72c4143df4abd09890d9ea5e8319168b37cf",
+    "source_working_tree_dirty": true,
+    "acceptance_sha256": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801"
+  },
+  "actual_model_id": null,
+  "started_at": "2026-11-08T07:33:39.456035+00:00",
+  "completed_at": "2026-11-08T07:33:49.775391+00:00",
+  "input_tokens": null,
+  "output_tokens": null,
+  "estimated_cost": "0",
+  "latency_ms": 10312.999999965541,
+  "execution_status": "COMPLETED",
+  "verification_status": "VERIFIED",
+  "security_status": null,
+  "evidence_reference": "D:\\Projects\\TrustBound\\benchmarks\\results\\raw\\9242ecaad5b24718ba43d0af14354553",
+  "failure_reason": null,
+  "formal_verification_status": "VERIFIED",
+  "model_request_latency_ms": null,
+  "phase_timings": {
+    "server_started_at": "2026-11-08T07:33:39.573906+00:00",
+    "server_finished_at": "2026-11-08T07:33:49.095003+00:00"
+  },
+  "cpu_peak": null,
+  "memory_peak": null,
+  "pid_peak": null,
+  "evidence_source": "OFFLINE_MODEL_DOCKER",
+  "report": {
+    "run_id": "962d3363196d46edaa3fff403def161b",
+    "task_id": "billing-rounding-01",
+    "source": "LIVE",
+    "mode": "fixture",
+    "candidate_id": "double_rounding",
+    "state": "COMPLETED",
+    "created_at": "2026-11-08T07:33:39.494928+00:00",
+    "started_at": "2026-11-08T07:33:39.573906+00:00",
+    "finished_at": "2026-11-08T07:33:49.095003+00:00",
+    "proposal": null,
+    "candidate": {
+      "path": "billing.py",
+      "content": "\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\nfrom decimal import Decimal, ROUND_HALF_UP\n\n\ndef to_cents(amount: str) -> int:\n    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+      "source": "FIXTURE"
+    },
+    "verification": {
+      "run_id": "d28cbd7c214a47f78c830abb276f6149",
+      "task": {
+        "task_id": "billing-rounding-01",
+        "acceptance_id": "billing-v1",
+        "allowed_write_paths": [
+          "billing.py"
+        ],
+        "timeout_seconds": 3
+      },
+      "candidate_id": "double_rounding",
+      "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+      "acceptance_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+      "status": "VERIFIED",
+      "policy_reason": "Allowed: all proposed writes are within billing.py",
+      "changed_paths": [
+        "billing.py"
+      ],
+      "diff": "--- original/billing.py\n+++ candidate/billing.py\n@@ -1,6 +1,6 @@\n-\"\"\"Bug: truncation loses fractions of a cent instead of rounding half up.\"\"\"\n-from decimal import Decimal\n+\"\"\"Reviewed hidden bug: premature four-place rounding changes later cent rounding.\"\"\"\n+from decimal import Decimal, ROUND_HALF_UP\n \n \n def to_cents(amount: str) -> int:\n-    return int(Decimal(amount) * 100)\n+    return int((Decimal(amount).quantize(Decimal(\"0.0001\"), rounding=ROUND_HALF_UP) * 100).quantize(Decimal(\"1\"), rounding=ROUND_HALF_UP))\n",
+      "executions": [
+        {
+          "phase": "public",
+          "container_name": "trustbound-013f919a79304c6e805a236631013631",
+          "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+          "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+          "test_hash": "3e448c8103aaab7629de44cd1072b32b8402f83c25c51a6e48ad4cd3963ac08a",
+          "status": "EXITED",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "test_round_fraction (__main__.PublicTests.test_round_fraction) ... ok\ntest_whole_cents (__main__.PublicTests.test_whole_cents) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+          "timeout_reason": null,
+          "cleanup_confirmed": true,
+          "workspace_unchanged": true,
+          "limits_verified": true,
+          "error": null,
+          "oom_killed": false
+        },
+        {
+          "phase": "acceptance",
+          "container_name": "trustbound-38c92fd208c445bfa845c5f46bf90758",
+          "image": "python@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+          "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+          "test_hash": "9510cc5c394c24d76e300c7706e2a44755faccfbc4642e4b57ed87be5ba81801",
+          "status": "EXITED",
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "test_declared_money_examples (__main__.AcceptanceTests.test_declared_money_examples) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+          "timeout_reason": null,
+          "cleanup_confirmed": true,
+          "workspace_unchanged": true,
+          "limits_verified": true,
+          "error": null,
+          "oom_killed": false
+        }
+      ],
+      "limitations": [
+        "Only fixed billing tasks and declared billing-v1 cases are supported",
+        "Resource settings inspected; CPU/memory/PID stress limits not benchmarked",
+        "Repository and Docker controller are trusted; containers are not a VM security proof"
+      ]
+    },
+    "executor": null,
+    "llm_source": "NONE",
+    "error": null,
+    "adversarial_mode": "off",
+    "adversarial_fixture": "standard",
+    "adversarial_report": null,
+    "final_decision": {
+      "status": "VERIFIED",
+      "formal_status": "VERIFIED",
+      "formal_report_id": "d28cbd7c214a47f78c830abb276f6149",
+      "artifact_hash": "941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b",
+      "adversarial_status": "NOT_REQUESTED",
+      "reason": "Formal acceptance only; adversarial verification not requested",
+      "scope": "Declared acceptance and bounded valid challenges only; not a proof of universal correctness"
+    },
+    "recovery_mode": "off",
+    "recovery_fixture": "fixed",
+    "recovery_report": null,
+    "current_attempt": null,
+    "inference_usage": {
+      "max_requests": 14,
+      "max_output_tokens": 14336,
+      "reserved_output_tokens": 0,
+      "request_count": 0,
+      "live_request_count": 0,
+      "offline_request_count": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "estimated_usd": null,
+      "billing_status": "UNKNOWN",
+      "calls": []
+    }
+  }
+}

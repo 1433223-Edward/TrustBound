@@ -1,0 +1,4 @@
+﻿experiment,server_run_id,client_record_id,classification,execution_status,verification_status,containers,cleanup_confirmed,limits_verified,client_latency_ms,model_generation_requests,estimated_model_cost_usd,evidence
+E-OFF,1efbe5db76fb44d9b3a2db5f10a655aa,f3f1553655424fcda3bf55c20290de90,REAL_LOCAL_DOCKER_NO_MODEL,COMPLETED,EXECUTED_UNVERIFIED,1,True,True,16468.999999924563,0,0,D:\Projects\TrustBound\benchmarks\results\raw\f3f1553655424fcda3bf55c20290de90
+E-ON,003b9588dfcf4958a54fd75f13915177,548f36d09bd54ec9af1118a8e3c136d0,REAL_LOCAL_DOCKER_NO_MODEL,COMPLETED,FAILED,1,True,True,4217.999999993481,0,0,D:\Projects\TrustBound\benchmarks\results\raw\548f36d09bd54ec9af1118a8e3c136d0
+D-OFF,962d3363196d46edaa3fff403def161b,9242ecaad5b24718ba43d0af14354553,REAL_LOCAL_DOCKER_NO_MODEL,COMPLETED,VERIFIED,2,True,True,10312.999999965541,0,0,D:\Projects\TrustBound\benchmarks\results\raw\9242ecaad5b24718ba43d0af14354553

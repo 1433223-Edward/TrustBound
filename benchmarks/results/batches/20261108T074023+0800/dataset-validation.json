@@ -1,0 +1,38 @@
+[
+  {
+    "file": "datasets\\scale-1.json",
+    "classification": "GENERATED_TEST_INPUT_NOT_EXPERIMENT",
+    "file_count": 1,
+    "source_bytes": 39,
+    "single_file_max_bytes": 39,
+    "validation": "PASS_STATIC_DATA_LIMITS_ONLY",
+    "sha256": "3a11d66c3354be0c39d25abdd3aacd744787292bd7248f479bb90a433138527a"
+  },
+  {
+    "file": "datasets\\scale-10.json",
+    "classification": "GENERATED_TEST_INPUT_NOT_EXPERIMENT",
+    "file_count": 10,
+    "source_bytes": 129,
+    "single_file_max_bytes": 39,
+    "validation": "PASS_STATIC_DATA_LIMITS_ONLY",
+    "sha256": "db009539125d257c7ee2a1def6bdd13c81f5d992cfc2f0ac519bbb6df30cdeb8"
+  },
+  {
+    "file": "datasets\\scale-20.json",
+    "classification": "GENERATED_TEST_INPUT_NOT_EXPERIMENT",
+    "file_count": 20,
+    "source_bytes": 239,
+    "single_file_max_bytes": 39,
+    "validation": "PASS_STATIC_DATA_LIMITS_ONLY",
+    "sha256": "f6e5b489f6ba76312c4fb7b9c6c7ec20ebc372e431e9bae25d0d451a54fe3b8d"
+  },
+  {
+    "file": "datasets\\scale-5.json",
+    "classification": "GENERATED_TEST_INPUT_NOT_EXPERIMENT",
+    "file_count": 5,
+    "source_bytes": 79,
+    "single_file_max_bytes": 39,
+    "validation": "PASS_STATIC_DATA_LIMITS_ONLY",
+    "sha256": "4f18673e91c42da2c5c8e5fb82b245882619ac76a8f193b1f345821378cfcda7"
+  }
+]

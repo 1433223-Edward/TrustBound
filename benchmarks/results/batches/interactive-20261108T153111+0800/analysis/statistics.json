@@ -1,0 +1,59 @@
+[
+  {
+    "label": "[\"E\", \"OFFLINE_MODEL_DOCKER\", null, \"on\", \"a4371cc70059e589e028caaaa12251a2e51fe5e2\", \"5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247\", \"workspace-reviewed-v1\", null, true, null]",
+    "n": 1,
+    "completed": 1,
+    "execution_counts": {
+      "COMPLETED": 1
+    },
+    "verification_counts": {
+      "FAILED": 1
+    },
+    "unknown_billing": 0,
+    "missing_models": 1,
+    "verified": 0,
+    "success": 0.0,
+    "latency": 4217.999999993481,
+    "latency_sd": null,
+    "cost": 0.0,
+    "cost_per_verified": null
+  },
+  {
+    "label": "[\"D\", \"OFFLINE_MODEL_DOCKER\", null, \"off\", \"a4371cc70059e589e028caaaa12251a2e51fe5e2\", \"941584c0c21d177f69549876fde5c99583924275b2154367c525fb629849533b\", \"billing-v1\", null, null, null]",
+    "n": 1,
+    "completed": 1,
+    "execution_counts": {
+      "COMPLETED": 1
+    },
+    "verification_counts": {
+      "VERIFIED": 1
+    },
+    "unknown_billing": 0,
+    "missing_models": 1,
+    "verified": 1,
+    "success": 1.0,
+    "latency": 10312.999999965541,
+    "latency_sd": null,
+    "cost": 0.0,
+    "cost_per_verified": 0.0
+  },
+  {
+    "label": "[\"E\", \"OFFLINE_MODEL_DOCKER\", null, \"off\", \"a4371cc70059e589e028caaaa12251a2e51fe5e2\", \"5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247\", \"workspace-reviewed-v1\", null, false, null]",
+    "n": 1,
+    "completed": 1,
+    "execution_counts": {
+      "COMPLETED": 1
+    },
+    "verification_counts": {
+      "EXECUTED_UNVERIFIED": 1
+    },
+    "unknown_billing": 0,
+    "missing_models": 1,
+    "verified": 0,
+    "success": 0.0,
+    "latency": 16468.999999924563,
+    "latency_sd": null,
+    "cost": 0.0,
+    "cost_per_verified": null
+  }
+]

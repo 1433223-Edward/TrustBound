@@ -1,0 +1,17 @@
+{
+  "quota": [
+    43,
+    11,
+    43008
+  ],
+  "states": {
+    "FINALIZED": 4
+  },
+  "server_parent": 40140,
+  "server_child": 35876,
+  "caps": {
+    "max_runs": 44,
+    "max_model_calls": 12,
+    "max_output_tokens": 47104
+  }
+}

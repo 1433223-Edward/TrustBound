@@ -1,0 +1,17 @@
+{
+  "experiment_id": "D-fixed-v2",
+  "experiment_type": "D",
+  "dataset_version": "billing-v1",
+  "source_commit": null,
+  "source_hash": null,
+  "pair_id": "fill-pair-id",
+  "group": "off",
+  "base_url": "http://127.0.0.1:5173",
+  "request": {
+    "task_id": "billing-rounding-01",
+    "mode": "fixture",
+    "candidate_id": "double_rounding",
+    "adversarial_mode": "off",
+    "recovery_mode": "off"
+  }
+}

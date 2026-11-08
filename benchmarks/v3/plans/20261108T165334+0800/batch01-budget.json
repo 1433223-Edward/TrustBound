@@ -1,0 +1,63 @@
+{
+  "version": "v3",
+  "status": "NOT_AUTHORIZED",
+  "batch": "01",
+  "matrix": "3 models x 2 tasks x 2 repeats",
+  "generation_requests": 12,
+  "max_output_tokens_per_request": 4096,
+  "reserved_output_tokens": 49152,
+  "retries": 0,
+  "concurrency": 1,
+  "current_counters": {
+    "runs": 44,
+    "calls": 12,
+    "tokens": 47104
+  },
+  "proposed_batch_absolute_caps": {
+    "max_runs": 56,
+    "max_model_calls": 24,
+    "max_output_tokens": 96256
+  },
+  "per_model": [
+    {
+      "model": "deepseek-v4.1-flash-1017",
+      "generation_requests": 4,
+      "reserved_output_tokens": 16384,
+      "prompt_usd_per_token": "0.00000015",
+      "completion_usd_per_token": "0.0000006",
+      "assumed_input_tokens_per_request": 16000,
+      "planning_estimate_usd": "0.01943040",
+      "estimate_is_hard_cap": false
+    },
+    {
+      "model": "glm-5.3-flash",
+      "generation_requests": 4,
+      "reserved_output_tokens": 16384,
+      "prompt_usd_per_token": "0.0000001",
+      "completion_usd_per_token": "0.00000035",
+      "assumed_input_tokens_per_request": 16000,
+      "planning_estimate_usd": "0.01213440",
+      "estimate_is_hard_cap": false
+    },
+    {
+      "model": "mimo-v2.6-flash",
+      "generation_requests": 4,
+      "reserved_output_tokens": 16384,
+      "prompt_usd_per_token": "0.0000001",
+      "completion_usd_per_token": "0.00000025",
+      "assumed_input_tokens_per_request": 16000,
+      "planning_estimate_usd": "0.01049600",
+      "estimate_is_hard_cap": false
+    }
+  ],
+  "planning_total_usd": "0.04206080",
+  "suggested_allowance_usd": "0.10",
+  "USD_hard_cap": false,
+  "effective_implementation_ceiling": {
+    "max_model_calls": 100,
+    "max_output_tokens": 200000,
+    "launcher_max_output_tokens": 200000
+  },
+  "third_model": "MiMo is catalog/allowlist available; actual generation response identity not yet observed",
+  "unknown_billing_stop": true
+}

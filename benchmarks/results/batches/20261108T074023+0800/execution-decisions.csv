@@ -1,0 +1,7 @@
+﻿experiment,status,submitted,run_id,actual_cost,new_model_requests,missing
+D-off,SKIPPED,False,,,0,source_commit; source_hash; real_pair_id
+E-off,SKIPPED,False,,,0,source_commit; source_hash; project_id; real_pair_id
+E-on,SKIPPED,False,,,0,source_commit; source_hash; project_id; real_pair_id
+B,SKIPPED,False,,,0,source_commit; source_hash; project_id; confirmed_model_id; fixed_paid_batch_approval; approved_total_cost_cap; effective_server_budget_verification; authorized_environment_verification; exact_single_and_batch_request_counts
+C,SKIPPED,False,,,0,source_commit; source_hash; project_id; confirmed_model_id; fixed_paid_batch_approval; approved_total_cost_cap; effective_server_budget_verification; authorized_environment_verification; exact_single_and_batch_request_counts
+D-on,SKIPPED,False,,,0,source_commit; source_hash; real_pair_id; fixed_paid_batch_approval; approved_total_cost_cap; effective_server_budget_verification; authorized_environment_verification; exact_single_and_batch_request_counts

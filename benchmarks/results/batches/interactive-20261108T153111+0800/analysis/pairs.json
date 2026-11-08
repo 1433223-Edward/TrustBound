@@ -1,0 +1,16 @@
+[
+  {
+    "experiment": "E",
+    "pair_id": "interactive-20261108T153111+0800-E-01",
+    "status": "MATCHED",
+    "reason": "Fixed candidate, no recovery; observations limited to this pair",
+    "latency_delta_ms": -12250.999999931082,
+    "cost_delta_usd": 0.0
+  },
+  {
+    "experiment": "D",
+    "pair_id": "interactive-20261108T153111+0800-D-01",
+    "status": "INVALID_PAIR",
+    "reason": "Need exactly one OFF and one ON per pair_id"
+  }
+]

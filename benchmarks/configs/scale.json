@@ -1,0 +1,16 @@
+{
+  "file_counts": [
+    1,
+    5,
+    10,
+    20
+  ],
+  "current_file_limit": 20,
+  "current_project_bytes_limit": 24576,
+  "stable_criteria": {
+    "min_repetitions": 5,
+    "min_verified_rate": 0.95,
+    "max_latency_ms": null,
+    "max_cost_usd": null
+  }
+}

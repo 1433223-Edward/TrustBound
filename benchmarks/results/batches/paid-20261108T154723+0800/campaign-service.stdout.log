@@ -1,0 +1,4 @@
+INFO:     127.0.0.1:51772 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52474 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52595 - "GET /api/workspace/projects/69e7990423e3492a8b572205116b12b2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52602 - "GET /api/health HTTP/1.1" 200 OK

@@ -1,0 +1,29 @@
+{
+  "batch_id": "20261108T074023+0800",
+  "completed_at": "2026-11-08T07:43:55.258105+08:00",
+  "offline_prepare": "COMPLETED",
+  "check": "NO_DATA",
+  "analyze": "NO_DATA",
+  "historical_analysis": "COMPLETED",
+  "new_experiment_submissions": 0,
+  "new_experiment_run_ids": [],
+  "new_model_requests": 0,
+  "new_docker_runs": 0,
+  "skipped_no_paid": [
+    "D-OFF",
+    "E-OFF",
+    "E-ON"
+  ],
+  "not_authorized": [
+    "B",
+    "C",
+    "D-ON"
+  ],
+  "new_security_attacks": 0,
+  "source_classes": [
+    "GENERATED_TEST_INPUT_NOT_EXPERIMENT",
+    "HISTORICAL_LOCAL_DOCKER_RECORD",
+    "READ_ONLY_PREFLIGHT"
+  ],
+  "status": "STOPPED_AFTER_ALLOWED_WORK"
+}

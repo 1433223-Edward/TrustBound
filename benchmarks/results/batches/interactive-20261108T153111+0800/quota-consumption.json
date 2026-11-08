@@ -1,0 +1,8 @@
+{
+  "path": "C:\\Users\\13626\\AppData\\Local\\TrustBound\\workspace-preview-v2\\quota.sqlite3",
+  "runs": 40,
+  "reserved_model_calls": 8,
+  "reserved_output_tokens": 30720,
+  "last_run": 1794123219,
+  "note": "Consumption only. This does not prove the running process configured quota ceilings."
+}

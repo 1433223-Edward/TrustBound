@@ -9,7 +9,8 @@ import socket
 import time
 from urllib import error, request
 
-from .admission import AdmissionError, reserve_live_attempt
+from .admission import AdmissionError, reserve_live_attempt, model_request_transition
+from .model_journal import JournalError
 from .config import load_local_env
 
 # Loaded once on backend import; fresh clients read the resulting process settings.
@@ -27,8 +28,8 @@ def _reserve_global_live_attempt(source, outputs):
     if source == "VULTR_LIVE_HTTP":
         try:
             reserve_live_attempt(outputs)
-        except AdmissionError as error:
-            raise InferenceError(error.code) from None
+        except (AdmissionError, JournalError) as error:
+            raise InferenceError(error.code if isinstance(error, AdmissionError) else str(error)) from None
 
 
 # One task scope covers all fresh clients without sharing agent message contexts.
@@ -116,13 +117,16 @@ def estimated_cost(usage, pricing):
 
 
 class VultrClient:
-    def __init__(self, api_key=None, *, transport=http_json, timeout=30, max_attempts=2, output_limit=1024):
+    def __init__(self, api_key=None, *, transport=http_json, timeout=30, max_attempts=2, output_limit=1024, input_limit=12000):
         self._key = api_key if api_key is not None else os.environ.get("VULTR_INFERENCE_API_KEY", "")
         if not 1 <= timeout <= 60 or not 1 <= max_attempts <= 2:
             raise ValueError("Invalid request budget")
         if type(output_limit) is not int or not 1 <= output_limit <= 4096:
             raise ValueError("Invalid output token limit")
         self.output_limit = output_limit
+        if type(input_limit) is not int or not 1 <= input_limit <= 48000:
+            raise ValueError('Invalid input size limit')
+        self.input_limit = input_limit
         self.transport, self.timeout, self.max_attempts = transport, timeout, max_attempts
         self.source = "VULTR_LIVE_HTTP" if transport is http_json else "OFFLINE_TEST"
         self.calls = []
@@ -140,7 +144,7 @@ class VultrClient:
     def complete(self, model, messages, max_tokens, *, json_mode=False, reasoning_tokens=None, response_schema=None):
         if not self.configured:
             raise InferenceError("MISSING_VULTR_INFERENCE_API_KEY")
-        if not 1 <= max_tokens <= self.output_limit or len(json.dumps(messages)) > 12000:
+        if not 1 <= max_tokens <= self.output_limit or len(json.dumps(messages)) > self.input_limit:
             raise InferenceError("REQUEST_BUDGET_EXCEEDED")
         payload = {"model": model["id"], "messages": messages,
                    "max_completion_tokens": max_tokens, "temperature": 0}
@@ -170,11 +174,15 @@ class VultrClient:
             else:
                 _reserve_global_live_attempt(self.source, max_tokens)
             self.calls.append(entry)
+            if self.source == "VULTR_LIVE_HTTP":
+                model_request_transition("SENT", entry)
             try:
                 response = self.transport("POST", "/chat/completions", payload,
                                           self._key, self.timeout)
             except error.HTTPError as exc:
                 entry["status"] = f"HTTP_{exc.code}"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("UNKNOWN_BILLING", entry)
                 # Only an explicit rate-limit rejection is retried. Timeouts/5xx may
                 # already be billable, so retrying those could duplicate paid work.
                 if exc.code == 429 and attempt < self.max_attempts:
@@ -183,13 +191,21 @@ class VultrClient:
                 raise InferenceError(entry["status"]) from None
             except (TimeoutError, socket.timeout):
                 entry["status"] = "TIMEOUT"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("UNKNOWN_BILLING", entry)
                 raise InferenceError("TIMEOUT_BILLING_UNKNOWN") from None
             except error.URLError as exc:
                 entry["status"] = "TIMEOUT" if isinstance(exc.reason, TimeoutError) else "API_FAILURE"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("UNKNOWN_BILLING", entry)
                 raise InferenceError(entry["status"] + "_BILLING_UNKNOWN") from None
             except Exception:
                 entry["status"] = "API_FAILURE"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("UNKNOWN_BILLING", entry)
                 raise InferenceError("API_FAILURE_BILLING_UNKNOWN") from None
+            if self.source == "VULTR_LIVE_HTTP":
+                model_request_transition("RESPONSE_RECEIVED", entry)
             try:
                 usage = response.get("usage")
                 entry["usage"] = {key: usage[key] for key in (
@@ -204,6 +220,7 @@ class VultrClient:
                 choice = response["choices"][0]
                 # Keep provider identity and termination metadata even on rejection.
                 entry["response_model"] = str(response.get("model", ""))[:200].replace(self._key, "[REDACTED]")
+                entry["provider_request_id"] = str(response.get("id", ""))[:200].replace(self._key, "[REDACTED]")
                 entry["finish_reason"] = str(choice.get("finish_reason", ""))[:80].replace(self._key, "[REDACTED]")
                 content = choice["message"].get("content")
                 entry["content_is_string"] = type(content) is str
@@ -212,7 +229,11 @@ class VultrClient:
                         or not content or response.get("model") != model["id"]):
                     raise ValueError("Invalid response")
                 entry["status"] = "COMPLETED"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("RESPONSE_RECEIVED", entry)
                 return content.replace(self._key, "[REDACTED]")
             except (KeyError, TypeError, IndexError, ValueError, AttributeError):
                 entry["status"] = "INVALID_RESPONSE"
+                if self.source == "VULTR_LIVE_HTTP":
+                    model_request_transition("RESPONSE_RECEIVED", entry)
                 raise InferenceError("INVALID_RESPONSE") from None

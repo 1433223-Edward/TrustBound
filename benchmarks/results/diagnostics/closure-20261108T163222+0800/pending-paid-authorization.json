@@ -1,0 +1,41 @@
+{
+  "status": "AWAITING_APPROVAL",
+  "model": "glm-5.3-flash",
+  "generation_requests": 1,
+  "output_tokens_per_request": 4096,
+  "max_total_reserved_output_tokens": 4096,
+  "retries": 0,
+  "concurrency": 1,
+  "model_oracle_task_unchanged": true,
+  "current_counters": {
+    "runs": 43,
+    "calls": 11,
+    "tokens": 43008
+  },
+  "current_caps": {
+    "runs": 43,
+    "calls": 100,
+    "tokens": 43008
+  },
+  "proposed_temporary_absolute_caps": {
+    "runs": 44,
+    "calls": 12,
+    "tokens": 47104
+  },
+  "proposed_fee_allowance_usd": "0.01",
+  "allowance_is_enforced_dollar_cap": false,
+  "last_observed_price_per_million": {
+    "input": "0.10",
+    "output": "0.35"
+  },
+  "planning_estimate_at_previous_741_input_and_max_output_usd": "0.00150770",
+  "USD_hard_cap": false,
+  "actual_model_id_confirmation": "API response_model must match request",
+  "evidence_directory": "benchmarks/results/raw/<new-client-uuid>",
+  "stop_conditions": [
+    "Any final result; no retry",
+    "Unknown billing or missing evidence",
+    "Container cleanup failure",
+    "Any invalid proposal; preserve exact new diagnostic code"
+  ]
+}

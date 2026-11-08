@@ -1,0 +1,86 @@
+{
+  "files": [
+    {
+      "path": "main.py",
+      "content": "def solve(value):\n    return value + 1\n"
+    },
+    {
+      "path": "helper_1.py",
+      "content": "VALUE = 1\n"
+    },
+    {
+      "path": "helper_2.py",
+      "content": "VALUE = 2\n"
+    },
+    {
+      "path": "helper_3.py",
+      "content": "VALUE = 3\n"
+    },
+    {
+      "path": "helper_4.py",
+      "content": "VALUE = 4\n"
+    },
+    {
+      "path": "helper_5.py",
+      "content": "VALUE = 5\n"
+    },
+    {
+      "path": "helper_6.py",
+      "content": "VALUE = 6\n"
+    },
+    {
+      "path": "helper_7.py",
+      "content": "VALUE = 7\n"
+    },
+    {
+      "path": "helper_8.py",
+      "content": "VALUE = 8\n"
+    },
+    {
+      "path": "helper_9.py",
+      "content": "VALUE = 9\n"
+    }
+  ],
+  "plan": {
+    "revision": 0,
+    "goal": "Change solve to return value + 2",
+    "entrypoint": "main.py:solve",
+    "allowed_write_paths": [
+      "main.py"
+    ],
+    "public_cases": [
+      {
+        "input": 0,
+        "expected": 2
+      }
+    ],
+    "acceptance_cases": [
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ],
+    "acceptance_basis": "Reviewed integer addition contract"
+  },
+  "metadata": {
+    "total_files": 10,
+    "total_source_bytes": 129,
+    "estimated_source_tokens": 33,
+    "directory_depth": 1,
+    "dependency_edges": 0,
+    "expected_files_modified": 1,
+    "source_hash": "e1cd475b3b53f3719d6793e517eef92bce762d811f0f74726562c8b1351d8d3a",
+    "eligibility": "ELIGIBLE",
+    "task": "Change solve to return value + 2",
+    "cases": [
+      {
+        "input": 0,
+        "expected": 2
+      },
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ]
+  }
+}

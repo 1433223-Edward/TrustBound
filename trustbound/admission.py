@@ -3,6 +3,7 @@ import argparse
 from contextlib import closing, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass
+from functools import cached_property
 import os
 from pathlib import Path
 import re
@@ -25,12 +26,21 @@ class Admission:
     max_model_calls: int = 0
     max_output_tokens: int = 0
 
-    def _reserve(self, *, outputs=None, now=None):
+    @cached_property
+    def journal(self):
+        from .model_journal import ModelJournal
+        return ModelJournal(self.database)
+
+    def _reserve(self, *, outputs=None, now=None, run_id=None):
         now = int(time.time()) if now is None else now
         try:
             # mode=rw is intentional: deletion must never silently reset a campaign.
             with closing(sqlite3.connect(self.database.as_uri() + "?mode=rw", uri=True, timeout=0.2)) as db, db:
                 db.execute("BEGIN IMMEDIATE")
+                if run_id is not None:
+                    db.execute("CREATE TABLE IF NOT EXISTS run_admissions (run_id TEXT PRIMARY KEY, reserved_at INTEGER NOT NULL)")
+                    if db.execute("SELECT 1 FROM run_admissions WHERE run_id=?", (run_id,)).fetchone():
+                        return
                 row = db.execute("SELECT runs, calls, tokens, last_run FROM budget WHERE id = 1").fetchone()
                 if row is None or any(type(value) is not int or value < 0 for value in row):
                     raise sqlite3.DatabaseError("Invalid quota ledger")
@@ -42,6 +52,8 @@ class Admission:
                     if wait > 0:
                         raise AdmissionError("RUN_RATE_LIMITED", wait)
                     db.execute("UPDATE budget SET runs = ?, last_run = ? WHERE id = 1", (runs + 1, now))
+                    if run_id is not None:
+                        db.execute("INSERT INTO run_admissions VALUES (?, ?)", (run_id, now))
                 else:
                     if calls >= self.max_model_calls or tokens + outputs > self.max_output_tokens:
                         raise AdmissionError("MODEL_QUOTA_EXHAUSTED")
@@ -49,8 +61,8 @@ class Admission:
         except (sqlite3.Error, OSError, ValueError):
             raise AdmissionError("QUOTA_STORE_UNAVAILABLE") from None
 
-    def reserve_run(self):
-        self._reserve()
+    def reserve_run(self, run_id=None):
+        self._reserve(run_id=run_id)
 
     def reserve_model(self, outputs):
         if type(outputs) is not int or not 1 <= outputs <= 4096:
@@ -106,6 +118,33 @@ def deployment_settings():
 
 
 _MODEL_ADMISSION = ContextVar("trustbound_model_admission", default=None)
+_MODEL_REQUEST = ContextVar("trustbound_model_request", default=None)
+
+
+@contextmanager
+def model_request_identity(run_id, role):
+    admission = _MODEL_ADMISSION.get()
+    if not isinstance(admission, Admission):
+        yield
+        return
+    from .model_journal import JournalError
+    from .inference import InferenceError
+    try:
+        request_id = admission.journal.create(run_id, role)
+    except JournalError as error:
+        raise InferenceError(str(error)) from None
+    token = _MODEL_REQUEST.set((admission, request_id))
+    try:
+        yield
+    finally:
+        _MODEL_REQUEST.reset(token)
+        admission.journal.fail_unsent(request_id)
+
+
+def model_request_transition(state, metadata=None):
+    identity = _MODEL_REQUEST.get()
+    if identity:
+        identity[0].journal.mark(identity[1], state, metadata)
 
 
 @contextmanager
@@ -119,7 +158,10 @@ def inference_admission(admission):
 
 def reserve_live_attempt(outputs):
     admission = _MODEL_ADMISSION.get()
-    if admission is not None:
+    identity = _MODEL_REQUEST.get()
+    if identity:
+        admission.journal.reserve(identity[1], outputs, admission.max_model_calls, admission.max_output_tokens)
+    elif admission is not None:
         admission.reserve_model(outputs)
 
 

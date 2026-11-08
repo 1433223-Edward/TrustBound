@@ -1,0 +1,10 @@
+{
+  "batch_stopped": true,
+  "remaining_output_reservation": 0,
+  "max_model_calls": 100,
+  "launcher_pid": 31392,
+  "max_runs": 43,
+  "default_model_unchanged": true,
+  "remaining_run_slots": 0,
+  "max_output_tokens": 43008
+}

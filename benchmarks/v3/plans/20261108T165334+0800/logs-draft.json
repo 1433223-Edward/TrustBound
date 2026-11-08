@@ -1,0 +1,149 @@
+{
+  "project_id": "0aa1f8f2cfbf44c997b591a00587dba7",
+  "files": [
+    {
+      "content": "# Application Log Summary\n\nCorrect log classification and interval filtering. The entry point is `logs.py:solve`. Each line has a decimal minute, a level and a message. Count the parsed level within the half-open interval from start to end. Count malformed lines separately. Output all three supported levels, including zeros.\n\nOnly `logs.py` is editable. Use the Workspace sample to load the public and protected cases. The original should fail due to a false ERROR and inclusive upper bound. The offline repair should pass. Inspect the per-case outputs and cleanup evidence in the Workspace report.\n",
+      "path": "README.md",
+      "sha256": "b086f60c4e51f86913a492c9bd12e7c709f55010840c6dbf85278a4764bbbfd2"
+    },
+    {
+      "content": "def parse(line):\n    fields = line.split(\" \", 2)\n    if len(fields) != 3:\n        return None\n    minute, level, message = fields\n    if not minute.isascii() or not minute.isdecimal() or level not in (\"INFO\", \"WARN\", \"ERROR\"):\n        return None\n    return int(minute), level, message\n",
+      "path": "format_rules.py",
+      "sha256": "31060fcff823869e0087c791908de45d8c325558741a7bd96447771bef41afaf"
+    },
+    {
+      "content": "from format_rules import parse\n\n\ndef solve(value):\n    counts = {\"INFO\": 0, \"WARN\": 0, \"ERROR\": 0}\n    invalid = 0\n    for line in value[\"lines\"]:\n        record = parse(line)\n        if record is None:\n            invalid += 1\n            continue\n        minute, level, message = record\n        if value[\"start\"] <= minute <= value[\"end\"]:\n            counts[\"ERROR\" if \"ERROR\" in message else level] += 1\n    return {\"counts\": counts, \"invalid\": invalid}\n",
+      "path": "logs.py",
+      "sha256": "be8a54569743fefc71b6cf6825ed25c22339b4890d59f232dddcccb708c3ad66"
+    }
+  ],
+  "snapshot_hash": "ec76437478d007b3ce15ba614029eb6b9c65c3cf26e5522511dd0c9b2779dc9f",
+  "revision": 1,
+  "state": "PLAN_READY",
+  "plan": {
+    "acceptance_basis": "Expected values are derived from the registered reference profile: logs",
+    "acceptance_cases": [
+      {
+        "expected": {
+          "counts": {
+            "ERROR": 1,
+            "INFO": 0,
+            "WARN": 0
+          },
+          "invalid": 1
+        },
+        "input": {
+          "end": 4,
+          "lines": [
+            "0 ERROR early",
+            "1 ERROR real",
+            "4 INFO late",
+            "2 DEBUG unknown"
+          ],
+          "start": 1
+        }
+      },
+      {
+        "expected": {
+          "counts": {
+            "ERROR": 0,
+            "INFO": 0,
+            "WARN": 0
+          },
+          "invalid": 0
+        },
+        "input": {
+          "end": 1,
+          "lines": [
+            "1 WARN one",
+            "2 WARN two"
+          ],
+          "start": 1
+        }
+      }
+    ],
+    "adversarial_cases": [],
+    "allowed_write_paths": [
+      "logs.py"
+    ],
+    "constraints": [
+      "Only change the approved entry file; no network or new dependencies"
+    ],
+    "entrypoint": "logs.py:solve",
+    "goal": "Count only the parsed log level inside [start, end). Count malformed lines separately. Always return INFO, WARN and ERROR counts, including zeros.",
+    "implementation": [
+      "Inspect the entry function against the reference rule",
+      "Fix the allowed file and run distinct acceptance cases"
+    ],
+    "planning": {
+      "affected_scope": [
+        "logs.py"
+      ],
+      "missing_requirements": [],
+      "reasons": [
+        "FORMAL_REVIEW_REQUIRED"
+      ],
+      "risk_flags": [
+        "USER_REQUESTED_PLAN"
+      ],
+      "route": "PLAN_REQUIRED",
+      "semantic_eligible": false,
+      "source": "RULES"
+    },
+    "public_cases": [
+      {
+        "expected": {
+          "counts": {
+            "ERROR": 0,
+            "INFO": 1,
+            "WARN": 0
+          },
+          "invalid": 0
+        },
+        "input": {
+          "end": 20,
+          "lines": [
+            "10 INFO contains ERROR",
+            "20 ERROR end"
+          ],
+          "start": 10
+        }
+      },
+      {
+        "expected": {
+          "counts": {
+            "ERROR": 0,
+            "INFO": 0,
+            "WARN": 1
+          },
+          "invalid": 1
+        },
+        "input": {
+          "end": 20,
+          "lines": [
+            "broken",
+            "11 WARN notice"
+          ],
+          "start": 10
+        }
+      }
+    ],
+    "questions": [],
+    "quick_mode": false,
+    "reference_profile": "logs",
+    "reference_rules": "Input has lines (strings), start and end (integers). Split each line at its first two literal spaces. Timestamp must be nonempty ASCII decimal digits, followed by level and message. Recognize INFO, WARN, ERROR only. Count valid entries with start <= timestamp < end. Count malformed lines separately regardless of time range. Always return all three level counts and invalid.",
+    "risks": [
+      "Boundary inputs must agree with the independent registered reference"
+    ],
+    "source": "OFFLINE_RULES",
+    "steps": [
+      "Inspect the entry function against the reference rule",
+      "Fix the allowed file and run distinct acceptance cases"
+    ],
+    "suggestions": [
+      "\u8986\u76d6\u6b63\u5e38\u884c\u4e3a\u3001\u8fb9\u754c\u53ca\u9519\u8bef\u8f93\u5165",
+      "\u4e3a\u6bcf\u4e2a\u7528\u4f8b\u7ed9\u51fa\u53ef\u6bd4\u8f83\u7684\u671f\u671b\u503c"
+    ]
+  },
+  "frozen_hash": null
+}

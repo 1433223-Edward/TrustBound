@@ -1,0 +1,8 @@
+{
+  "max_model_calls": 100,
+  "launcher_pid": 3264,
+  "benchmark_status": "FROZEN",
+  "max_runs": 44,
+  "max_output_tokens": 47104,
+  "additional_requests_authorized": 0
+}

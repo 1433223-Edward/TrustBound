@@ -6,15 +6,15 @@ defineProps({ report: Object, decision: Object, formalStatus: String })
 <template>
   <div class="adversarial-view">
     <div v-if="!report" class="empty-state">
-      <h3>Adversarial verification not requested</h3>
-      <p>在 Local API 中选择独立对抗验证。历史 Demo 不含这一阶段，不能补造证据。</p>
+      <h3>{{ $t("Adversarial verification not requested", "未请求对抗验收") }}</h3>
+      <p>{{ $t("Select adversarial verification in Local API. The historical replay has no adversarial record.", "在 Local API 中选择独立对抗验证。历史 Demo 不含这一阶段，不能补造证据。") }}</p>
     </div>
     <template v-else>
       <div class="adversarial-header">
-        <div><h3>Independent adversarial verification</h3><p class="micro">{{ report.source === 'OFFLINE_TEST' ? 'OFFLINE · 只模拟模型响应，合法反例真实执行 Docker。' : report.source === 'NO_LIVE_CALL' ? '未调用模型；本阶段没有完成验证。' : 'Vultr HTTP · 独立消息上下文' }}</p></div>
+        <div><h3>{{ $t("Independent adversarial verification", "独立对抗验收") }}</h3><p class="micro">{{ report.source === 'OFFLINE_TEST' ? $t("Offline proposals · valid challenges run in real Docker.", "OFFLINE · 只模拟模型响应，合法反例真实执行 Docker。") : report.source === 'NO_LIVE_CALL' ? $t("No model call was made. Verification remains incomplete.", "未调用模型；本阶段没有完成验证。") : $t("Vultr HTTP · separate context", "Vultr HTTP · 独立消息上下文") }}</p></div>
         <StatusBadge :status="report.status" />
       </div>
-      <div class="adversarial-counts mono">Generated {{ report.generated_count ?? '—' }} · Valid {{ report.valid_count }} · Confirmed {{ report.confirmed_count }}<span>Formal {{ formalStatus }} → Overall {{ decision?.status }}</span></div>
+      <div class="adversarial-counts mono">{{ $t('Generated', '生成') }} {{ report.generated_count ?? '—' }} · {{ $t('Valid', '有效') }} {{ report.valid_count }} · {{ $t('Confirmed', '已确认') }} {{ report.confirmed_count }}<span>Formal {{ formalStatus }} → Overall {{ decision?.status }}</span></div>
       <p class="micro">{{ report.reason }}</p>
       <p class="micro" v-if="decision">{{ decision.reason }}</p>
       <div v-for="row in report.challenges" :key="row.challenge.challenge_id" class="challenge-row">
@@ -23,13 +23,13 @@ defineProps({ report: Object, decision: Object, formalStatus: String })
         <div v-if="row.status !== 'INVALID'" class="challenge-values mono"><span>Expected: {{ row.expected }}</span><span>Observed: {{ row.actual ?? 'not observed' }}{{ row.actual_type ? ` (${row.actual_type})` : '' }}</span></div>
       </div>
       <details v-if="report.execution" class="adversarial-evidence">
-        <summary>Actual sandbox evidence · exit {{ report.execution.exit_code ?? 'unknown' }} · cleanup {{ report.execution.cleanup_confirmed }}</summary>
+        <summary>{{ $t('Actual sandbox evidence · exit', '真实沙盒证据 · 退出码') }} {{ report.execution.exit_code ?? 'unknown' }} · cleanup {{ report.execution.cleanup_confirmed }}</summary>
         <p class="micro mono">Artifact {{ report.artifact_hash }}<br>Driver {{ report.driver_hash }}</p>
         <p class="micro">{{ report.execution.status }} · limits {{ report.execution.limits_verified }} · workspace unchanged {{ report.execution.workspace_unchanged }}</p>
         <pre>stdout: {{ report.execution.stdout || '(empty)' }}
 stderr: {{ report.execution.stderr || '(empty)' }}</pre>
       </details>
-      <p class="micro">{{ decision?.scope }} · 无反例不等于绝对正确；模型文字不是执行证据。</p>
+      <p class="micro">{{ decision?.scope }} · {{ $t('A missing counterexample does not establish universal correctness.', '未发现反例不代表绝对正确。') }}</p>
     </template>
   </div>
 </template>

@@ -1,0 +1,94 @@
+{
+  "plan_directory": "D:\\Projects\\TrustBound\\benchmarks\\v3\\plans\\20261108T165334+0800",
+  "health": {
+    "status": "ok",
+    "active_run_id": null,
+    "max_concurrent_runs": 1,
+    "docker": "checked_by_execution_not_health",
+    "public_demo": false,
+    "persistent_quota": true,
+    "custom_task": {
+      "enabled": false
+    },
+    "workspace": {
+      "enabled": true,
+      "execution": "LOCAL_DOCKER",
+      "access": "local",
+      "retry_enabled": true,
+      "live_enabled": true
+    },
+    "modes": {
+      "fixture": {
+        "enabled": true
+      },
+      "offline_executor": {
+        "enabled": true
+      },
+      "live_executor": {
+        "enabled": true,
+        "reason": "CONFIGURED_NOT_AUTHENTICATED_UNTIL_REQUEST"
+      }
+    }
+  },
+  "quota": {
+    "runs": 44,
+    "calls": 12,
+    "tokens": 47104
+  },
+  "journal_states": {
+    "FINALIZED": 5
+  },
+  "advertised_models": {
+    "models": [
+      "deepseek-v4.1-flash-1017",
+      "glm-5.3-flash",
+      "mimo-v2.6-flash"
+    ]
+  },
+  "projects_count": 15,
+  "remaining_project_slots": 1,
+  "project_run_counts": {
+    "138a2c5ea391473c8fdd6648006a1908": 1,
+    "2fcdbeae21af414a8f1f2adc9b6cf43d": 2,
+    "56a2da08f6964f7aa56e42b097852562": 1,
+    "5b7abbc12c334c9d9090dc974f69d497": 1,
+    "62ad2f2dd6e246878917b176adcad07c": 1,
+    "69e7990423e3492a8b572205116b12b2": 5
+  },
+  "inventory": {
+    "project_id": "69e7990423e3492a8b572205116b12b2",
+    "revision": 2,
+    "state": "FROZEN",
+    "snapshot_hash": "5f0e2b5a7a6ed4462cb53044f2fc370c5ebd404575de996f8f975f752789a247",
+    "frozen_hash": "9f9e2203345b75adee51b5836f03caab666a364eec9d0d3f80c6105b59a26bd4"
+  },
+  "logs": {
+    "project_id": "0aa1f8f2cfbf44c997b591a00587dba7",
+    "revision": 1,
+    "state": "PLAN_READY"
+  },
+  "prices": [
+    {
+      "id": "deepseek-v4.1-flash-1017",
+      "pricing": {
+        "prompt": "0.00000015",
+        "completion": "0.0000006"
+      }
+    },
+    {
+      "id": "glm-5.3-flash",
+      "pricing": {
+        "prompt": "0.0000001",
+        "completion": "0.00000035"
+      }
+    },
+    {
+      "id": "mimo-v2.6-flash",
+      "pricing": {
+        "prompt": "0.0000001",
+        "completion": "0.00000025"
+      }
+    }
+  ],
+  "new_generation_requests": 0
+}
