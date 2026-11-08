@@ -52,6 +52,26 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(reply.headers["cache-control"], "no-store")
         return reply.json()
 
+    def test_https_workspace_origin_still_requires_token_and_exact_origin(self):
+        origin = 'https://workspace.example.com'
+        with patch.dict(os.environ, {'TRUSTBOUND_WORKSPACE_ORIGIN': origin}):
+            app = create_app(report_directory=None)
+        with TestClient(app, base_url=origin) as client:
+            self.assertEqual(client.post(PROJECTS, json=FILES, headers={'Origin': origin}).status_code, 401)
+            self.assertEqual(client.post(PROJECTS, json=FILES,
+                headers={**HEADERS, 'Origin': origin}).status_code, 201)
+            self.assertEqual(client.post(PROJECTS, json=FILES,
+                headers={**HEADERS, 'Origin': 'https://evil.example.com'}).status_code, 403)
+            self.assertEqual(client.post(PROJECTS, json=FILES,
+                headers={**HEADERS, 'Origin': origin, 'X-TrustBound-Public': '1'}).status_code, 404)
+            self.assertEqual(client.get('/api/health', headers={'Host': 'evil.example.com'}).status_code, 400)
+
+    def test_https_workspace_origin_rejects_insecure_configuration(self):
+        for origin in ('http://workspace.example.com', 'https://example.com/path', 'https://user@example.com'):
+            with self.subTest(origin=origin), patch.dict(os.environ, {'TRUSTBOUND_WORKSPACE_ORIGIN': origin}):
+                with self.assertRaises(ValueError):
+                    create_app(report_directory=None)
+
     def test_import_plan_freeze_and_keep_original_approval(self):
         project = self.post(PROJECTS, FILES, 201)
         path = f"{PROJECTS}/{project['project_id']}"

@@ -217,6 +217,15 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
     transport = workspace_transport() if workspace_enabled else None
     local_workspace = (transport == "LOCAL_DOCKER"
                        and os.environ.get("TRUSTBOUND_WORKSPACE_LOCAL_PREVIEW") == "1")
+    # An explicitly configured HTTPS origin exposes only the token-protected
+    # Workspace profile; the public offline profile remains separate.
+    workspace_origin = os.environ.get("TRUSTBOUND_WORKSPACE_ORIGIN", "").strip() if workspace_enabled else ""
+    workspace_host = ""
+    if workspace_origin:
+        match = re.fullmatch(r"https://((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63})", workspace_origin)
+        if not match or local_workspace or len(match[1]) > 253:
+            raise ValueError("Workspace origin requires an HTTPS hostname and token authentication")
+        workspace_host = match[1]
     workspace_db = None
     if workspace_enabled and (not local_workspace or os.environ.get("TRUSTBOUND_WORKSPACE_DB")):
         workspace_db = Path(os.environ.get("TRUSTBOUND_WORKSPACE_DB", ""))
@@ -258,7 +267,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
             yield
 
     app = FastAPI(title="TrustBound Local API", version="0.1.0", lifespan=lifespan)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"] + ([domain] if public else []))
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"] + ([domain] if public else []) + ([workspace_host] if workspace_host else []))
 
     @app.middleware("http")
     async def local_request_policy(request: Request, call_next):
@@ -285,6 +294,7 @@ def create_app(*, execute=execute_web_run, report_directory=ROOT / "artifacts/we
             if ((public and origin != f"https://{domain}")
                     or (not public and origin
                         and not (local_workspace and origin == str(request.base_url).rstrip("/"))
+                        and not (workspace_request and workspace_origin and origin == workspace_origin)
                         and origin not in {
                         "http://localhost:5173", "http://127.0.0.1:5173",
                         "http://localhost:8000", "http://127.0.0.1:8000"})):
