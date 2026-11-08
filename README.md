@@ -105,3 +105,9 @@ TrustBound 将四件事明确分开：AI 只提出修改建议；人类审批修
 - [Verification modes](docs/VERIFICATION_MODES.md)
 - [Public API / historical contracts](docs/WEB_API_CONTRACT.md)
 - [Historical experiments](docs/EXPERIMENTS.md)
+
+## License / 开源许可证
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+本项目采用 MIT 开源许可证，详情请参阅 [LICENSE](LICENSE)。
